@@ -1,0 +1,51 @@
+# 事实来源索引与任务工作集；不是聊天摘要，也不是封闭文件白名单。
+task_id: ""
+packet_revision: 1
+context_snapshot: ""
+prepared_by: "planner | owner"
+
+problem_model:
+  current_behavior: ""
+  expected_behavior: ""
+  user_visible_impact: ""
+  hypotheses:
+    - statement: ""
+      status: "confirmed | inferred | unknown"
+      evidence_ref: ""
+
+context_floor_refs:
+  - path: "AGENTS.md"
+    role: "repository governance"
+    snapshot_or_version: ""
+  - path: ""
+    role: "required skill | contract | architecture anchor"
+    snapshot_or_version: ""
+
+fact_source_graph:
+  - path: ""
+    category: "production | test | contract | trace | adjacent_implementation | decision"
+    why_relevant: ""
+    read_status: "required | read | excluded"
+
+exploration:
+  allowed_neighbor_roots: []
+  search_terms: []
+  questions_to_resolve: []
+
+fact_ledger:
+  - fact: ""
+    status: "confirmed | inferred | unknown"
+    source_ref: "path:line or artifact ref"
+    snapshot: ""
+
+excluded_leads:
+  - lead: ""
+    evidence: ""
+
+lessons:
+  relevant_refs: []
+  searched_trigger_terms: []
+  applied: []
+  rejected_as_stale_or_irrelevant: []
+
+contradictions_or_blockers: []

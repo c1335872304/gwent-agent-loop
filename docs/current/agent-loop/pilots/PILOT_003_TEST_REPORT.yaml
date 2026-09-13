@@ -1,0 +1,44 @@
+task_id: "GW-PILOT-003"
+packet_revision: 1
+tested_snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+tester: "test-verification"
+overall: "BLOCKED"
+
+results:
+  - command: "read Product diff and required contract files"
+    cwd: "."
+    status: "INCONCLUSIVE"
+    exit_code: null
+    duration_seconds: null
+    evidence_ref: "Test Agent helper_unknown_error: setup refresh had errors"
+  - command: "python scripts/check.py docker-test"
+    cwd: "."
+    status: "NOT_RUN"
+    exit_code: null
+    duration_seconds: null
+    evidence_ref: "Independent Test Agent executor failed before command start"
+
+environment:
+  runner: "multi-agent Test/Verification executor"
+  missing_dependencies:
+    - "Windows executor setup refresh unavailable"
+  docker:
+    used: false
+    compose_files: []
+    health: "not_required"
+    cleanup: "not_required"
+    evidence_refs: []
+
+failures:
+  - classification: "ENVIRONMENT_FAILURE"
+    reproduction: "Test Agent could not start its file reader or Docker command; helper_unknown_error: setup refresh had errors"
+    likely_owner: "execution environment"
+
+manual_checks:
+  - "Main reviewed the Product diff and confirmed only the two declared files changed."
+  - "Main follow-up Docker verification passed: python scripts/check.py docker-test, 104 tests, exit 0. This is not independent Test Agent evidence."
+  - "Host contract subset passed: python -m pytest -q tests/test_core_contract.py, 8 passed."
+  - "Host full backend request tests were not authoritative because pytest-asyncio is absent."
+
+changed_test_paths:
+  - "apps/web/backend/tests/test_core_contract.py"

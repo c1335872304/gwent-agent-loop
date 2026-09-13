@@ -1,0 +1,64 @@
+# 不可变任务输入。需求、范围或基线变化时创建 revision + 1，不覆盖旧文件。
+protocol_version: 1
+task_id: "GW-YYYYMMDD-001"
+revision: 1
+title: "short, verifiable outcome"
+requested_outcome: ""
+non_goals: []
+
+authority:
+  user_request_ref: ""
+  repo_rules: ["AGENTS.md"]
+  required_skills: []
+
+ownership:
+  primary_owner: "core | trainer | product | teacher | context-integration"
+  consulted_owners: []
+  handoff_required_before_completion: false
+
+scope:
+  allowed_write_paths: []
+  forbidden_paths: []
+  declared_contracts:
+    # 每项明确 changed / unchanged；unknown 阻止实施。
+    - "name: unchanged"
+
+workspace:
+  snapshot_kind: "git_commit | worktree_manifest | file_hash_manifest"
+  snapshot_ref: ""
+  known_user_changes: []
+
+inputs:
+  # 非琐碎任务的 ContextBrief；其引用在 token 紧张时不可省略。
+  context_brief_ref: ""
+  context_floor_refs: []
+  canonical_files:
+    - path: ""
+      reason: ""
+  external_inputs: []
+
+acceptance:
+  behavioral: []
+  verification_commands: []
+  manual_checks: []
+
+risks:
+  - type: "none | privacy | schema | compatibility | operational"
+    mitigation: ""
+
+execution:
+  write_lock_keys: []
+  max_owner_attempts: 2
+  max_elapsed_minutes: 90
+  max_parallel_readers: 2
+  # 所有值都是整个 Task 的总预算，不是单个 Agent 的配额。
+  max_role_runs: 6
+  max_subtasks: 1
+  max_subtask_depth: 1
+  max_model_input_tokens: 64000
+  max_model_output_tokens: 16000
+  max_model_turns: 14
+
+gates: []
+artifacts:
+  task_root: ".agent-loop/tasks/GW-YYYYMMDD-001"

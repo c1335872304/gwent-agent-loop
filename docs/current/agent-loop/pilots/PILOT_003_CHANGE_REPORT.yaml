@@ -1,0 +1,41 @@
+task_id: "GW-PILOT-003"
+packet_revision: 1
+attempt_id: "GW-PILOT-003-PRODUCT-001"
+owner: "product"
+skills_read:
+  - "AGENTS.md"
+  - ".agents/skills/product-integration/SKILL.md"
+  - "apps/web/docs/CORE_API_CONTRACT.md"
+base_snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+end_snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+
+changed_files:
+  - path: "apps/web/backend/app/models/core_contract.py"
+    purpose: "Make the existing GameState.mode contract field required."
+  - path: "apps/web/backend/tests/test_core_contract.py"
+    purpose: "Add a regression test for a missing mode field."
+
+contracts:
+  core_http_mode: "unchanged"
+  product_core_model: "changed"
+  core_rules: "unchanged"
+  api_version: "unchanged"
+
+verification:
+  - command: "python -m pytest -q tests/test_core_contract.py"
+    cwd: "apps/web/backend"
+    status: "PASS"
+    exit_code: 0
+    evidence_ref: "8 passed in host contract subset"
+
+known_limits:
+  - "Host full backend suite lacks pytest-asyncio; async failures are environment diagnostics."
+  - "The Product child reported its own contract subset pass; independent Test Agent could not start its executor."
+  - "No HEAD commit exists, so this pilot uses a file-hash manifest rather than a reproducible Git worktree."
+
+handoff_to_reviewer:
+  focus:
+    - "Confirm missing mode is rejected rather than defaulted."
+    - "Confirm only the declared Product files changed."
+  unresolved:
+    - "Independent Test/Verification Agent is BLOCKED by Windows executor setup refresh."

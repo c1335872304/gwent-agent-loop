@@ -1,0 +1,49 @@
+schema_version: "1.0"
+task_id: GW-PILOT-002
+generated_by: context-integration
+snapshot_id: "git-index:apps/web/frontend/src/pages/GamePage.tsx@aee2dc0c4103fdacb62993658869e75f530b4bae"
+objective: "Provide the minimum context for a Product stale-state recovery fix and independent verification."
+source_graph:
+  authority:
+    - path: AGENTS.md
+      role: "routing, Product boundary, and verification policy"
+    - path: .agents/skills/product-integration/SKILL.md
+      role: "structured action and stale revision invariants"
+    - path: docs/current/agent-loop/TEST_MATRIX.yaml
+      role: "test commands and Docker policy"
+  implementation:
+    - path: apps/web/frontend/src/pages/GamePage.tsx
+      role: "load and stale_state recovery path"
+    - path: apps/web/frontend/src/types/game.ts
+      role: "frontend state and Core action shape"
+  verification:
+    - path: deploy/docker/Dockerfile.test
+      role: "pinned pytest image"
+    - path: deploy/docker/requirements.test.txt
+      role: "pytest and plugin dependencies"
+    - path: scripts/check.py
+      role: "architecture and canonical docker-test entry points"
+lessons_applied:
+  - id: LL-001
+    decision: "Keep the context limited to the Product path and its authoritative action contract."
+  - id: LL-005
+    decision: "Do not use full quick for this frontend architecture pilot."
+  - id: LL-007
+    decision: "Treat failed patch transport as not applied until the target is inspected."
+  - id: LL-008
+    decision: "Use small, independently verifiable patches."
+  - id: LL-009
+    decision: "Use Docker as authoritative for Python pytest; host plugin failures are environment evidence."
+rejected_context:
+  - source: models/v3/policy.pt
+    reason: "No model behavior or Trainer change is in scope."
+  - source: src and include
+    reason: "Core rules and action contracts are unchanged."
+  - source: training and configs
+    reason: "No training or checkpoint behavior is in scope."
+known_limits:
+  - "No browser automation test framework is installed; frontend behavior is verified by source scope review and production build."
+  - "The Docker pytest command does not replace C++ or frontend build validation."
+handoff:
+  next_role: test-verification
+  payload: "Review the one-file diff, run the declared commands, classify host pytest mismatch as environment failure, and report final snapshot evidence."

@@ -1,0 +1,56 @@
+# AgentProfile v1
+# 角色能力与边界声明。它不是提示词百科，也不记录某次运行的实际消耗。
+protocol_version: 1
+profile_id: "<stable-profile-id>"
+profile_revision: 1
+agent_id: "<agent-id>"
+display_name: "<human-readable-name>"
+role_type: "domain_owner | verification | context_integration | coordinator"
+
+authority:
+  boundary: "<the facts this role owns>"
+  required_skills: []
+  source_of_truth_refs: []
+  handoff_recipients: []
+
+capabilities:
+  read_roots: []
+  write_roots: []
+  test_write_roots: []
+  tools: ["read", "edit", "shell"]
+  can_modify_production_code: false
+  can_modify_tests: false
+  can_change_contracts: false
+
+forbidden_roots: []
+
+docker:
+  allowed: false
+  compose_files: []
+  allowed_actions: []
+  cleanup_required: true
+  max_runtime_minutes: 0
+
+model_policy:
+  model: "runner-defined"
+  reasoning: "runner-defined"
+  prompt_revision: ""
+  skill_revisions: []
+
+execution_limits:
+  max_attempts: 2
+  max_elapsed_minutes: 90
+  max_input_tokens: 64000
+  max_output_tokens: 16000
+  may_spawn_subtasks: false
+  max_subtask_depth: 0
+
+required_outputs:
+  - "<structured report path or report kind>"
+required_verification:
+  - "<command or explicit not_run reason>"
+stop_conditions:
+  - "scope or authority is ambiguous"
+  - "required source or contract is missing"
+  - "snapshot drift is detected"
+  - "budget is exhausted"

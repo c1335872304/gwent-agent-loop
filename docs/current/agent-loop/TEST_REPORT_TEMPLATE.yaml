@@ -1,0 +1,32 @@
+# Tester 不修改业务实现；测试快照必须与最终候选改动一致。
+task_id: ""
+packet_revision: 1
+tested_snapshot: ""
+tester: ""
+overall: "PASS | FAIL | BLOCKED | INCONCLUSIVE"
+
+results:
+  - command: ""
+    cwd: "repository-relative path"
+    status: "PASS | FAIL | NOT_RUN | INCONCLUSIVE"
+    exit_code: null
+    duration_seconds: null
+    evidence_ref: ""
+
+environment:
+  runner: ""
+  missing_dependencies: []
+  docker:
+    used: false
+    compose_files: []
+    health: "not_required | passed | failed"
+    cleanup: "not_required | complete | incomplete | unknown"
+    evidence_refs: []
+
+failures:
+  - classification: "CODE_DEFECT | CONTRACT_GAP | ENVIRONMENT_FAILURE | PERMISSION_REQUIRED | EXTERNAL_DEPENDENCY | PROTOCOL_FAILURE"
+    reproduction: ""
+    likely_owner: ""
+
+manual_checks: []
+changed_test_paths: []

@@ -1,0 +1,65 @@
+schema_version: "1.0"
+protocol_version: 1
+task_id: GW-PILOT-002
+revision: 1
+title: "Clear stale Product UI interaction state after snapshot reload"
+requested_outcome: "When Product reloads a fresh game snapshot after stale_state, old pending actions and selection state cannot affect the new snapshot."
+authority:
+  source: AGENTS.md
+  decision_owner: product
+  escalation: human
+ownership:
+  primary_owner: product
+  consulted_roles:
+    - test-verification
+scope:
+  allowed_write_paths:
+    - apps/web/frontend/src/pages/GamePage.tsx
+  forbidden_paths:
+    - src
+    - include
+    - python
+    - services
+    - models
+    - configs
+    - training
+  declared_contracts:
+    - product-http: unchanged
+    - core-actions: consumed without modification
+workspace:
+  snapshot_ref: "git-index:apps/web/frontend/src/pages/GamePage.tsx@aee2dc0c4103fdacb62993658869e75f530b4bae"
+inputs:
+  - path: AGENTS.md
+    purpose: "repository routing and verification boundary"
+  - path: .agents/skills/product-integration/SKILL.md
+    purpose: "Product workflow and action contract invariants"
+  - path: apps/web/frontend/src/pages/GamePage.tsx
+    purpose: "stale_state reload path"
+  - path: docs/current/agent-loop/TEST_MATRIX.yaml
+    purpose: "verification commands and Docker policy"
+  - path: docs/current/agent-loop/LESSONS_LEARNED.md
+    purpose: "Docker and scope lessons"
+acceptance:
+  - "cd apps/web/frontend && npm run build"
+  - "python scripts/check.py architecture"
+  - "python scripts/check.py docker-test"
+execution:
+  max_owner_attempts: 1
+  max_elapsed_minutes: 30
+  max_role_runs: 2
+  max_model_input_tokens: 4000
+  max_model_output_tokens: 3000
+  max_model_turns: 2
+  max_subtasks: 0
+  max_subtask_depth: 0
+artifacts:
+  required:
+    - docs/current/agent-loop/pilots/PILOT_002_CONTEXT_BRIEF.yaml
+    - docs/current/agent-loop/pilots/PILOT_002_CHANGE_REPORT.yaml
+    - docs/current/agent-loop/pilots/PILOT_002_TEST_REPORT.yaml
+    - docs/current/agent-loop/pilots/PILOT_002_RUN_MANIFEST.yaml
+    - docs/current/agent-loop/pilots/PILOT_002_REPORT.md
+  forbidden:
+    - production_contract_diff
+    - model_diff
+    - trainer_diff

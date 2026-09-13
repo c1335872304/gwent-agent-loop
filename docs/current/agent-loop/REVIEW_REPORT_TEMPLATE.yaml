@@ -1,0 +1,17 @@
+# 默认只读的独立审查；PASS 仅表示声明范围内无阻塞发现。
+task_id: ""
+packet_revision: 1
+review_snapshot: ""
+reviewer: ""
+decision: "PASS | FAIL | INCONCLUSIVE"
+
+findings:
+  - id: "R1"
+    severity: "blocking | important | advisory"
+    category: "correctness | contract | privacy | regression | maintainability | test_gap"
+    location: "path:line or contract name"
+    evidence: ""
+    required_resolution: ""
+
+positive_checks: []
+limits: []

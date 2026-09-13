@@ -1,0 +1,29 @@
+# ContextIndex v1
+# 事实导航索引；每条事实都必须能够回到来源和 snapshot。
+index_version: 1
+workspace_snapshot: "<git commit, worktree manifest, or pending-baseline marker>"
+generated_at: "YYYY-MM-DD hhmm"
+entries:
+  - id: "<stable-fact-id>"
+    domain: "core | trainer | product | teacher | verification | project"
+    claim: "<one precise fact; do not combine unrelated claims>"
+    source_refs:
+      - path: "<repo-relative path>"
+        locator: "<line, key, symbol, or section>"
+        source_kind: "rule | contract | skill | test | architecture | lesson"
+    verified_at: "YYYY-MM-DD hhmm"
+    verified_snapshot: "<same snapshot family as workspace_snapshot>"
+    status: "confirmed | inferred | superseded"
+    confidence: "high | medium | low"
+    trigger_terms: []
+    owner: "core | trainer | product | teacher | verification | project"
+    lesson_refs: []
+    supersedes: []
+    superseded_by: []
+    notes: ""
+
+maintenance:
+  stale_after_days: 30
+  stale_policy: "stale entries require re-verification before implementation; they are not silently deleted"
+  conflict_policy: "current authoritative contract wins; unresolved conflict becomes HUMAN_REQUIRED"
+  write_policy: "only confirmed or explicitly marked inferred facts may be added; claims from a task report do not become confirmed automatically"

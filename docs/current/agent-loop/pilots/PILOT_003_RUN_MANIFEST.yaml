@@ -1,0 +1,192 @@
+protocol_version: 1
+run_id: "GW-PILOT-003-RUN-001"
+task_id: "GW-PILOT-003"
+task_revision: 1
+runner: "multi-agent Product + Test/Verification + Main Docker review"
+status: blocked
+created_at: "2026-09-14T00:00:00+08:00"
+updated_at: "2026-09-14T00:00:00+08:00"
+
+workspace:
+  base_snapshot_kind: "file_hash_manifest"
+  base_snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+  final_snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+  known_user_changes:
+    - "No HEAD commit; initial Git commit awaits author identity."
+  write_scope_refs:
+    - "apps/web/backend/app/models/core_contract.py"
+    - "apps/web/backend/tests/test_core_contract.py"
+
+budget:
+  max_role_runs: 3
+  max_subtasks: 2
+  max_subtask_depth: 1
+  max_input_tokens: 16000
+  max_output_tokens: 6000
+  max_model_turns: 6
+  max_elapsed_minutes: 30
+  role_runs_used: 2
+  subtasks_used: 2
+  input_tokens_used: 0
+  output_tokens_used: 0
+  model_turns_used: 0
+  elapsed_minutes: 12
+  exhaustion_action: "transition_to_human_required_and_stop_new_runs"
+  accounting_note: "Platform token usage was not exposed; zero is not evidence of zero cost."
+
+role_runs:
+  - attempt_id: "GW-PILOT-003-PRODUCT-001"
+    role: "product"
+    profile_id: "product"
+    profile_revision: 1
+    runner_ref: "multi-agent:01a09c10-2d27-7a62-b858-9d81e343c7b3"
+    started_at: "2026-09-14T00:00:00+08:00"
+    ended_at: "2026-09-14T00:00:00+08:00"
+    base_snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+    final_snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+    status: "closed"
+    model: "not exposed"
+    reasoning: "not exposed"
+    prompt_revision: "pilot-003-product-v1"
+    skill_revisions: ["product-integration@current"]
+    input_tokens: 0
+    output_tokens: 0
+    turns: 0
+    changed_paths:
+      - "apps/web/backend/app/models/core_contract.py"
+      - "apps/web/backend/tests/test_core_contract.py"
+    artifact_refs: ["PILOT_003_CHANGE_REPORT.yaml"]
+    verification_refs: []
+    failure_class: "none"
+    stop_reason: "change report returned"
+  - attempt_id: "GW-PILOT-003-TEST-001"
+    role: "test-verification"
+    profile_id: "test-verification"
+    profile_revision: 1
+    runner_ref: "multi-agent:01a09c17-411a-7af1-8edb-670cad18c4cd"
+    started_at: "2026-09-14T00:00:00+08:00"
+    ended_at: "2026-09-14T00:00:00+08:00"
+    base_snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+    final_snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+    status: "blocked"
+    model: "not exposed"
+    reasoning: "not exposed"
+    prompt_revision: "pilot-003-test-v1"
+    skill_revisions: []
+    input_tokens: 0
+    output_tokens: 0
+    turns: 0
+    changed_paths: []
+    artifact_refs: ["PILOT_003_TEST_REPORT.yaml"]
+    verification_refs: []
+    failure_class: "environment"
+    stop_reason: "Windows executor setup refresh failed"
+
+artifacts:
+  - artifact_id: "GW-PILOT-003-PACKET"
+    kind: "decision"
+    path: "docs/current/agent-loop/pilots/PILOT_003_TASK_PACKET.yaml"
+    producer_attempt_id: "GW-PILOT-003-PRODUCT-001"
+    snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+    sha256: "not-computed"
+    redaction_status: "verified"
+    retention: "project_record"
+  - artifact_id: "GW-PILOT-003-BRIEF"
+    kind: "context_brief"
+    path: "docs/current/agent-loop/pilots/PILOT_003_CONTEXT_BRIEF.yaml"
+    producer_attempt_id: "GW-PILOT-003-PRODUCT-001"
+    snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+    sha256: "not-computed"
+    redaction_status: "verified"
+    retention: "project_record"
+  - artifact_id: "GW-PILOT-003-CHANGE"
+    kind: "change_report"
+    path: "docs/current/agent-loop/pilots/PILOT_003_CHANGE_REPORT.yaml"
+    producer_attempt_id: "GW-PILOT-003-PRODUCT-001"
+    snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+    sha256: "not-computed"
+    redaction_status: "verified"
+    retention: "project_record"
+  - artifact_id: "GW-PILOT-003-TEST"
+    kind: "test_report"
+    path: "docs/current/agent-loop/pilots/PILOT_003_TEST_REPORT.yaml"
+    producer_attempt_id: "GW-PILOT-003-TEST-001"
+    snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+    sha256: "not-computed"
+    redaction_status: "verified"
+    retention: "project_record"
+  - artifact_id: "GW-PILOT-003-REPORT"
+    kind: "log"
+    path: "docs/current/agent-loop/pilots/PILOT_003_REPORT.md"
+    producer_attempt_id: "GW-PILOT-003-TEST-001"
+    snapshot: "file-hash-manifest:c865ec810844e95c0a7b3f4bb15bcf46f167376737a3a2f407807dfdff06ddd5"
+    sha256: "not-computed"
+    redaction_status: "verified"
+    retention: "project_record"
+
+state_events:
+  - event_seq: 1
+    event_id: "pilot-003-created"
+    at: "2026-09-14T00:00:00+08:00"
+    from_status: ""
+    to_status: "created"
+    actor: "main"
+    reason: "first-stage bounded Product pilot"
+    evidence_refs: ["PILOT_003_TASK_PACKET.yaml"]
+  - event_seq: 2
+    event_id: "pilot-003-owner-closed"
+    at: "2026-09-14T00:00:00+08:00"
+    from_status: "created"
+    to_status: "running"
+    actor: "main"
+    reason: "Product child completed the declared change"
+    evidence_refs: ["PILOT_003_CHANGE_REPORT.yaml"]
+  - event_seq: 3
+    event_id: "pilot-003-test-blocked"
+    at: "2026-09-14T00:00:00+08:00"
+    from_status: "running"
+    to_status: "blocked"
+    actor: "test-verification"
+    reason: "independent executor setup refresh failed"
+    evidence_refs: ["PILOT_003_TEST_REPORT.yaml"]
+
+gates:
+  - gate_id: "product_scope"
+    kind: "scope"
+    status: "passed"
+    evidence_refs: ["PILOT_003_CHANGE_REPORT.yaml"]
+    decided_by: "main"
+    decided_at: "2026-09-14T00:00:00+08:00"
+  - gate_id: "product_contract"
+    kind: "contract"
+    status: "passed"
+    evidence_refs: ["PILOT_003_CHANGE_REPORT.yaml"]
+    decided_by: "main"
+    decided_at: "2026-09-14T00:00:00+08:00"
+  - gate_id: "canonical_docker"
+    kind: "docker"
+    status: "passed"
+    evidence_refs: ["PILOT_003_REPORT.md"]
+    decided_by: "main"
+    decided_at: "2026-09-14T00:00:00+08:00"
+  - gate_id: "independent_test"
+    kind: "test"
+    status: "failed"
+    evidence_refs: ["PILOT_003_TEST_REPORT.yaml"]
+    decided_by: "test-verification"
+    decided_at: "2026-09-14T00:00:00+08:00"
+  - gate_id: "git_snapshot"
+    kind: "human"
+    status: "failed"
+    evidence_refs: ["PILOT_003_REPORT.md"]
+    decided_by: "main"
+    decided_at: "2026-09-14T00:00:00+08:00"
+
+termination:
+  completion_claim: "Product change and Main Docker review completed; first-stage independent verification remains blocked."
+  final_report_ref: "docs/current/agent-loop/pilots/PILOT_003_REPORT.md"
+  unresolved_blockers:
+    - "Independent Test Agent executor failed before reading the diff or running Docker."
+    - "No HEAD commit; Git author identity is not configured."
+  recovery_point: "Repeat independent Test/Verification from the final file-hash snapshot after executor and Git baseline are resolved."
+  cleanup: "complete"

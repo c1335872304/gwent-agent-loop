@@ -1,0 +1,74 @@
+task_id: "GW-PILOT-003"
+packet_revision: 1
+context_snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+prepared_by: "context-integration"
+
+problem_model:
+  current_behavior: "GameState.mode defaults to manual_test when the Core payload omits mode."
+  expected_behavior: "The Product model rejects a Core state without the required mode field."
+  user_visible_impact: "A malformed state can be rendered as manual test mode and hide Teacher behavior."
+  hypotheses:
+    - statement: "The default is outside the existing Core HTTP contract."
+      status: "confirmed"
+      evidence_ref: "apps/web/docs/CORE_API_CONTRACT.md"
+
+context_floor_refs:
+  - path: "AGENTS.md"
+    role: "repository governance"
+    snapshot_or_version: "working-tree baseline"
+  - path: ".agents/skills/product-integration/SKILL.md"
+    role: "Product workflow and invariant"
+    snapshot_or_version: "current"
+  - path: "apps/web/docs/CORE_API_CONTRACT.md"
+    role: "Core HTTP state contract"
+    snapshot_or_version: "current"
+
+fact_source_graph:
+  - path: "apps/web/backend/app/models/core_contract.py"
+    category: "production"
+    why_relevant: "Defines Product-side GameState validation."
+    read_status: "required"
+  - path: "apps/web/backend/tests/test_core_contract.py"
+    category: "test"
+    why_relevant: "Contains the regression payload and model tests."
+    read_status: "required"
+  - path: "apps/web/docs/CORE_API_CONTRACT.md"
+    category: "contract"
+    why_relevant: "Declares mode as a required state field."
+    read_status: "required"
+  - path: "docs/current/agent-loop/LESSONS_LEARNED.md"
+    category: "decision"
+    why_relevant: "Provides relevant Docker, host pytest, and bounded-loop lessons."
+    read_status: "required"
+
+exploration:
+  allowed_neighbor_roots: ["apps/web/backend/app/models", "apps/web/backend/tests", "apps/web/docs"]
+  search_terms: ["GameState", "mode", "manual_test", "human_vs_ai"]
+  questions_to_resolve:
+    - "Does the change modify only malformed-state handling?"
+    - "Are both legal mode values still covered by existing tests?"
+
+fact_ledger:
+  - fact: "The Product model currently supplies manual_test as a default."
+    status: "confirmed"
+    source_ref: "apps/web/backend/app/models/core_contract.py"
+    snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+  - fact: "The Core HTTP contract treats mode as required."
+    status: "confirmed"
+    source_ref: "apps/web/docs/CORE_API_CONTRACT.md"
+    snapshot: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+
+excluded_leads:
+  - lead: "Change Core or frontend behavior."
+    evidence: "Outside Product pilot scope."
+
+lessons:
+  relevant_refs: ["LL-001", "LL-005", "LL-006", "LL-007", "LL-008", "LL-009"]
+  searched_trigger_terms: ["Product", "Core HTTP", "pytest", "Docker", "snapshot", "Windows patch"]
+  applied:
+    - "Use Docker as authoritative pytest evidence."
+    - "Keep scope and reports explicit."
+  rejected_as_stale_or_irrelevant: []
+
+contradictions_or_blockers:
+  - "No HEAD commit or configured Git author identity; exact Git worktree launch is not yet available."

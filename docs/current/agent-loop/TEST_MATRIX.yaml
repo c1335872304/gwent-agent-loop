@@ -1,0 +1,101 @@
+protocol_version: 1
+matrix_version: 1
+default_report: "TestReport"
+failure_classes:
+  - "CODE_DEFECT"
+  - "CONTRACT_GAP"
+  - "ENVIRONMENT_FAILURE"
+  - "DOCKER_FAILURE"
+  - "PERMISSION_REQUIRED"
+  - "FLAKY_TEST"
+  - "PROTOCOL_FAILURE"
+  - "BUDGET_EXHAUSTED"
+
+default_docker:
+  allowed_actions: ["config", "up", "down", "ps", "health", "logs"]
+  cleanup_required: true
+  max_runtime_minutes: 30
+
+canonical_pytest:
+  command: "python scripts/check.py docker-test"
+  image_definition: "deploy/docker/Dockerfile.test"
+  dependency_manifest: "deploy/docker/requirements.test.txt"
+  container_policy: "run --rm"
+  host_result: "diagnostic_only"
+
+domains:
+  - domain: "core"
+    owner: "core"
+    production_read_roots: ["src", "include", "config", "contracts"]
+    production_write_roots: []
+    test_write_roots: ["tests", "tools/golden"]
+    required_skills: ["core-environment"]
+    commands:
+      - id: "core-schema"
+        command: "python .agents/skills/core-environment/scripts/check_schema.py"
+        cwd: "."
+        evidence: "schema and ABI contract result"
+      - id: "core-golden"
+        command: "declared by TaskPacket from tools/golden"
+        cwd: "."
+        evidence: "golden/trace result bound to final snapshot"
+    docker:
+      compose_files: []
+      allowed_actions: []
+    manual_gates: ["contract impact reviewed by Core Owner"]
+
+  - domain: "trainer"
+    owner: "trainer"
+    production_read_roots: ["python", "configs", "training", "tools/server"]
+    production_write_roots: []
+    test_write_roots: ["python/tests", "training"]
+    required_skills: ["training-config"]
+    commands:
+      - id: "training-config"
+        command: "python .agents/skills/training-config/scripts/validate_training.py --all"
+        cwd: "."
+        evidence: "all training config/task definitions pass"
+      - id: "training-smoke"
+        command: "declared by TaskPacket; smoke before budget expansion"
+        cwd: "."
+        evidence: "completed-episode and illegal-result counts"
+    docker:
+      compose_files: ["deploy/docker/compose.train.cpu.yml", "deploy/docker/compose.train.yml"]
+      allowed_actions: ["config", "up", "down", "ps", "logs"]
+    manual_gates: ["warm-start/resume/promotion decision recorded"]
+
+  - domain: "product"
+    owner: "product"
+    production_read_roots: ["apps/web", "include/gwent/api"]
+    production_write_roots: []
+    test_write_roots: ["apps/web/backend/tests", "apps/web/frontend"]
+    required_skills: ["product-integration"]
+    commands:
+      - id: "product-backend"
+        command: "PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests"
+        cwd: "."
+        evidence: "BFF contract and request tests"
+      - id: "product-frontend"
+        command: "npm run build"
+        cwd: "apps/web/frontend"
+        evidence: "frontend production build"
+    docker:
+      compose_files: ["deploy/docker/compose.cpu.yml"]
+      allowed_actions: ["config", "up", "down", "ps", "health", "logs"]
+    manual_gates: ["Core actions are rendered and submitted without frontend legality inference"]
+
+  - domain: "teacher"
+    owner: "teacher"
+    production_read_roots: ["services/teacher", "apps/web/backend", "apps/web/frontend"]
+    production_write_roots: []
+    test_write_roots: ["services/teacher/tests", "apps/web/backend/tests"]
+    required_skills: ["teacher-explanation"]
+    commands:
+      - id: "teacher-tests"
+        command: "PYTHONPATH=. pytest -q services/teacher/tests"
+        cwd: "."
+        evidence: "evidence provenance and privacy regression tests"
+    docker:
+      compose_files: ["deploy/docker/compose.cpu.yml"]
+      allowed_actions: ["config", "up", "down", "ps", "health", "logs"]
+    manual_gates: ["hidden hand and undisclosed candidate privacy review"]

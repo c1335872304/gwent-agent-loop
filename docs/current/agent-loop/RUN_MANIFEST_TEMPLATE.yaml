@@ -1,0 +1,92 @@
+# RunManifest v1
+# 一次任务的真实执行账本。必须在运行过程中追加，不允许只靠最终总结事后补写。
+protocol_version: 1
+run_id: "GW-YYYYMMDD-001"
+task_id: "GW-YYYYMMDD-001"
+task_revision: 1
+runner: "manual | codex | ci"
+status: "created | running | blocked | human_required | completed | cancelled | failed | superseded"
+created_at: "YYYY-MM-DD hhmm"
+updated_at: "YYYY-MM-DD hhmm"
+
+workspace:
+  base_snapshot_kind: "git_commit | worktree_manifest | file_hash_manifest"
+  base_snapshot: ""
+  final_snapshot: ""
+  known_user_changes: []
+  write_scope_refs: []
+
+budget:
+  max_role_runs: 0
+  max_subtasks: 0
+  max_subtask_depth: 0
+  max_input_tokens: 0
+  max_output_tokens: 0
+  max_model_turns: 0
+  max_elapsed_minutes: 0
+  role_runs_used: 0
+  subtasks_used: 0
+  input_tokens_used: 0
+  output_tokens_used: 0
+  model_turns_used: 0
+  elapsed_minutes: 0
+  exhaustion_action: "transition_to_human_required_and_stop_new_runs"
+
+role_runs:
+  - attempt_id: "<run-id>-<role>-<n>"
+    role: "core | trainer | product | teacher | test-verification | context-integration"
+    profile_id: ""
+    profile_revision: 0
+    runner_ref: ""
+    started_at: ""
+    ended_at: ""
+    base_snapshot: ""
+    final_snapshot: ""
+    status: "planned | running | closed | lost | blocked | failed"
+    model: ""
+    reasoning: ""
+    prompt_revision: ""
+    skill_revisions: []
+    input_tokens: 0
+    output_tokens: 0
+    turns: 0
+    changed_paths: []
+    artifact_refs: []
+    verification_refs: []
+    failure_class: "none | model | runner | docker | test | code | permission | context | budget"
+    stop_reason: ""
+
+artifacts:
+  - artifact_id: "<stable-artifact-id>"
+    kind: "context_brief | change_report | review_report | test_report | handoff | decision | log"
+    path: ""
+    producer_attempt_id: ""
+    snapshot: ""
+    sha256: ""
+    redaction_status: "not_required | pending | verified"
+    retention: "task_lifetime | project_record | discard_after_summary"
+
+state_events:
+  - event_seq: 1
+    event_id: ""
+    at: ""
+    from_status: ""
+    to_status: ""
+    actor: "main | scheduler | role | user"
+    reason: ""
+    evidence_refs: []
+
+gates:
+  - gate_id: "<gate-id>"
+    kind: "scope | contract | test | docker | privacy | human"
+    status: "pending | passed | failed | waived"
+    evidence_refs: []
+    decided_by: ""
+    decided_at: ""
+
+termination:
+  completion_claim: ""
+  final_report_ref: ""
+  unresolved_blockers: []
+  recovery_point: ""
+  cleanup: "not_started | complete | incomplete | not_required"

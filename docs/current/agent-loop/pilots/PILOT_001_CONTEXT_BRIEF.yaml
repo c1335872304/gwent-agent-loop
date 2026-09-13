@@ -1,0 +1,51 @@
+schema_version: "1.0"
+task_id: GW-PILOT-001
+generated_by: context-integration
+snapshot_id: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+objective: "为一次无业务代码变更的 Agent Loop 协议演练提供最小充分上下文。"
+source_graph:
+  authority:
+    - path: AGENTS.md
+      role: "仓库级路由、边界和验证规则"
+    - path: docs/current/AGENT_LOOP_PLAN.md
+      role: "Agent Loop 基础协议"
+    - path: docs/current/AGENT_LOOP_PHASE_PLAN.md
+      role: "阶段推进和退出条件"
+  executable_contracts:
+    - path: docs/current/agent-loop/CONTEXT_INDEX.yaml
+    - path: docs/current/agent-loop/TEST_MATRIX.yaml
+    - path: docs/current/agent-loop/TEST_MODIFICATION_POLICY.md
+    - path: scripts/agent_loop
+  role_profiles:
+    - docs/current/agent-loop/profiles/context-integration.yaml
+    - docs/current/agent-loop/profiles/test-verification.yaml
+lessons_applied:
+  - id: LL-004
+    decision: "Pilot 允许 max_subtasks=0；验证器必须区分零值上限和必须为正的预算字段。"
+    evidence: "首次 preflight 暴露 schema 误拒绝，已修复 validator 并由回归测试锁定。"
+  - id: LL-001
+    decision: "只传递声明范围内的上下文，不把整个仓库灌入任务。"
+    relevance: applied
+  - id: LL-002
+    decision: "测试结果只记录状态和路径，不以报告正文代替协议证据。"
+    relevance: applied
+  - id: LL-003
+    decision: "本 Pilot 不允许主 Agent 直接修改业务代码。"
+    relevance: applied
+rejected_context:
+  - source: models/v3/policy.pt
+    reason: "本任务不执行模型加载；文件的存在只作为已知环境条件记录。"
+  - source: docker compose files
+    reason: "本任务只验证 Docker 可用性，不运行服务。"
+known_blockers:
+  - id: TRAINER-ENV-001
+    description: "架构阶段按 MODEL_SCOPE 暂时接受冻结模型，不读取模型内容；training-config 的 validate_training.py --all 仍受当前 Python 环境缺少 torch 阻塞。"
+    owner: trainer
+    action: "保留给 Trainer/环境阶段处理，不在本 Pilot 越权修复。"
+  - id: GIT-IDENTITY-001
+    description: "仓库尚无首个 commit，因为 Git identity/remote 尚未确认。"
+    owner: human
+    action: "确认 user.name、user.email 和 remote 后再提交。"
+handoff:
+  next_role: test-verification
+  payload: "只验证 acceptance 命令、写入证据和越权检查；不修改生产代码。"

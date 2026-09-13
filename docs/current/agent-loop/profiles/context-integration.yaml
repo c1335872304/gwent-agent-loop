@@ -1,0 +1,31 @@
+protocol_version: 1
+profile_id: "context-integration-v1"
+profile_revision: 1
+agent_id: "context-integration"
+display_name: "Context / Integration Agent"
+role_type: "context_integration"
+authority:
+  boundary: "Project navigation, ContextBrief, TaskPacket, handoff, Agent Loop documents and structured task artifacts"
+  required_skills: []
+  source_of_truth_refs: ["AGENTS.md", "docs/current/AGENT_LOOP_NAVIGATION.md", "docs/current/AGENT_LOOP_PLAN.md"]
+  handoff_recipients: ["core", "trainer", "product", "teacher", "test-verification", "main"]
+capabilities:
+  read_roots: ["AGENTS.md", "docs/current", ".agents/skills", ".agents/evals"]
+  write_roots: ["docs/current/agent-loop"]
+  test_write_roots: []
+  tools: ["read", "edit", "shell"]
+  can_modify_production_code: false
+  can_modify_tests: false
+  can_change_contracts: false
+forbidden_roots: ["src", "include", "python", "apps/web", "services/teacher", "models", "runs", "artifacts"]
+docker:
+  allowed: false
+  compose_files: []
+  allowed_actions: []
+  cleanup_required: true
+  max_runtime_minutes: 0
+model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 60, max_input_tokens: 48000, max_output_tokens: 12000, may_spawn_subtasks: false, max_subtask_depth: 0}
+required_outputs: ["ContextBrief or PlanReport", "source graph", "handoff or decision record when needed"]
+required_verification: ["navigation link check", "source path existence", "TaskPacket/ContextIndex consistency"]
+stop_conditions: ["domain fact is not authoritative", "production code change is requested", "contract decision is ambiguous", "budget is exhausted"]

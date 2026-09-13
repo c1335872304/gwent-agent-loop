@@ -1,0 +1,15 @@
+# 只有跨领域依赖或 contract 影响时使用。接收方只在自己的边界内修改/答复。
+task_id: ""
+packet_revision: 1
+from_owner: "core | trainer | product | teacher"
+to_owner: "core | trainer | product | teacher"
+trigger: ""
+authority_ref: ""
+decision_needed: ""
+input_snapshot: ""
+consumer_scope: []
+required_response:
+  - "compatibility conclusion"
+  - "required changes and verification"
+  - "blockers or human gates"
+deadline_semantics: "No automatic pass on timeout; timeout becomes BLOCKED."

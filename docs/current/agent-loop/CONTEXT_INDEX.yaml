@@ -1,0 +1,92 @@
+index_version: 1
+workspace_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+generated_at: "2026-09-13 0000"
+entries:
+  - id: "project-routing"
+    domain: "project"
+    claim: "Four domain owners are routed by fact authority; no permanent Manager Agent is added."
+    source_refs:
+      - {path: "AGENTS.md", locator: "路由 and Agent sections", source_kind: "rule"}
+      - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "角色与职责", source_kind: "architecture"}
+    verified_at: "2026-09-13 0000"
+    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["agent routing", "domain owner", "manager agent", "handoff"]
+    owner: "project"
+    lesson_refs: []
+    supersedes: []
+    superseded_by: []
+    notes: "Cross-boundary work must identify an authoritative owner before implementation."
+  - id: "core-legality-source"
+    domain: "core"
+    claim: "Core actions are the legality source; consumers must render and submit the returned option_index."
+    source_refs:
+      - {path: "AGENTS.md", locator: "Core Agent / Product Agent", source_kind: "rule"}
+      - {path: ".agents/skills/core-environment/references/ACTION_CONTRACT.md", locator: "action contract", source_kind: "contract"}
+      - {path: ".agents/skills/product-integration/SKILL.md", locator: "legal action", source_kind: "skill"}
+    verified_at: "2026-09-13 0000"
+    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["legal action", "option_index", "action grammar", "frontend action"]
+    owner: "core"
+    lesson_refs: ["LL-001"]
+    supersedes: []
+    superseded_by: []
+    notes: "Product must request a contract change when structured metadata is missing."
+  - id: "teacher-privacy-boundary"
+    domain: "teacher"
+    claim: "Teacher explains an executed action from structured evidence and must not expose hidden hand or undisclosed candidates."
+    source_refs:
+      - {path: "AGENTS.md", locator: "Teacher Coding Agent", source_kind: "rule"}
+      - {path: ".agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md", locator: "privacy boundary", source_kind: "contract"}
+    verified_at: "2026-09-13 0000"
+    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["Teacher", "explanation", "hidden information", "privacy", "evidence"]
+    owner: "teacher"
+    lesson_refs: ["LL-002"]
+    supersedes: []
+    superseded_by: []
+    notes: "A fluent explanation is not evidence of correctness."
+  - id: "training-asset-provenance"
+    domain: "trainer"
+    claim: "Checkpoint and model provenance are Training-owned; installed runtime assets must not be confused with the source policy asset."
+    source_refs:
+      - {path: "AGENTS.md", locator: "Trainer Agent", source_kind: "rule"}
+      - {path: ".agents/skills/training-config/SKILL.md", locator: "warm-start/resume/model promotion", source_kind: "skill"}
+      - {path: "artifacts/checkpoints/registry.yaml", locator: "registry", source_kind: "contract"}
+    verified_at: "2026-09-13 0000"
+    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["checkpoint", "warm-start", "resume", "model promotion", "policy.pt"]
+    owner: "trainer"
+    lesson_refs: ["LL-003"]
+    supersedes: []
+    superseded_by: []
+    notes: "Any promotion or long training run needs explicit source schema and budget."
+  - id: "agent-loop-budget"
+    domain: "project"
+    claim: "A loop must have whole-task limits for role runs, subtasks, depth, tokens, turns and elapsed time; exhaustion stops new model work."
+    source_refs:
+      - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "预算、熔断与退出", source_kind: "architecture"}
+      - {path: "docs/current/AGENT_LOOP_PHASE_PLAN.md", locator: "Phase 2 / budget", source_kind: "architecture"}
+    verified_at: "2026-09-13 0000"
+    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["token budget", "retry", "infinite loop", "subtask depth", "runner loss"]
+    owner: "project"
+    lesson_refs: ["LL-004"]
+    supersedes: []
+    superseded_by: []
+    notes: "Per-agent limits are insufficient; accounting is task-wide."
+
+maintenance:
+  stale_after_days: 30
+  stale_policy: "stale entries require re-verification before implementation; do not silently delete"
+  conflict_policy: "current authoritative contract wins; unresolved conflict becomes HUMAN_REQUIRED"
+  write_policy: "new facts start as inferred unless verified against an authoritative source"

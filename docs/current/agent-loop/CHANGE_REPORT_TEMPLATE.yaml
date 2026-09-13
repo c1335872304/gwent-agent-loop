@@ -1,0 +1,27 @@
+# 每次 Owner attempt 一份；未运行验证必须显式记录为 NOT_RUN / INCONCLUSIVE。
+task_id: ""
+packet_revision: 1
+attempt_id: ""
+owner: "core | trainer | product | teacher"
+skills_read: []
+base_snapshot: ""
+end_snapshot: ""
+
+changed_files:
+  - path: ""
+    purpose: ""
+
+contracts:
+  # key: changed | unchanged | handoff_required
+  example_contract: "unchanged"
+
+verification:
+  - command: ""
+    status: "PASS | FAIL | NOT_RUN | INCONCLUSIVE"
+    exit_code: null
+    evidence_ref: ""
+
+known_limits: []
+handoff_to_reviewer:
+  focus: []
+  unresolved: []

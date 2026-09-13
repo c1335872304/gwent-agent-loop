@@ -1,0 +1,85 @@
+protocol_version: 1
+task_id: "GW-PILOT-003"
+revision: 1
+title: "Reject missing Product mode field"
+requested_outcome: "Make the existing Core HTTP mode field required in the Product contract model."
+non_goals:
+  - "Do not change Core rules or legal actions."
+  - "Do not change api_version or add a new contract field."
+  - "Do not modify Trainer, Teacher, frontend, model, or deployment files."
+
+authority:
+  user_request_ref: "user: implement first stage"
+  repo_rules: ["AGENTS.md"]
+  required_skills: ["product-integration"]
+
+ownership:
+  primary_owner: "product"
+  consulted_owners: ["test-verification"]
+  handoff_required_before_completion: true
+
+scope:
+  allowed_write_paths:
+    - "apps/web/backend/app/models/core_contract.py"
+    - "apps/web/backend/tests/test_core_contract.py"
+  forbidden_paths:
+    - "src/"
+    - "include/"
+    - "python/"
+    - "services/teacher/"
+    - "models/"
+    - "deploy/"
+  declared_contracts:
+    - "core_http_mode: unchanged"
+    - "product_core_model: changed: mode becomes required"
+    - "core_rules: unchanged"
+
+workspace:
+  snapshot_kind: "file_hash_manifest"
+  snapshot_ref: "file-hash-manifest:49d79e59bbe1b16b2c41e03ea6f7b6601586891a56612b50176f247584f2fd7d"
+  known_user_changes:
+    - "Repository has no HEAD commit; initial commit is blocked by missing author identity."
+    - "The staged Git index was used as the pre-change scope baseline."
+
+inputs:
+  context_brief_ref: "docs/current/agent-loop/pilots/PILOT_003_CONTEXT_BRIEF.yaml"
+  context_floor_refs:
+    - "AGENTS.md"
+    - ".agents/skills/product-integration/SKILL.md"
+    - "apps/web/docs/CORE_API_CONTRACT.md"
+  canonical_files:
+    - path: "apps/web/backend/app/models/core_contract.py"
+      reason: "Product model for Core HTTP state"
+    - path: "apps/web/backend/tests/test_core_contract.py"
+      reason: "Existing contract regression tests"
+  external_inputs: []
+
+acceptance:
+  behavioral:
+    - "A Core state without mode is rejected by the Product model."
+    - "human_vs_ai and manual_test remain accepted values."
+  verification_commands:
+    - "python scripts/check.py docker-test"
+    - "python scripts/check.py architecture"
+  manual_checks:
+    - "Changed paths stay within the declared Product scope."
+
+risks:
+  - type: "compatibility"
+    mitigation: "Only malformed or legacy Core responses without the required mode field are rejected."
+
+execution:
+  write_lock_keys: ["apps/web/backend/app/models/core_contract.py", "apps/web/backend/tests/test_core_contract.py"]
+  max_owner_attempts: 1
+  max_elapsed_minutes: 30
+  max_parallel_readers: 1
+  max_role_runs: 3
+  max_subtasks: 2
+  max_subtask_depth: 1
+  max_model_input_tokens: 16000
+  max_model_output_tokens: 6000
+  max_model_turns: 6
+
+gates: ["scope", "contract", "test", "docker", "human"]
+artifacts:
+  task_root: "docs/current/agent-loop/pilots/PILOT_003_*"

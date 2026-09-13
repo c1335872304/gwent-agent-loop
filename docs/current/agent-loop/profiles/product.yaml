@@ -1,0 +1,31 @@
+protocol_version: 1
+profile_id: "product-owner-v1"
+profile_revision: 1
+agent_id: "product"
+display_name: "Product Agent"
+role_type: "domain_owner"
+authority:
+  boundary: "React frontend, FastAPI BFF, Core HTTP/JSON consumer contract and user-facing integration"
+  required_skills: ["product-integration"]
+  source_of_truth_refs: ["AGENTS.md", ".agents/skills/product-integration/SKILL.md", "apps/web/docs/CORE_API_CONTRACT.md"]
+  handoff_recipients: ["core", "teacher"]
+capabilities:
+  read_roots: ["apps/web", "contracts", "docs/current/TEACHER_AND_WEB.md", ".agents/skills/product-integration"]
+  write_roots: ["apps/web"]
+  test_write_roots: ["apps/web/backend/tests", "apps/web/frontend"]
+  tools: ["read", "edit", "shell"]
+  can_modify_production_code: true
+  can_modify_tests: true
+  can_change_contracts: true
+forbidden_roots: ["src", "include", "python/src/gwent_rl", "models", "runs"]
+docker:
+  allowed: true
+  compose_files: ["deploy/docker/compose.cpu.yml"]
+  allowed_actions: ["config", "up", "down", "ps", "health", "logs"]
+  cleanup_required: true
+  max_runtime_minutes: 30
+model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 90, max_input_tokens: 64000, max_output_tokens: 16000, may_spawn_subtasks: false, max_subtask_depth: 0}
+required_outputs: ["ChangeReport", "backend/frontend verification", "Core or Teacher handoff for contract changes"]
+required_verification: ["Product Skill checks and relevant backend/frontend tests or build"]
+stop_conditions: ["legal action source is missing", "hidden information risk is found", "breaking contract scope is unclear", "budget is exhausted"]

@@ -1,0 +1,42 @@
+task_id: GW-PILOT-002
+packet_revision: 1
+tested_snapshot: "git-index:apps/web/frontend/src/pages/GamePage.tsx@29719a033b7d2215a523def4292e3fa1bb3e8888"
+tester: test-verification
+overall: PASS
+results:
+  - command: "cd apps/web/frontend && npm run build"
+    cwd: "apps/web/frontend"
+    status: PASS
+    exit_code: 0
+    duration_seconds: 0.311
+    evidence_ref: "tsc and Vite production build completed"
+  - command: "python scripts/check.py docker-test"
+    cwd: "."
+    status: PASS
+    exit_code: 0
+    duration_seconds: 260
+    evidence_ref: "Docker image rebuilt; 62 pytest tests passed"
+  - command: "python scripts/check.py architecture"
+    cwd: "."
+    status: PASS
+    exit_code: 0
+    duration_seconds: 4
+    evidence_ref: "docs, profile, contract, syntax, and 25 Agent Loop tests passed"
+  - command: "python -m pytest -q apps/web/backend/tests"
+    cwd: "."
+    status: INCONCLUSIVE
+    exit_code: 1
+    duration_seconds: 0.35
+    evidence_ref: "Host lacks pytest-asyncio; 13 passed and 4 async tests were not runnable"
+environment:
+  runner: "Docker test image for authoritative pytest; host Python for diagnostic comparison"
+  missing_dependencies:
+    - "Host pytest-asyncio"
+failures:
+  - classification: ENVIRONMENT_FAILURE
+    reproduction: "python -m pytest -q apps/web/backend/tests on host"
+    likely_owner: environment
+manual_checks:
+  - "Diff review confirmed only apps/web/frontend/src/pages/GamePage.tsx changed for the Product fix."
+  - "No Core, Trainer, model, HTTP contract, or Teacher files changed in the pilot scope."
+  - "Docker test used run --rm and did not run global compose down."

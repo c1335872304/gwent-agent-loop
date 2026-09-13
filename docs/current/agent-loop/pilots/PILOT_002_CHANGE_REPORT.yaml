@@ -1,0 +1,37 @@
+task_id: GW-PILOT-002
+packet_revision: 1
+attempt_id: GW-PILOT-002-PRODUCT-001
+owner: product
+skills_read:
+  - product-integration
+base_snapshot: "git-index:apps/web/frontend/src/pages/GamePage.tsx@aee2dc0c4103fdacb62993658869e75f530b4bae"
+end_snapshot: "git-index:apps/web/frontend/src/pages/GamePage.tsx@29719a033b7d2215a523def4292e3fa1bb3e8888"
+changed_files:
+  - path: apps/web/frontend/src/pages/GamePage.tsx
+    purpose: "Clear transient action, selection, and acted-turn state after a fresh snapshot load."
+contracts:
+  product-http: unchanged
+  core-actions: unchanged
+  teacher: unchanged
+verification:
+  - command: "cd apps/web/frontend && npm run build"
+    status: PASS
+    exit_code: 0
+    evidence_ref: "VITE production build: 29 modules transformed"
+  - command: "python scripts/check.py architecture"
+    status: PASS
+    exit_code: 0
+    evidence_ref: "25 Agent Loop tests and project architecture checks passed"
+  - command: "python scripts/check.py docker-test"
+    status: PASS
+    exit_code: 0
+    evidence_ref: "62 pinned-container pytest tests passed"
+known_limits:
+  - "No browser automation test was available; the build and source scope review are the current frontend evidence."
+  - "Host backend pytest was not used as final evidence because pytest-asyncio is absent on the host."
+handoff_to_reviewer:
+  focus:
+    - "Fresh state load clears all transient interaction state."
+    - "No Core action or HTTP contract inference was added."
+    - "Diff is limited to one Product file."
+  unresolved: []

@@ -1,0 +1,31 @@
+protocol_version: 1
+profile_id: "test-verification-v1"
+profile_revision: 1
+agent_id: "test-verification"
+display_name: "Test / Verification Agent"
+role_type: "verification"
+authority:
+  boundary: "Review, test execution, Docker evidence and test-only changes; never production implementation"
+  required_skills: []
+  source_of_truth_refs: ["AGENTS.md", "docs/current/AGENT_LOOP_PLAN.md", "docs/current/PROJECT_TEST_PLAN.md"]
+  handoff_recipients: ["core", "trainer", "product", "teacher", "main"]
+capabilities:
+  read_roots: ["."]
+  write_roots: []
+  test_write_roots: ["declared test scope only"]
+  tools: ["read", "edit", "shell"]
+  can_modify_production_code: false
+  can_modify_tests: true
+  can_change_contracts: false
+forbidden_roots: ["src", "include", "python/src", "apps/web/backend/app", "apps/web/frontend/src", "services/teacher", "models", "runs", "artifacts"]
+docker:
+  allowed: true
+  compose_files: ["deploy/docker/compose.cpu.yml", "deploy/docker/compose.train.cpu.yml"]
+  allowed_actions: ["config", "up", "down", "ps", "health", "logs"]
+  cleanup_required: true
+  max_runtime_minutes: 30
+model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 60, max_input_tokens: 48000, max_output_tokens: 12000, may_spawn_subtasks: false, max_subtask_depth: 0}
+required_outputs: ["ReviewReport or TestReport", "changed test paths", "failure classification", "final snapshot"]
+required_verification: ["run only declared commands", "distinguish code/test/environment/docker/permission failures"]
+stop_conditions: ["production write is requested", "test assertion would be weakened", "Docker cleanup cannot be guaranteed", "budget is exhausted"]

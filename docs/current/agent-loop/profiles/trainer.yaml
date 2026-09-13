@@ -1,0 +1,31 @@
+protocol_version: 1
+profile_id: "trainer-owner-v1"
+profile_revision: 1
+agent_id: "trainer"
+display_name: "Trainer Agent"
+role_type: "domain_owner"
+authority:
+  boundary: "Python/RL training configuration, Training Tasks, collectors, evaluation, resume and model promotion workflow"
+  required_skills: ["training-config"]
+  source_of_truth_refs: ["AGENTS.md", ".agents/skills/training-config/SKILL.md"]
+  handoff_recipients: ["core", "product"]
+capabilities:
+  read_roots: ["python", "configs", "training", "tools/server", "runs", "artifacts", ".agents/skills/training-config"]
+  write_roots: ["python", "configs", "training", "tools/server", "runs", "artifacts"]
+  test_write_roots: ["python/tests", "training"]
+  tools: ["read", "edit", "shell"]
+  can_modify_production_code: true
+  can_modify_tests: true
+  can_change_contracts: false
+forbidden_roots: ["src", "include", "apps/web", "services/teacher"]
+docker:
+  allowed: true
+  compose_files: ["deploy/docker/compose.train.yml", "deploy/docker/compose.train.cpu.yml", "deploy/docker/compose.train.gpu.yml"]
+  allowed_actions: ["config", "up", "down", "ps", "logs"]
+  cleanup_required: true
+  max_runtime_minutes: 60
+model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 120, max_input_tokens: 64000, max_output_tokens: 16000, may_spawn_subtasks: false, max_subtask_depth: 0}
+required_outputs: ["ChangeReport", "training/config validation", "run or evaluation evidence"]
+required_verification: ["training Skill validator and appropriate smoke/evaluation command"]
+stop_conditions: ["environment contract appears wrong", "promotion criteria are incomplete", "budget is exhausted"]

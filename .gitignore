@@ -1,0 +1,50 @@
+build/
+build-*/
+cmake-build-*/
+.build/
+.agent-build/
+.agent-loop/
+.vscode/
+.idea/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Python caches
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Runtime training outputs; keep the directory contract/documentation.
+runs/*
+!runs/README.md
+
+# Pinned model metadata stays in git; large checkpoint binaries do not.
+artifacts/checkpoints/**/*.pt
+artifacts/checkpoints/**/*.pth
+artifacts/checkpoints/**/*.ckpt
+
+# Web product
+apps/web/backend/.venv/
+apps/web/backend/.env
+apps/web/frontend/node_modules/
+apps/web/frontend/dist/
+
+# Local service secrets/config
+services/*/.env
+deploy/docker/.env
+apps/web/frontend/*.tsbuildinfo
+# Local inference model. Keep the slot/docs, not the binary artifact.
+models/**/*.pt
+models/**/*.pth
+models/**/*.ckpt
+models/**/installed.json
+
+# Public inference asset for the GitHub project demo. Other model artifacts
+# and training checkpoints remain ignored.
+!models/v3/policy.pt

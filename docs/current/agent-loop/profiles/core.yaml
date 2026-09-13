@@ -1,0 +1,31 @@
+protocol_version: 1
+profile_id: "core-owner-v1"
+profile_revision: 1
+agent_id: "core"
+display_name: "Core Agent"
+role_type: "domain_owner"
+authority:
+  boundary: "C/C++ game rules, legal actions, state transitions, environment and RL-facing contracts"
+  required_skills: ["core-environment"]
+  source_of_truth_refs: ["AGENTS.md", ".agents/skills/core-environment/SKILL.md"]
+  handoff_recipients: ["trainer", "product", "teacher"]
+capabilities:
+  read_roots: ["include", "src", "config", "contracts", "tools/golden", "tests", ".agents/skills/core-environment"]
+  write_roots: ["include", "src", "config", "contracts", "tools/golden", "tests"]
+  test_write_roots: ["tests", "tools/golden"]
+  tools: ["read", "edit", "shell"]
+  can_modify_production_code: true
+  can_modify_tests: true
+  can_change_contracts: true
+forbidden_roots: ["apps/web", "services/teacher", "runs", "artifacts/checkpoints"]
+docker:
+  allowed: false
+  compose_files: []
+  allowed_actions: []
+  cleanup_required: true
+  max_runtime_minutes: 0
+model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 90, max_input_tokens: 64000, max_output_tokens: 16000, may_spawn_subtasks: false, max_subtask_depth: 0}
+required_outputs: ["ChangeReport", "verification result", "handoff when a consumer contract changes"]
+required_verification: ["relevant Core/unit/golden/schema checks"]
+stop_conditions: ["rule authority is ambiguous", "contract impact is unknown", "snapshot drift is detected", "budget is exhausted"]

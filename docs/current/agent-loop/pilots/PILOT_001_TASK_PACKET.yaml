@@ -1,0 +1,102 @@
+schema_version: "1.0"
+protocol_version: 1
+task_id: GW-PILOT-001
+revision: 1
+title: "Agent Loop protocol rehearsal"
+requested_outcome: "完成一次可复现、可审计且无业务代码写入的 Agent Loop 协议演练。"
+authority:
+  source: AGENTS.md
+  decision_owner: context-integration
+  escalation: human
+ownership:
+  primary_owner: context-integration
+  consulted_roles:
+    - test-verification
+scope:
+  allowed_write_paths:
+    - docs/current/agent-loop/pilots
+  forbidden_paths:
+    - apps
+    - python/src
+    - services
+    - models
+    - runs
+    - artifacts
+  declared_contracts:
+    - agent-loop-protocol: confirmed
+    - business-code-contract: unaffected
+workspace:
+  snapshot_ref: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+inputs:
+  - path: AGENTS.md
+    purpose: "仓库级路由和边界"
+  - path: docs/current/AGENT_LOOP_PLAN.md
+    purpose: "Agent Loop 协议"
+  - path: docs/current/agent-loop/CONTEXT_INDEX.yaml
+    purpose: "项目事实索引"
+  - path: docs/current/agent-loop/TEST_MATRIX.yaml
+    purpose: "验证矩阵"
+objective: >-
+  在不修改业务代码、不启动真实子 Agent 的前提下，演练 Context/Integration
+  与 Test/Verification 的边界、快照、预算、证据和结束条件。
+required_skills:
+  - context-integration
+  - test-verification
+allowed_write_paths:
+  - docs/current/agent-loop/pilots
+forbidden_write_paths:
+  - apps
+  - python/src
+  - services
+  - models
+  - runs
+  - artifacts
+snapshot:
+  id: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+  scope:
+    - AGENTS.md
+    - python/pyproject.toml
+    - scripts/check.py
+    - docs/current/AGENT_LOOP_PLAN.md
+    - docs/current/AGENT_LOOP_NAVIGATION.md
+    - docs/current/AGENT_LOOP_PHASE_PLAN.md
+    - docs/current/agent-loop/AGENT_PROFILE_TEMPLATE.yaml
+    - docs/current/agent-loop/CONTEXT_INDEX.yaml
+    - docs/current/agent-loop/TEST_MATRIX.yaml
+    - docs/current/agent-loop/TEST_MODIFICATION_POLICY.md
+    - scripts/agent_loop
+constraints:
+  max_model_input_tokens: 1000
+  max_model_output_tokens: 1000
+  max_model_turns: 1
+  max_role_runs: 2
+  max_subtasks: 0
+  max_subtask_depth: 0
+acceptance:
+  - "python scripts/agent_loop/check.py"
+  - "python -c \"import scripts.check as check; check.check_docs()\""
+  - "python -m unittest -q scripts.agent_loop.test_control_plane scripts.agent_loop.test_schema_validation scripts.agent_loop.test_persistence scripts.agent_loop.test_file_locks scripts.agent_loop.test_manifest_completion scripts.agent_loop.test_snapshot_scope scripts.agent_loop.test_test_matrix scripts.agent_loop.test_context_integration"
+  - "docker version --format '{{.Server.Version}}'"
+known_conditions:
+  - "当前仓库已 git init，但尚无首个 commit；用户改动保持在 staged/working tree 范围内。"
+  - "models/v3/policy.pt 是项目声明的运行时资产；当前 Python 环境缺少 torch，未加载该模型。"
+  - "Docker 只做可用性探测，本 Pilot 不启动服务、不创建容器。"
+termination:
+  success: "所有 acceptance 命令通过，证据和 RunManifest 完整，且没有越权写入。"
+  blocked: "出现边界违规、证据缺失、预算超限或校验失败时立即停止并记录。"
+execution:
+  max_owner_attempts: 1
+  max_elapsed_minutes: 10
+  max_role_runs: 2
+  max_model_input_tokens: 1000
+  max_model_output_tokens: 1000
+  max_model_turns: 1
+  max_subtasks: 0
+  max_subtask_depth: 0
+artifacts:
+  required:
+    - docs/current/agent-loop/pilots/PILOT_001_CONTEXT_BRIEF.yaml
+    - docs/current/agent-loop/pilots/PILOT_001_RUN_MANIFEST.yaml
+    - docs/current/agent-loop/pilots/PILOT_001_REPORT.md
+  forbidden:
+    - production_code_diff

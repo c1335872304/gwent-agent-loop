@@ -1,0 +1,107 @@
+schema_version: "1.0"
+protocol_version: 1
+run_id: GW-PILOT-001-RUN-001
+task_id: GW-PILOT-001
+task_revision: 1
+runner: deterministic-manual-pilot
+status: completed
+started_at: "2026-09-13T00:00:00+08:00"
+completed_at: "2026-09-13T00:00:00+08:00"
+workspace:
+  base_snapshot: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+  final_snapshot: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+budget:
+  role_runs_used: 2
+  max_role_runs: 2
+  subtasks_used: 0
+  max_subtasks: 0
+  input_tokens_used: 0
+  max_input_tokens: 1000
+  output_tokens_used: 0
+  max_output_tokens: 1000
+  model_turns_used: 0
+  max_model_turns: 1
+  elapsed_minutes: 0
+  max_elapsed_minutes: 10
+role_runs:
+  - role: context-integration
+    attempt_id: GW-PILOT-001-CONTEXT-001
+    profile_id: context-integration
+    status: closed
+    input_ref: docs/current/agent-loop/pilots/PILOT_001_TASK_PACKET.yaml
+    output_ref: docs/current/agent-loop/pilots/PILOT_001_CONTEXT_BRIEF.yaml
+    snapshot_id: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+    changed_files: []
+  - role: test-verification
+    attempt_id: GW-PILOT-001-TEST-001
+    profile_id: test-verification
+    status: closed
+    input_ref: docs/current/agent-loop/pilots/PILOT_001_CONTEXT_BRIEF.yaml
+    output_ref: docs/current/agent-loop/pilots/PILOT_001_REPORT.md
+    snapshot_id: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+    changed_files: []
+gates:
+  - name: agent_loop_assets
+    status: passed
+    evidence_ref: "python scripts/agent_loop/check.py"
+  - name: docs_links
+    status: passed
+    evidence_ref: "python -c \"import scripts.check as check; check.check_docs()\""
+  - name: unit_tests
+    status: passed
+    evidence_ref: "19 Agent Loop unit tests"
+  - name: docker_probe
+    status: passed
+    evidence_ref: "docker version --format '{{.Server.Version}}'"
+artifacts:
+  - artifact_id: GW-PILOT-001-ARTIFACT-PACKET
+    kind: decision
+    path: docs/current/agent-loop/pilots/PILOT_001_TASK_PACKET.yaml
+    producer_attempt_id: GW-PILOT-001-CONTEXT-001
+    snapshot: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+    sha256: not-computed
+    redaction_status: verified
+    retention: task
+  - artifact_id: GW-PILOT-001-ARTIFACT-BRIEF
+    kind: handoff
+    path: docs/current/agent-loop/pilots/PILOT_001_CONTEXT_BRIEF.yaml
+    producer_attempt_id: GW-PILOT-001-CONTEXT-001
+    snapshot: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+    sha256: not-computed
+    redaction_status: verified
+    retention: task
+  - artifact_id: GW-PILOT-001-ARTIFACT-REPORT
+    kind: test_report
+    path: docs/current/agent-loop/pilots/PILOT_001_REPORT.md
+    producer_attempt_id: GW-PILOT-001-TEST-001
+    snapshot: file-hash-manifest:c86098912fce433728e0751f78dbaa0136f5b77e87afa693393b8543947b575e
+    sha256: not-computed
+    redaction_status: verified
+    retention: task
+state_events:
+  - event_seq: 1
+    type: task_created
+  - event_seq: 2
+    type: context_bound
+  - event_seq: 3
+    type: context_handoff
+  - event_seq: 4
+    type: validation_started
+  - event_seq: 5
+    type: validation_passed
+  - event_seq: 6
+    type: evidence_written
+  - event_seq: 7
+    type: gates_passed
+  - event_seq: 8
+    type: task_completed
+final_report_ref: docs/current/agent-loop/pilots/PILOT_001_REPORT.md
+termination:
+  final_report_ref: docs/current/agent-loop/pilots/PILOT_001_REPORT.md
+  reason: "pilot_passed"
+  summary: "协议演练通过；不代表整个项目或 quick 检查已全部通过。"
+  unresolved:
+    - "当前环境缺少 torch，Trainer 模型槽位未加载验证。"
+cleanup:
+  status: not_required
+  containers_started: 0
