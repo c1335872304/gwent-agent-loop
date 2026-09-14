@@ -3,7 +3,7 @@
 
 Usage:
   python scripts/check.py architecture  # architecture/Agent Loop checks without Trainer runtime
-  python scripts/check.py docker-test  # canonical pytest environment in Docker
+  python3 scripts/check.py docker-test  # canonical pytest environment in Docker
   python scripts/check.py quick   # metadata/docs/schema/training definitions
   python scripts/check.py test    # quick + focused C/Python regression tests
   python scripts/check.py full    # quick + full C/Python test suites

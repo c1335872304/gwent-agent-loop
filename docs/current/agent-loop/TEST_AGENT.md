@@ -8,7 +8,7 @@ The agent must never run a global `docker compose down` on a shared project. It 
 
 ## Canonical pytest environment
 
-The pinned Docker test image is the canonical environment for Python pytest. It contains pytest, pytest-asyncio, PyYAML, tomli, project API dependencies, and CPU torch. Use `python scripts/check.py docker-test` to rebuild the image when its manifest changes and run the current working tree tests.
+The pinned Docker test image is the canonical environment for Python pytest. It contains pytest, pytest-asyncio, PyYAML, tomli, project API dependencies, and CPU torch. Use `python3 scripts/check.py docker-test` to rebuild the image when its manifest changes and run the current working tree tests. The `python3` launcher is required on the WSL/Linux Host; the test image itself runs its pinned Python entrypoint.
 
 Host pytest may be used only to diagnose host dependency problems. A host PASS or FAIL is not the authoritative Product, Teacher, or Agent Loop test result. The container is intentionally run with `--rm`; dependencies persist in the image, while container state does not.
 

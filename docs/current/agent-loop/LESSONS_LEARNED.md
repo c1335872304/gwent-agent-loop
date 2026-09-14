@@ -199,13 +199,13 @@ impact: "A host dependency mismatch can be misclassified as a code defect and ca
 root_cause: "The host interpreter and the repository test image were treated as equivalent environments even though only the image pins the required pytest plugins and runtime dependencies."
 evidence:
   - ref: "python -m pytest -q apps/web/backend/tests: 13 passed, 4 async plugin failures on host"
-  - ref: "python scripts/check.py docker-test: 62 passed in the pinned test image"
+  - ref: "python3 scripts/check.py docker-test: 62 passed in the pinned test image"
   - ref: "deploy/docker/requirements.test.txt"
-correct_practice: "Use python scripts/check.py docker-test as authoritative Python pytest evidence for Product, Teacher, and Agent Loop scopes. Use host pytest only to diagnose environment differences, and classify its result as ENVIRONMENT_FAILURE when plugins or runtime dependencies are missing."
+correct_practice: "Use python3 scripts/check.py docker-test as authoritative Python pytest evidence for Product, Teacher, and Agent Loop scopes. Use host pytest only to diagnose environment differences, and classify its result as ENVIRONMENT_FAILURE when plugins or runtime dependencies are missing."
 verification:
   - "Docker test image rebuild completed"
   - "62 tests passed, 2 dependency warnings"
-regression_test: "python scripts/check.py docker-test"
+regression_test: "python3 scripts/check.py docker-test"
 trigger_terms: ["pytest", "pytest-asyncio", "host environment", "docker-test", "environment failure"]
 ```
 

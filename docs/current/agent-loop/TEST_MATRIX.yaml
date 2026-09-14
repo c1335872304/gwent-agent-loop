@@ -17,7 +17,7 @@ default_docker:
   max_runtime_minutes: 30
 
 canonical_pytest:
-  command: "python scripts/check.py docker-test"
+  command: "python3 scripts/check.py docker-test"
   image_definition: "deploy/docker/Dockerfile.test"
   dependency_manifest: "deploy/docker/requirements.test.txt"
   container_policy: "run --rm"

@@ -178,7 +178,7 @@ service-backed Docker, Pilot 009 records the serial Scheduler canary, and
 Pilot 010 records multi-role routing, restart/rebind and contract handoff. Raw
 TaskPacket, ContextBrief, ChangeReport, TestReport, handoff, and RunManifest
 files remain under `.agent-loop/`. The canonical Python pytest command is
-`python scripts/check.py docker-test`; host pytest is diagnostic only when
+`python3 scripts/check.py docker-test`; host pytest is diagnostic only when
 dependencies differ. The CLI bridge entry point is
 `scripts/agent_loop/codex_cli_bridge.py`, and its single-domain coordinator is
 `scripts/agent_loop/bounded_loop.py`.

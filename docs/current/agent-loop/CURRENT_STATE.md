@@ -104,7 +104,7 @@ budget; independent Test was not started. The field result is
 | Runner lifecycle and execution journal | implemented as model-free contracts | `runner.py`, `execution.py` |
 | Owner to Test handoff and verification plan | implemented as validators | `handoff.py`, `verification.py` |
 | TestReport evidence gate | implemented | `report_validation.py`, `TEST_REPORT_TEMPLATE.yaml` |
-| Docker canonical pytest | implemented for the declared Python test suite | `scripts/check.py docker-test` |
+| Docker canonical pytest | implemented for the declared Python test suite | `python3 scripts/check.py docker-test` |
 | Bounded recovery / circuit breaker | implemented deterministically | `recovery.py`, `RECOVERY_POLICY.md` |
 | Recovery decision journaling and bounded resume hook | live controlled loss/resume passed once; bounded | `execution.py`, `PILOT_005_REPORT.md` |
 | Codex project-task request | builder implemented | `codex_bridge.py`, `CODEX_TRANSPORT.md` |

@@ -138,6 +138,6 @@ PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests
 cd apps/web/frontend && npm ci && npm run build
 ```
 
-For Python pytest in Product, Teacher, and Agent Loop scopes, the canonical environment is Docker: `python scripts/check.py docker-test`. Host pytest is diagnostic only and must not be used as the final PASS/FAIL evidence when host dependencies differ from the pinned test image.
+For Python pytest in Product, Teacher, and Agent Loop scopes, the canonical environment is Docker: `python3 scripts/check.py docker-test`. Host pytest is diagnostic only and must not be used as the final PASS/FAIL evidence when host dependencies differ from the pinned test image.
 
 最终说明应包含：改了什么、为什么、读取了哪个 Skill/contract、验证结果、是否跨越 Agent 边界。
