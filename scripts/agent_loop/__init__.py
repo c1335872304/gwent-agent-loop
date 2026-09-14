@@ -2,6 +2,7 @@
 
 __all__ = [
     "budget",
+    "host_registry",
     "locks",
     "manifest",
     "snapshot",

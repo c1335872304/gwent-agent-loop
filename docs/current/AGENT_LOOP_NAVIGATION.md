@@ -1,7 +1,7 @@
 # Gwent Agent Loop 项目导航
 
-> **状态：In Progress（Phase 4 pilot）**
-> **版本：0.2**
+> **状态：In Progress（以 `agent-loop/CURRENT_STATE.md` 为唯一现状）**
+> **版本：0.3**
 > **用途：给主 Agent、Context / Integration Agent 和各领域 Owner 提供稳定的上下文入口。**
 > **当前实现状态：** [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md) 是唯一现状入口。
 
@@ -148,7 +148,7 @@ LL-008，并完成以下检查：
 
 ## 6. 导航维护规则
 
-当前推进到 Phase 4 人工试点：已具备 Profile、ContextIndex、TestMatrix、RunManifest、Docker canonical pytest 和 `scripts/agent_loop/` 确定性控制器；Pilot 002 已完成真实 Product 改动与独立验证，Runner 执行记录已绑定 TaskStore packet revision，LaunchSpec、共享 ContextBrief contract、transport-only adapter、Owner-to-Verification handoff、VerificationPlan、TestReport evidence gate、bounded recovery policy、Codex project-task request builder 和 Host Transport 生命周期映射已完成校验，但真实 Codex 平台 bridge、Codex 子会话和真实自动恢复仍未接入。模型暂按 [`MODEL_SCOPE.md`](agent-loop/MODEL_SCOPE.md) 作为冻结、暂时正确的架构输入处理。
+当前推进到三阶段路线图的阶段三 P0：已具备 Profile、ContextIndex、TestMatrix、RunManifest、Docker canonical pytest、`scripts/agent_loop/` 确定性控制器、Codex CLI bridge、单领域 Owner-to-Verification 编排、串行 Scheduler 和模型无关的多角色 Scheduler canary；`GW-REAL-PRODUCT-001` 已完成真实 Product → Test/Verification、受控 Runner 恢复、隔离集成和 service-backed Docker 试点。阶段三的控制面已补齐按角色 backend、snapshot restore/rebind 和跨域 contract handoff；真实 Codex Host-backed 多角色重启恢复与独立验证仍待低风险现场试点。模型暂按 [`MODEL_SCOPE.md`](agent-loop/MODEL_SCOPE.md) 作为冻结、暂时正确的架构输入处理。
 
 1. 新增或变更 contract 时，同一任务必须检查本导航的事实来源链接和路由表。
 2. 新发现的可复现坑，先写入 `LESSONS_LEARNED.md`，再决定是否修代码或补测试。
@@ -168,6 +168,17 @@ LL-008，并完成以下检查：
 问题涉及用户选择、breaking 或高风险？ → Main Agent → Human gate
 ```
 
-## 8. Current pilot pointer
+## 8. Current evidence pointer
 
-Pilot 002 is the current completed Product pilot. Its TaskPacket, ContextBrief, ChangeReport, TestReport, RunManifest, and report are under `agent-loop/pilots/PILOT_002_*`. The execution binding is implemented in `scripts/agent_loop/execution.py` and covered by the architecture gate. The canonical Python pytest command is `python scripts/check.py docker-test`; host pytest is diagnostic only when dependencies differ.
+`CURRENT_STATE.md` is the only current-status source. Completed live evidence is
+split by capability: Pilot 004 records the first CLI Product → Test loop, Pilot
+005 records loss/resume, Pilot 006 records integration and canonical Docker,
+Pilot 007 records isolated integration and budget re-audit, Pilot 008 records
+service-backed Docker, Pilot 009 records the serial Scheduler canary, and
+Pilot 010 records multi-role routing, restart/rebind and contract handoff. Raw
+TaskPacket, ContextBrief, ChangeReport, TestReport, handoff, and RunManifest
+files remain under `.agent-loop/`. The canonical Python pytest command is
+`python scripts/check.py docker-test`; host pytest is diagnostic only when
+dependencies differ. The CLI bridge entry point is
+`scripts/agent_loop/codex_cli_bridge.py`, and its single-domain coordinator is
+`scripts/agent_loop/bounded_loop.py`.

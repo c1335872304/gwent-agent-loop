@@ -18,6 +18,7 @@ ownership:
 
 scope:
   allowed_write_paths: []
+  allowed_test_write_paths: []
   forbidden_paths: []
   declared_contracts:
     # 每项明确 changed / unchanged；unknown 阻止实施。

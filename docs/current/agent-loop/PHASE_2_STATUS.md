@@ -1,8 +1,8 @@
 # Phase 2 状态：确定性控制平面
 
-> 状态：已落地（控制器、持久化、跨进程锁和主检查入口完成；quick 仅受训练环境缺少 torch 阻断）
+> 状态：已结束（历史记录；确定性控制平面已落地）
 >
-> 当前状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件记录 Phase 2 当时的状态。
+> 当前状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件记录 Phase 2 当时的状态，文中的“下一步”不再作为当前待办。
 
 ## 已落地
 
@@ -32,6 +32,6 @@ python -m compileall -q scripts/agent_loop                    PASS
 1. `python scripts/check.py architecture` 已按 [`MODEL_SCOPE.md`](MODEL_SCOPE.md) 接受冻结模型槽位，不读取模型内容；全项目 `quick` 才会进入 Trainer 环境并需要 `torch`。
 2. `scripts/check.py quick` 已纳入 21 个控制平面测试；安装环境仍需实际同步 `PyYAML>=6.0` dev 依赖。
 
-## Phase 2 下一步
+## Phase 2 下一步（历史记录）
 
 控制平面已进入人工闭环试点；在 Trainer 环境补齐前，不执行需要加载 PyTorch checkpoint 的训练验证，也不把它误判为 Agent Loop 协议失败。

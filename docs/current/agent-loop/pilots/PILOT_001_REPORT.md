@@ -1,5 +1,7 @@
 # Pilot 001：Agent Loop 协议演练报告
 
+> 记录属性：历史协议演练；当前状态以 [`CURRENT_STATE.md`](../CURRENT_STATE.md) 为准。
+
 ## 结论
 
 Pilot 001 通过。它验证了“Context/Integration 先形成边界明确的 ContextBrief，再交给 Test/Verification 做只读验证，最后生成 RunManifest”的最小闭环。

@@ -2,7 +2,7 @@
 
 ## Docker readiness note
 
-The repository has a working Docker foundation, but it is not yet a complete all-tests runner. The current test image passed 62 Agent Loop/Python/API/Teacher tests, and the CPU trainer image provides `torch=2.6.0+cpu`. Core C++ tests, frontend builds, and full Trainer validation do not yet share one container command.
+The repository has a working Docker foundation, but it is not yet a complete all-tests runner. The current test image passed 121 Agent Loop/Python/API/Teacher tests, and the CPU trainer image provides `torch=2.6.0+cpu`. Core C++ tests, frontend builds, and full Trainer validation do not yet share one container command.
 
 The agent must never run a global `docker compose down` on a shared project. It must record pre-existing containers, use `run --rm` or an isolated project name, and clean only resources created by the current attempt. Unknown ownership means `HUMAN_REQUIRED`.
 
@@ -12,7 +12,11 @@ The pinned Docker test image is the canonical environment for Python pytest. It 
 
 Host pytest may be used only to diagnose host dependency problems. A host PASS or FAIL is not the authoritative Product, Teacher, or Agent Loop test result. The container is intentionally run with `--rm`; dependencies persist in the image, while container state does not.
 
-状态：Agent 配置已实现；自动 Runner 尚未实现。
+状态：Agent 配置和本地 Codex CLI Runner 已实现；Pilot 005 已完成一次真实
+Runner 丢失后的同一责任链有界恢复，并由独立 Test Agent 在 Owner 最终
+snapshot 上验证通过。Pilot 006 还完成了父工作树集成后的第二轮独立验证，
+并通过了 canonical Docker test；Pilot 008 已由声明服务依赖的 TaskPacket
+补齐 service-backed Docker health/failure/cleanup 证据。
 
 ## 角色定位
 
@@ -83,4 +87,4 @@ Owner ChangeReport
       └─ 权限、预算、范围或 cleanup 问题 → HUMAN_REQUIRED
 ```
 
-当前先实现角色配置和协议；真实跨会话 Runner 要等人工试点证明权限、证据和停止条件稳定后再实现。
+当前阶段三继续验证多角色 Scheduler 与跨会话 Runner 的边界；模型无关的角色路由、snapshot restore/rebind 和跨域 contract handoff 已由 Pilot 010 覆盖，但真实 Host-backed rebind 与独立进程恢复仍待现场试点。任何恢复失败、预算耗尽或权限不确定都必须进入 `HUMAN_REQUIRED`，不能通过新增 Agent 绕过。当前单领域 CLI 闭环、受控恢复、service-backed Docker、串行 Scheduler 和多角色控制面 canary 的已完成证据以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准。

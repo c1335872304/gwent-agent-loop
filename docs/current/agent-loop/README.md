@@ -13,9 +13,18 @@
 - Phase 1 资产：`AGENT_PROFILE_TEMPLATE.yaml`、`profiles/`、`CONTEXT_INDEX.yaml`、`RUN_MANIFEST_TEMPLATE.yaml`；
 - Phase 2 第一版：`scripts/agent_loop/` 的状态机、预算、锁、snapshot、校验和本地持久化；
 - Phase 3 准备：`TEST_MATRIX.yaml`、`TEST_MODIFICATION_POLICY.md` 和 TestMatrix 校验；
-- Test / Verification Agent: `TEST_AGENT.md` and `.codex/agents/test-verification.toml` are implemented; the real cross-session host transport is not implemented yet;
-- Recovery policy: `RECOVERY_POLICY.md` and `scripts/agent_loop/recovery.py` are implemented; automatic transport execution is not enabled;
-- Codex transport boundary: `CODEX_TRANSPORT.md` and `scripts/agent_loop/codex_bridge.py` are implemented; the host API adapter is not enabled;
+- Test / Verification Agent: `TEST_AGENT.md` and `.codex/agents/test-verification.toml` are implemented; the concrete Codex CLI cross-session transport is available;
+- Recovery policy: `RECOVERY_POLICY.md`, `recovery.py`, and `RunnerExecution.recover()` are connected; Pilot 005 proves one live bounded same-runner loss/resume;
+- Pilot 005: `PILOT_005_REPORT.md` records the live recovery chain and the parent integration gate as it stood at that time; later integration evidence is in Pilots 006–007;
+- Pilot 006: `PILOT_006_REPORT.md` records the applied integration, post-integration verification, canonical Docker result, rollback rehearsal, and initial budget audit;
+- Pilot 007: `PILOT_007_REPORT.md` records the isolated unattended integration path, recalibrated budget audit, and final canonical verification;
+- Pilot 008: `PILOT_008_REPORT.md` records the service-backed Docker health, controlled failure classification, and ownership-scoped cleanup evidence;
+- Phase 2 integration gate: `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `integration.py`, and its deterministic tests provide read-only planning, explicit approval, disjoint isolated auto-integration, and applied-snapshot recording; direct mutation of a dirty parent remains human-gated;
+- Phase 3 P0 Scheduler: `scheduler.py` and `test_scheduler.py` provide serial FIFO routing, pause/resume/end, hard concurrency/task/token/time limits and append-only scheduling evidence; `PILOT_009_REPORT.md` records the canary;
+- Phase 3 Runner backend: `scheduler_backend.py` and `test_scheduler_backend.py` bind `RunnerExecution` to the Scheduler, preserve cumulative metrics as deltas, count model turns, and require persisted resume artifacts;
+- Phase 3 multi-role control plane: `MultiRoleRunnerExecutionBackend`, strict Scheduler restore/rebind and `ContractHandoffEnvelope` are covered by `PILOT_010_REPORT.md`; the canary is model-free and the live Host rebind remains a separate gate;
+- Live multi-role canary design: `PILOT_011_TASK_DESIGN.md` defines the bounded Product → Teacher → Test task, restart injection point, budget and fail-closed conditions;
+- Codex transport boundary: `CODEX_TRANSPORT.md`, `scripts/agent_loop/codex_bridge.py`, `scripts/agent_loop/codex_cli_bridge.py`, and `scripts/agent_loop/bounded_loop.py` are implemented; the Desktop MCP adapter remains injectable;
 - Phase 4 试点：已完成一次无业务代码写入的 Pilot 001，证据位于 `pilots/`；
 - 阶段记录：[PHASE_1_STATUS.md](PHASE_1_STATUS.md)、[PHASE_2_STATUS.md](PHASE_2_STATUS.md)、[PHASE_3_STATUS.md](PHASE_3_STATUS.md)、[PHASE_4_STATUS.md](PHASE_4_STATUS.md)。
 

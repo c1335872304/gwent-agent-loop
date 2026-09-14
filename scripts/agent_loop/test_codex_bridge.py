@@ -30,7 +30,18 @@ class CodexBridgeTests(unittest.TestCase):
         )
         self.assertNotIn("raw_transcript", payload)
         self.assertFalse(payload["spawn_policy"]["allow_child_tasks"])
+        self.assertEqual(payload["structured_inputs"]["task_packet"]["task_id"], "TASK-1")
         self.assertIn("TaskPacket: tasks/TASK-1.yaml", launch.prompt)
+
+    def test_verifier_prompt_requires_exact_test_report_shape(self):
+        verifier = git_spec()
+        verifier = replace(verifier, profile={**verifier.profile, "agent_id": "test-verification", "role_type": "verification"})
+        verifier = replace(verifier, request=replace(verifier.request, role="test-verification"))
+        launch = build_codex_thread_launch(
+            verifier, project_id="gwent-v4", project_is_git=True
+        )
+        self.assertIn("tested_snapshot", launch.prompt)
+        self.assertIn("exact full command string", launch.prompt)
 
     def test_requires_git_project_and_git_snapshot(self):
         with self.assertRaisesRegex(CodexBridgeError, "Git project"):

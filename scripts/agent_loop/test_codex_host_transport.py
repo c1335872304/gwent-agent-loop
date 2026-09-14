@@ -13,6 +13,7 @@ class FakeCodexHostBridge:
     def __init__(self):
         self.created = None
         self.wait_status = {"status": "running"}
+        self.rebound = None
 
     def create_task(self, payload):
         self.created = payload
@@ -21,6 +22,10 @@ class FakeCodexHostBridge:
     def wait_task(self, handle):
         return dict(self.wait_status)
 
+    def rebind_task(self, handle, *, payload):
+        self.rebound = (handle.runner_ref, payload)
+        return {"status": "running", "resume_count": 1}
+
     def interrupt_task(self, handle, *, reason):
         return {"status": "interrupted", "reason": reason}
 
@@ -28,10 +33,33 @@ class FakeCodexHostBridge:
         return {"status": "running"}
 
     def close_task(self, handle, *, report_ref):
-        return {"status": "completed"}
+        return {
+            "status": "completed",
+            "report_ref": "stable-report.yaml",
+            "final_snapshot": "final-1",
+            "changed_paths": ["apps/web/frontend/src/App.tsx"],
+        }
+
+    def inject_loss(self, handle, *, reason):
+        return {"status": "lost", "reason": reason}
 
 
 class CodexHostTransportTests(unittest.TestCase):
+    def test_rebind_uses_persisted_reference_without_create(self):
+        spec = git_spec()
+        bridge = FakeCodexHostBridge()
+        transport = CodexHostTransport(
+            project_id="gwent-v4", project_is_git=True, bridge=bridge
+        )
+
+        rebound = transport.rebind(spec.to_payload(), "codex:local:thread-1")
+
+        self.assertEqual(rebound["event"], "rebound")
+        self.assertEqual(rebound["runner_ref"], "codex:local:thread-1")
+        self.assertEqual(rebound["resume_count"], 1)
+        self.assertIsNotNone(bridge.rebound)
+        self.assertIsNone(bridge.created)
+
     def test_round_trip_maps_host_lifecycle_to_runner_execution(self):
         spec = git_spec()
         bridge = FakeCodexHostBridge()
@@ -50,6 +78,9 @@ class CodexHostTransportTests(unittest.TestCase):
 
         self.assertEqual(closed.status, "closed")
         self.assertEqual(closed.runner_ref, "codex:local:thread-1")
+        self.assertEqual(closed.report_ref, "stable-report.yaml")
+        self.assertEqual(closed.final_snapshot, "final-1")
+        self.assertEqual(closed.changed_paths, ("apps/web/frontend/src/App.tsx",))
         self.assertEqual(bridge.created["project_id"], "gwent-v4")
         self.assertFalse(bridge.created["spawn_policy"]["allow_child_tasks"])
 
@@ -95,6 +126,18 @@ class CodexHostTransportTests(unittest.TestCase):
         execution.open()
         with self.assertRaisesRegex(CodexHostTransportError, "requires a reason"):
             execution.wait()
+
+    def test_controlled_loss_hook_maps_to_lost_runner_event(self):
+        spec = git_spec()
+        transport = CodexHostTransport(
+            project_id="gwent-v4", project_is_git=True, bridge=FakeCodexHostBridge()
+        )
+        execution = RunnerExecution(
+            ExternalRunnerAdapter(spec, transport), spec.request, max_resumes=1
+        )
+        opened = execution.open()
+        lost = transport.inject_loss(opened.runner_ref, reason="field trial")
+        self.assertEqual(lost["status"], "lost")
 
 
 if __name__ == "__main__":

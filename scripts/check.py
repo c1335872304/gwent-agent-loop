@@ -219,6 +219,13 @@ def check_agent_loop() -> None:
         "scripts.agent_loop.test_recovery",
         "scripts.agent_loop.test_codex_bridge",
         "scripts.agent_loop.test_codex_host_transport",
+        "scripts.agent_loop.test_codex_cli_bridge",
+        "scripts.agent_loop.test_host_registry",
+        "scripts.agent_loop.test_bounded_loop",
+        "scripts.agent_loop.test_integration",
+        "scripts.agent_loop.test_scheduler",
+        "scripts.agent_loop.test_scheduler_backend",
+        "scripts.agent_loop.test_stage3_canary",
     )
 
 

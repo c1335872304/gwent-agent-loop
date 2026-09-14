@@ -1,10 +1,10 @@
 # Phase 1 状态：上下文资产化
 
-> 状态：进行中（资产第一版已落地，确定性校验器尚未实现）
+> 状态：已结束（历史记录；后续确定性校验器已在 Phase 2 落地）
 >
 > 本记录是阶段实施状态，不替代 [`AGENT_LOOP_PHASE_PLAN.md`](../AGENT_LOOP_PHASE_PLAN.md) 的协议定义。
 >
-> 当前状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件中的“尚未实现”均是本阶段当时的历史记录。
+> 当前状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件中的“尚未实现”均是本阶段当时的历史记录，不是当前待办。
 
 ## 已落地
 
@@ -22,7 +22,7 @@
 - 没有启动 Codex 子会话，也没有把完整聊天记录写入项目记忆。
 - Profile 不等于提示词；ContextIndex 不等于聊天摘要；RunManifest 不等于最终汇报。
 
-## 进入 Phase 2 前的剩余动作
+## 进入 Phase 2 前的剩余动作（历史记录）
 
 1. 配置 Git identity 并创建初始 baseline commit。
 2. 用 baseline commit 更新 `CONTEXT_INDEX.yaml` 的 `workspace_snapshot` 和所有 `verified_snapshot`。

@@ -128,7 +128,10 @@ def build_launch_spec(
         task_revision=task_revision,
         snapshot=snapshot,
     )
-    _validate_write_scope(write_scope, list(task_packet["scope"]["allowed_write_paths"]))
+    scope_paths = task_packet["scope"]["allowed_write_paths"]
+    if role == "test-verification" and task_packet["scope"].get("allowed_test_write_paths"):
+        scope_paths = task_packet["scope"]["allowed_test_write_paths"]
+    _validate_write_scope(write_scope, list(scope_paths))
 
     if not attempt_id.strip() or not task_packet_ref.strip() or not context_brief_ref.strip() or not profile_ref.strip():
         raise ValidationError("RunnerLaunchSpec references and attempt_id must not be empty")
@@ -216,3 +219,46 @@ def build_launch_spec_from_payload(payload: Mapping[str, Any]) -> RunnerLaunchSp
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise ValidationError("Runner launch payload has invalid structured fields") from exc
+
+
+def build_verification_launch_spec(
+    owner_spec: RunnerLaunchSpec,
+    handoff: Any,
+    *,
+    test_profile: Mapping[str, Any],
+    attempt_id: str,
+    task_packet_ref: str,
+    context_brief_ref: str,
+    profile_ref: str,
+    write_scope: tuple[str, ...],
+    max_turns: int,
+    max_input_tokens: int,
+    max_output_tokens: int,
+    max_elapsed_minutes: int,
+) -> RunnerLaunchSpec:
+    """Build the independent verifier launch at the owner's final snapshot."""
+    final_snapshot = str(getattr(handoff, "final_snapshot", "")).strip()
+    if not final_snapshot:
+        raise ValidationError("verification launch requires the owner's final snapshot")
+    packet = copy.deepcopy(dict(owner_spec.task_packet))
+    workspace = dict(packet.get("workspace", {}))
+    workspace["snapshot_kind"] = "git_commit"
+    workspace["snapshot_ref"] = final_snapshot
+    packet["workspace"] = workspace
+    context = copy.deepcopy(dict(owner_spec.context_brief))
+    context["context_snapshot"] = final_snapshot
+    return build_launch_spec(
+        task_packet=packet,
+        context_brief=context,
+        profile=copy.deepcopy(dict(test_profile)),
+        task_packet_ref=task_packet_ref,
+        context_brief_ref=context_brief_ref,
+        profile_ref=profile_ref,
+        attempt_id=attempt_id,
+        write_scope=write_scope,
+        max_turns=max_turns,
+        max_input_tokens=max_input_tokens,
+        max_output_tokens=max_output_tokens,
+        max_elapsed_minutes=max_elapsed_minutes,
+        subtask_depth=0,
+    )

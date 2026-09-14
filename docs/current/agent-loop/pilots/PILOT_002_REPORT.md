@@ -1,5 +1,7 @@
 # Pilot 002: Product stale-state recovery
 
+> 记录属性：历史 Product 试点；后续 CLI、恢复和 service-backed 证据以 [`CURRENT_STATE.md`](../CURRENT_STATE.md) 及 Pilot 004–008 为准。
+
 ## Conclusion
 
 Pilot 002 passed. The Product Owner changed one frontend file so a fresh game snapshot clears pending actions, selected card state, and the acted-turn marker. The change does not modify Core actions, HTTP contracts, Teacher behavior, models, or Trainer code.

@@ -28,12 +28,18 @@ it does not launch a model, a child task, or Docker.
    silently become a new owner task.
 4. An invalid report blocks completion before any retry decision.
 5. A protocol failure is stopped for inspection instead of being retried.
-6. The caller must persist the decision and counters in the RunManifest before
-   executing the next action.
+6. `RunnerExecution.recover()` persists the decision and counters in the
+   ExecutionJournal before it invokes a bounded resume; the caller must project
+   the same entry into the RunManifest before executing any later action.
 
 ## Current implementation boundary
 
-`scripts/agent_loop/recovery.py` implements the policy and
-`scripts/agent_loop/test_recovery.py` tests it without model, Docker, or host
-dependencies. The platform transport still has to call this policy and persist
-the resulting action; that integration is the next execution-layer step.
+`scripts/agent_loop/recovery.py` implements the policy, while
+`RunnerExecution.recover()` connects it to the per-attempt ExecutionJournal
+and the existing bounded `resume()` operation. Pilot 005 provided live evidence
+that a persisted Codex CLI rollout can survive one injected loss and resume on
+the same Runner. An earlier immediate-loss attempt failed with Codex's
+`no rollout found` because persistence had not completed; it correctly stopped
+instead of fabricating recovery. The local CLI bridge now exposes token and
+elapsed metrics; Pilot 006 recorded them and correctly stopped when the
+TaskPacket budget was exceeded.

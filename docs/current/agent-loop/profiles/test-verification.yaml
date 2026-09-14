@@ -25,7 +25,7 @@ docker:
   cleanup_required: true
   max_runtime_minutes: 30
 model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
-execution_limits: {max_attempts: 2, max_elapsed_minutes: 60, max_input_tokens: 48000, max_output_tokens: 12000, may_spawn_subtasks: false, max_subtask_depth: 0}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 60, max_input_tokens: 1000000, max_output_tokens: 12000, may_spawn_subtasks: false, max_subtask_depth: 0}
 required_outputs: ["ReviewReport or TestReport", "changed test paths", "failure classification", "final snapshot"]
 required_verification: ["run only declared commands", "distinguish code/test/environment/docker/permission failures"]
 stop_conditions: ["production write is requested", "test assertion would be weakened", "Docker cleanup cannot be guaranteed", "budget is exhausted"]

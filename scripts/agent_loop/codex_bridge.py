@@ -72,6 +72,7 @@ class CodexThreadLaunch:
     max_output_tokens: int
     max_elapsed_minutes: int
     subtask_depth: int
+    structured_inputs: Mapping[str, Mapping[str, Any]]
 
     def to_payload(self) -> dict[str, Any]:
         """Return a create-task payload without transcript or model overrides."""
@@ -87,6 +88,7 @@ class CodexThreadLaunch:
                 "task_revision": self.task_revision,
                 "attempt_id": self.attempt_id,
                 "role": self.role,
+                "profile_revision": self.profile_revision,
                 "snapshot": self.snapshot,
                 "write_scope": list(self.write_scope),
             },
@@ -103,6 +105,9 @@ class CodexThreadLaunch:
                 "subtask_depth": self.subtask_depth,
             },
             "spawn_policy": {"allow_child_tasks": False, "max_depth": 0},
+            "structured_inputs": {
+                name: dict(value) for name, value in self.structured_inputs.items()
+            },
         }
 
 
@@ -150,19 +155,31 @@ def build_codex_thread_launch(
     if not title:
         raise CodexBridgeError("task title must not be empty")
 
-    prompt = "\n".join(
-        [
-            f"Act as the {spec.request.role} Agent for task {spec.request.task_id}.",
-            f"Work only on attempt {spec.request.attempt_id} at snapshot {snapshot}.",
-            "Read the structured task files before editing:",
-            f"- TaskPacket: {task_packet_ref}",
-            f"- ContextBrief: {context_brief_ref}",
-            f"- AgentProfile: {profile_ref}",
-            "Obey AGENTS.md, the declared write scope, and the relevant Skill.",
-            "Do not read or request the parent chat transcript.",
-            "Do not create child tasks. Return a structured ChangeReport or blockage report.",
-        ]
-    )
+    instructions = [
+        f"Act as the {spec.request.role} Agent for task {spec.request.task_id}.",
+        f"Work only on attempt {spec.request.attempt_id} at snapshot {snapshot}.",
+        "Read the structured task files before editing:",
+        f"- TaskPacket: {task_packet_ref}",
+        f"- ContextBrief: {context_brief_ref}",
+        f"- AgentProfile: {profile_ref}",
+        "Obey AGENTS.md, the declared write scope, and the relevant Skill.",
+        "Do not read or request the parent chat transcript.",
+        "Return only one JSON object as the final response; do not wrap it in Markdown.",
+    ]
+    if spec.request.role == "test-verification":
+        instructions.extend(
+            [
+                "Do not create child tasks. Return a structured TestReport or blockage report.",
+                "For a TestReport, use these exact top-level fields: task_id, packet_revision, tested_snapshot, tester, overall, results, environment, failures, manual_checks, changed_test_paths.",
+                f"Set tested_snapshot exactly to {snapshot}; set tester exactly to test-verification.",
+                "Each results item must use the exact full command string from TaskPacket.acceptance.verification_commands; never abbreviate it with ellipses and do not use a commands field.",
+                "Each results item must include command, cwd, status, exit_code, and evidence_ref. For a non-Docker host run, environment.runner is host-diagnostic, missing_dependencies is [], and environment.docker.used is false.",
+                "Use failures as a list (empty for PASS), manual_checks as a list, and changed_test_paths as a list. Do not substitute final_snapshot for tested_snapshot.",
+            ]
+        )
+    else:
+        instructions.append("Do not create child tasks. Return a structured ChangeReport or blockage report.")
+    prompt = "\n".join(instructions)
     target = {
         "type": "project",
         "projectId": project,
@@ -191,6 +208,11 @@ def build_codex_thread_launch(
         max_output_tokens=spec.max_output_tokens,
         max_elapsed_minutes=spec.max_elapsed_minutes,
         subtask_depth=spec.subtask_depth,
+        structured_inputs={
+            "task_packet": dict(spec.task_packet),
+            "context_brief": dict(spec.context_brief),
+            "profile": dict(spec.profile),
+        },
     )
 
 
@@ -207,3 +229,15 @@ def parse_codex_thread_handle(payload: Mapping[str, Any]) -> CodexThreadHandle:
         if value and ("\n" in value or "\r" in value or len(value) > 256):
             raise CodexBridgeError(f"{label} is invalid")
     return CodexThreadHandle(thread_id=thread_id, host_id=host_id)
+
+
+def parse_codex_runner_ref(runner_ref: str) -> CodexThreadHandle:
+    """Parse the durable ``codex:<host_id>:<thread_id>`` identity."""
+    value = _require_text(runner_ref, "runner_ref")
+    prefix, separator, remainder = value.partition(":")
+    if prefix != "codex" or not separator:
+        raise CodexBridgeError("runner_ref must use the codex:<host>:<thread> format")
+    host_id, separator, thread_id = remainder.partition(":")
+    if not separator or not host_id or not thread_id:
+        raise CodexBridgeError("runner_ref must include host_id and thread_id")
+    return parse_codex_thread_handle({"thread_id": thread_id, "host_id": host_id})

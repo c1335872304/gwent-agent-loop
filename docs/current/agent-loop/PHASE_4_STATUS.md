@@ -1,8 +1,8 @@
 # Phase 4 状态：真实闭环试点
 
-状态：进行中（Pilot 002 已完成，尚未满足 Phase 4 退出条件）
+状态：已结束（历史记录；后续 Pilot 004–008 已覆盖真实 CLI、恢复和 service-backed Docker）
 
-当前实时状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件保留 Phase 4 和 Pilot 002 的历史证据。
+当前实时状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件保留 Phase 4 和 Pilot 002 的历史证据，文中的“尚未完成”是当时结论。
 
 ## 已完成
 
@@ -14,14 +14,14 @@
 
 详见：[Pilot 001 任务包](./pilots/PILOT_001_TASK_PACKET.yaml)、[上下文简报](./pilots/PILOT_001_CONTEXT_BRIEF.yaml)、[运行清单](./pilots/PILOT_001_RUN_MANIFEST.yaml)、[报告](./pilots/PILOT_001_REPORT.md)。
 
-## 尚未完成
+## 尚未完成（当时记录）
 
 - 尚未开启真实 Codex 子任务，因此还没有验证独立上下文和跨任务 handoff。
 - 尚未验证 Docker compose 白名单、测试数据隔离、容器清理和服务失败分类。
 - 尚未处理 Trainer 本地模型加载阻塞：当前环境缺少 `torch`；这保留给 Trainer/环境边界处理。
 - 尚未满足“真实业务改动至少通过两轮独立验证”的 Phase 4 退出条件。
 
-## 下一阶段
+## 下一阶段（当时计划）
 
 实现并验证一个真实外部 Runner 适配器；仍限制在单一领域 Owner，Test/Verification 独立复核，并记录冲突、失败分类、预算和最终快照。若出现越权或不确定性，立即停在人工闸门，不扩大任务范围。
 

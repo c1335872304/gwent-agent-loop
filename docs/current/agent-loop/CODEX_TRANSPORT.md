@@ -1,8 +1,9 @@
 # Codex Project Task Transport
 
 This document defines the first platform-specific boundary for Agent Loop.
-The request builder and lifecycle adapter are implemented; the platform bridge
-is still injected and not connected to the Codex app.
+The request builder, lifecycle adapter, and durable Host rebind boundary are
+implemented. A concrete Codex CLI bridge is available for local bounded runs;
+the Desktop app's MCP bridge remains an optional host integration.
 
 ## What is created
 
@@ -21,13 +22,35 @@ The child task is therefore a project task with its own session and worktree.
 The parent does not pass its chat transcript. The child reads the structured
 files and the repository rules from the selected snapshot.
 
-## What is deliberately not done yet
+## Concrete local bridge
 
-`codex_bridge.py` and `codex_host_transport.py` do not call the Codex app tool,
-create a task, send a message, poll a task, or close a task. The host bridge
-must still implement those calls and provide normalized responses to
+`scripts/agent_loop/codex_cli_bridge.py` implements the Host Bridge contract
+against the installed Codex CLI. It resolves an explicit project id, verifies
+the Git snapshot, creates a detached temporary worktree, starts `codex exec
+--json`, and maps the process to create/wait/interrupt/resume/close. On close
+it validates changed paths, commits only the declared scope, returns the final
+commit, copies the structured final response to an ignored artifact directory,
+and removes only the temporary worktree it created. It also persists a
+Host-owned session record under the configured registry root, including the
+thread, PID, worktree, stdout/stderr and task identity. A new bridge process
+can call `rebind_task` with the original `runner_ref`; it validates identity,
+attaches to the existing PID/worktree and never calls `create_task`.
+
+`scripts/agent_loop/bounded_loop.py` composes exactly one domain Owner with
+one independent Test/Verification Runner. It requires the verifier to start
+from the Owner final snapshot, validates the TestReport, and projects the
+execution records into a RunManifest with a human gate.
+
+## Platform boundary and remaining live proof
+
+The repository code does not call the Codex Desktop MCP tool directly. A host
+integration may implement `CodexHostBridge` with the app's create/wait/resume
+and durable `rebind_task` operations and provide normalized responses to
 `CodexHostTransport`, which maps them to the existing `ExternalRunnerAdapter`
-event contract.
+event contract. The local CLI bridge is the reference implementation for the
+same contract. The code-level independent-process rebind regression passes;
+the live multi-role Product → Teacher/Test canary is still a separate field
+run and must record its real RunManifest evidence.
 
 No model or reasoning override is included. The temporary model scope remains
 in force. A non-Git project or a file-hash/working-tree snapshot is rejected
@@ -40,9 +63,11 @@ worktree.
 2. Validate the TaskPacket, ContextBrief, profile, budget and snapshot.
 3. Call `build_codex_thread_launch` and create exactly one project task.
 4. Store the returned thread id and host id as the Runner reference.
-5. Map wait, interrupt, resume and close results to Runner events.
-6. Persist every event through `RunnerExecution` before making the next call.
-7. Apply `RECOVERY_POLICY.md` after a failure; never retry from the host API
+5. Persist the Host session registry entry before treating the task as running.
+6. Map wait, interrupt, resume and close results to Runner events; on process
+   restart use lookup/rebind and never call create/open a second time.
+7. Persist every event through `RunnerExecution` before making the next call.
+8. Apply `RECOVERY_POLICY.md` after a failure; never retry from the host API
    without a persisted decision.
 
 The first real experiment must remain one domain Owner followed by one

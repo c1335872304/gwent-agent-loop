@@ -118,6 +118,39 @@ class TestRunnerExecution(unittest.TestCase):
         with self.assertRaisesRegex(ExecutionRecordError, "resume limit"):
             execution.resume(["second-report.yaml"])
 
+    def test_repeated_running_polls_do_not_exhaust_lifecycle_event_budget(self):
+        execution = RunnerExecution(DeterministicRunner(), make_request())
+        execution.open()
+        for _ in range(64):
+            execution.wait()
+        self.assertEqual(len(execution.record.events), 2)
+        self.assertEqual(execution.record.events[-1]["status"], "running")
+
+    def test_recovery_decision_is_journaled_before_bounded_resume(self):
+        request = make_request()
+        with TemporaryDirectory() as temp_dir:
+            journal = ExecutionJournal.for_task(
+                Path(temp_dir), request.task_id, request.attempt_id
+            )
+            runner = DeterministicRunner()
+            execution = RunnerExecution(runner, request, journal=journal, max_resumes=1)
+            opened = execution.open()
+            lost = runner.mark_lost(opened.runner_ref, reason="injected runner loss")
+            execution._accept(lost)
+
+            decision = execution.recover(
+                artifact_refs=["runner-loss.json"],
+                failure_class="RUNNER_FAILURE",
+                remaining_budget=3,
+            )
+
+            self.assertEqual(decision.action, "RESUME_SAME_RUNNER")
+            self.assertEqual(execution.record.resume_count, 1)
+            saved = journal.read()
+            self.assertEqual(saved["recovery_decisions"][0]["action"], "RESUME_SAME_RUNNER")
+            self.assertTrue(saved["recovery_decisions"][0]["persisted_before_action"])
+            self.assertEqual(saved["events"][-1]["event"], "resumed")
+
 
 if __name__ == "__main__":
     unittest.main()

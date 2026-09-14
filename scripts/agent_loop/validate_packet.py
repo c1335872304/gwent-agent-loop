@@ -209,6 +209,7 @@ def validate_task_packet(packet: Mapping[str, Any]) -> None:
     scope = _require_mapping(packet["scope"], "TaskPacket.scope")
     for field in ("allowed_write_paths", "forbidden_paths", "declared_contracts"):
         _list(scope.get(field), f"TaskPacket.scope.{field}")
+    _list(scope.get("allowed_test_write_paths", []), "TaskPacket.scope.allowed_test_write_paths")
     for contract in scope["declared_contracts"]:
         statuses = _contract_statuses(contract)
         if any(status.strip().lower() == "unknown" for status in statuses):

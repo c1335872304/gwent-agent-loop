@@ -1,7 +1,7 @@
 # 理想 Agent Loop 三阶段路线图
 
 > **当前版本：** 0.1
-> **当前所在：** 阶段一入口；Host Transport 生命周期适配已完成，真实平台 bridge 尚未接入
+> **当前所在：** 阶段一现场试点已通过，阶段二受控恢复、隔离集成和 service-backed Docker 试点已通过；直接父工作树集成闸门仍需人工处理
 > **权威现状：** [`CURRENT_STATE.md`](CURRENT_STATE.md)
 
 这份文档把原来的 Phase 0–7 压缩成三个可验收的工程阶段。以后推进只
@@ -100,7 +100,8 @@
 - 代码缺陷、Docker 故障、权限问题、协议错误和预算耗尽的不同恢复路径；
 - `IntegrationManifest`：base snapshot、每次 attempt、changed paths、
   冲突、最终 snapshot 和回滚方式；
-- worktree 到主工作树的人工确认集成闸门；
+- worktree 到主工作树的人工确认集成闸门；对脏 parent 的 disjoint candidate
+  可自动产出隔离分支/worktree，但不自动改写 parent；
 - Test Agent 修改测试后的 Owner/Review 二次检查；
 - 实际模型调用、token、耗时、停止原因和预算消耗记录；
 - ContextIndex 的 snapshot 新鲜度和 superseded 检查；
@@ -167,14 +168,29 @@ Test/Verification 组合成可重复的多 Agent 工作流。
 
 ## 当前推进位置与下一步
 
-当前处于阶段一入口：确定性控制平面、TestReport 闸门、Recovery Policy
-、Codex 请求构建器和 Host Transport 生命周期适配已经完成；还没有真实平台
-bridge，也没有真实
-Product → Test/Verification 子任务证据。
+当前已通过阶段一最小现场试点，并完成阶段二的一次真实受控恢复试点：确定性
+控制平面、TestReport 闸门、Recovery Policy 与 RunnerExecution 恢复决策日志、
+Codex 请求构建器、Codex CLI bridge、单领域 Product → Test/Verification 编排和
+IntegrationManifest 均已实现；`PILOT_005_REPORT.md` 至
+`PILOT_007_REPORT.md` 记录了真实 Owner 丢失、同一 Runner 有界恢复、父工作树
+集成、隔离分支自动集成、两轮独立 Test 和 Docker canonical test。真实
+token/elapsed 指标也已接通，预算口径调整后的无超预算审计已通过。
+声明服务依赖任务的 Docker/service-backed health/failure/cleanup 证据已由
+`PILOT_008_REPORT.md` 通过；预算口径调整后的无超预算审计已通过；成功候选的 rollback 已在隔离 clone 中
+完成演练，脏 parent 的 disjoint candidate 已由隔离分支路径自动应用，父工作树
+候选本身仍由人工决定是否回退或直接合入。
 
-下一步只做阶段一的最小实验：一个 Product Owner、一个 Test Agent、一个
-低风险任务、一个 Git snapshot、一个 Docker 验证链。实验结束后更新
-[`CURRENT_STATE.md`](CURRENT_STATE.md)，再决定是否进入阶段二。
+阶段三 P0 的串行 Scheduler 已实现并由 `PILOT_009_REPORT.md` 验证：
+`max_concurrency=1` 下按 owner 路由、FIFO 排队，暂停任务继续占用调度槽，
+并对任务数、tokens、turns 和 elapsed 设置硬上限。
+
+阶段三控制面已完成：Scheduler 已接入显式 per-role Runner backend，补齐了
+snapshot restore/rebind、跨角色 contract handoff，并通过模型无关的多角色
+串行 canary（`PILOT_010_REPORT.md`）。下一步只剩把这些 factory 接到真实
+Codex Host，并做一次低风险 live 多角色验证；外部 main 的混合 index 仍保留，只有本次
+明确授权的 `apps/web/frontend/index.html` 已通过路径级提交合入。若要继续直接
+写入该 main，再由人工决定处理方式。当前已应用
+的 Product commit、隔离分支和父工作树现有改动均须继续保留审计记录。
 
 ## 维护规则
 

@@ -59,6 +59,11 @@ class RunnerEvent:
     resume_count: int
     report_ref: str | None = None
     reason: str | None = None
+    final_snapshot: str | None = None
+    changed_paths: tuple[str, ...] = ()
+    input_tokens: int = 0
+    output_tokens: int = 0
+    elapsed_seconds: float = 0.0
 
 
 class RunnerAdapter(Protocol):
@@ -187,4 +192,9 @@ def runner_event_dict(event: RunnerEvent) -> Mapping[str, object]:
         "resume_count": event.resume_count,
         "report_ref": event.report_ref,
         "reason": event.reason,
+        "final_snapshot": event.final_snapshot,
+        "changed_paths": list(event.changed_paths),
+        "input_tokens": event.input_tokens,
+        "output_tokens": event.output_tokens,
+        "elapsed_seconds": event.elapsed_seconds,
     }

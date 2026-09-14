@@ -1,0 +1,43 @@
+# IntegrationManifest v1
+# 只记录 worktree -> parent 的可审计集成计划；不授权自动合并。
+schema: "agent-loop.integration-manifest.v1"
+task_id: "GW-YYYYMMDD-001"
+task_revision: 1
+status: "ready | human_required | blocked | approved | applied | rolled_back"
+repository: ""
+base_snapshot: ""
+parent_snapshot: ""
+candidate_snapshot: ""
+changed_paths: []
+allowed_write_paths: []
+scope_violations: []
+
+attempts:
+  - attempt_id: "<run-id>-<role>-<n>"
+    role: "product | core | trainer | teacher | test-verification"
+    base_snapshot: ""
+    final_snapshot: ""
+    changed_paths: []
+    status: "closed | lost | blocked | failed"
+    artifact_refs: []
+
+conflicts: []
+known_user_changes: []
+
+human_gate:
+  status: "pending | passed | not_available"
+  required: true
+  approved: false
+  decided_by: ""
+  reason: ""
+
+rollback:
+  available: true
+  ref: "<parent_snapshot>"
+  method: "revert_or_restore parent_snapshot only after human review"
+  executed: false
+
+apply:
+  status: "not_applied | applied | rolled_back"
+  method: "human-approved merge/cherry-pick"
+  applied_snapshot: ""

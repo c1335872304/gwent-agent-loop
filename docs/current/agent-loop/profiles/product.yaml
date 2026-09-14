@@ -25,7 +25,7 @@ docker:
   cleanup_required: true
   max_runtime_minutes: 30
 model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
-execution_limits: {max_attempts: 2, max_elapsed_minutes: 90, max_input_tokens: 64000, max_output_tokens: 16000, may_spawn_subtasks: false, max_subtask_depth: 0}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 90, max_input_tokens: 1000000, max_output_tokens: 32000, may_spawn_subtasks: false, max_subtask_depth: 0}
 required_outputs: ["ChangeReport", "backend/frontend verification", "Core or Teacher handoff for contract changes"]
 required_verification: ["Product Skill checks and relevant backend/frontend tests or build"]
 stop_conditions: ["legal action source is missing", "hidden information risk is found", "breaking contract scope is unclear", "budget is exhausted"]

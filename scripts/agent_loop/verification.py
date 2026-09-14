@@ -128,7 +128,7 @@ def build_verification_plan(
         verification_attempt_id=verification_attempt_id,
         source_attempt_id=handoff.attempt_id,
         domain=handoff.from_role,
-        snapshot=handoff.snapshot,
+        snapshot=handoff.final_snapshot,
         changed_paths=handoff.changed_paths,
         verification_scope=handoff.verification_scope,
         command_ids=tuple(command_ids),

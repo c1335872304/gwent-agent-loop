@@ -30,6 +30,7 @@ budget:
   output_tokens_used: 0
   model_turns_used: 0
   elapsed_minutes: 0
+  elapsed_seconds_used: 0
   exhaustion_action: "transition_to_human_required_and_stop_new_runs"
 
 role_runs:
@@ -53,6 +54,7 @@ role_runs:
     changed_paths: []
     artifact_refs: []
     verification_refs: []
+    recovery_decisions: []
     failure_class: "none | model | runner | docker | test | code | permission | context | budget"
     stop_reason: ""
 

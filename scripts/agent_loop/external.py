@@ -16,6 +16,8 @@ class ExternalRunnerError(ValidationError):
 class ExternalTransport(Protocol):
     def open(self, payload: Mapping[str, Any]) -> Mapping[str, Any]: ...
 
+    def rebind(self, payload: Mapping[str, Any], runner_ref: str) -> Mapping[str, Any]: ...
+
     def wait(self, runner_ref: str) -> Mapping[str, Any]: ...
 
     def interrupt(self, runner_ref: str, *, reason: str) -> Mapping[str, Any]: ...
@@ -58,6 +60,21 @@ def _event_from_payload(payload: Mapping[str, Any]) -> RunnerEvent:
         raise ExternalRunnerError("external Runner numeric fields are invalid") from exc
     if task_revision < 1 or resume_count < 0:
         raise ExternalRunnerError("external Runner numeric fields are out of range")
+    raw_changed_paths = payload.get("changed_paths", ())
+    if not isinstance(raw_changed_paths, (list, tuple)):
+        raise ExternalRunnerError("external Runner response has invalid changed_paths")
+    changed_paths = tuple(str(path) for path in raw_changed_paths)
+    final_snapshot = payload.get("final_snapshot")
+    if final_snapshot is not None and not str(final_snapshot).strip():
+        raise ExternalRunnerError("external Runner response has invalid final_snapshot")
+    try:
+        input_tokens = int(payload.get("input_tokens", 0))
+        output_tokens = int(payload.get("output_tokens", 0))
+        elapsed_seconds = float(payload.get("elapsed_seconds", 0.0))
+    except (TypeError, ValueError) as exc:
+        raise ExternalRunnerError("external Runner metrics are invalid") from exc
+    if input_tokens < 0 or output_tokens < 0 or elapsed_seconds < 0:
+        raise ExternalRunnerError("external Runner metrics must be non-negative")
     return RunnerEvent(
         runner_ref=str(payload["runner_ref"]),
         event=str(payload["event"]),
@@ -71,6 +88,11 @@ def _event_from_payload(payload: Mapping[str, Any]) -> RunnerEvent:
         resume_count=resume_count,
         report_ref=(str(payload["report_ref"]) if payload.get("report_ref") else None),
         reason=(str(payload["reason"]) if payload.get("reason") else None),
+        final_snapshot=str(final_snapshot) if final_snapshot is not None else None,
+        changed_paths=changed_paths,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        elapsed_seconds=elapsed_seconds,
     )
 
 
@@ -94,6 +116,16 @@ class ExternalRunnerAdapter:
         if request != self.spec.request:
             raise ExternalRunnerError("RunnerRequest does not match LaunchSpec")
         event = self._decode(self.transport.open(self.spec.to_payload()))
+        self._runner_ref = event.runner_ref
+        return event
+
+    def rebind(self, runner_ref: str) -> RunnerEvent:
+        """Attach to the existing transport session; never call ``open``."""
+        if self._runner_ref is not None:
+            raise ExternalRunnerError("external Runner adapter already initialized")
+        event = self._decode(self.transport.rebind(self.spec.to_payload(), runner_ref))
+        if event.runner_ref != runner_ref:
+            raise ExternalRunnerError("external Runner rebind reference mismatch")
         self._runner_ref = event.runner_ref
         return event
 

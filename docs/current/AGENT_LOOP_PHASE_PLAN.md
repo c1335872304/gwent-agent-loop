@@ -1,12 +1,12 @@
 # Gwent Agent Loop 阶段实施计划
 
-> **状态：In Progress（Phase 4）**
-> **版本：0.4**
+> **状态：历史阶段边界；实时状态以 `agent-loop/CURRENT_STATE.md` 为准**
+> **版本：0.5**
 > **配套规范：** [`AGENT_LOOP_PLAN.md`](AGENT_LOOP_PLAN.md)
 > **项目导航：** [`AGENT_LOOP_NAVIGATION.md`](AGENT_LOOP_NAVIGATION.md)
 > **原则：先把上下文和控制平面做成可验证的工程，再接入 Codex 子会话。**
 >
-> **当前实现状态：** 请先阅读 [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)；本文件保留阶段边界和退出条件，不重复维护实时状态。
+> **当前实现状态：** 请先阅读 [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)；本文件保留 Phase 0–7 的阶段边界和退出条件，不重复维护实时状态。
 > **三阶段路线图：** [`agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md`](agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md)
 
 ## 0. 这份计划解决什么问题
@@ -526,9 +526,12 @@ Agent Loop 只有同时满足以下条件，才可以称为可用系统：
 - 不在没有 snapshot、权限和预算记录时启动子会话；
 - 不在人工 gate 未批准时自动部署、发布、promotion 或执行破坏性操作。
 
-## 13. Current roadmap after role completion
+## 13. Historical transition notes
 
-This section is the current execution pointer for the 2026-09-13 baseline. It supplements the earlier phase descriptions and makes the next work explicit.
+This section records the 2026-09-13 transition from the initial baseline to the
+Runner implementation. It is retained for auditability, but it is not a current
+roadmap. For current work and remaining gaps, use
+[`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md).
 
 ### 13.1 Completed foundation
 
@@ -537,7 +540,7 @@ This section is the current execution pointer for the 2026-09-13 baseline. It su
 - The verification boundary is defined: TestMatrix, Docker allowlist, test modification policy, failure classes, and cleanup ownership.
 - The architecture gate passes without loading the local model or requiring local torch.
 
-### 13.2 Next work, in order
+### 13.2 Historical implementation sequence (superseded)
 
 1. Completed the Phase 4 low-risk Product pilot as Pilot 002.
 2. Confirmed final-snapshot validation, historical-lesson use, budget evidence, failure classification, and human gates for Pilot 002.
@@ -553,16 +556,24 @@ This section is the current execution pointer for the 2026-09-13 baseline. It su
 12. Require two independent validation rounds before limited automatic repair.
 13. Delay cross-domain orchestration, model operations, deployment, and promotion until the bounded loop is proven.
 
-### 13.3 Completion gate for the next stage
+### 13.3 Historical completion gate (superseded)
 
 The next stage is complete only when a low-risk task can be opened, paused, resumed, verified, and closed with preserved artifacts; a failure can stop at HUMAN_REQUIRED; no recursive subtask is created; no out-of-scope file is written; and the final report contains reproducible commands, snapshots, budget, and failure classification.
 
 Do not add another Agent to compensate for a missing Runner, stale context, weak validation, or unclear ownership. Fix the control plane or the execution adapter instead.
 
-### 13.4 Runner progress boundary
+### 13.4 Historical runner boundary (superseded)
 
-The deterministic lifecycle contract is implemented in `scripts/agent_loop/runner.py` and covered by negative tests. `scripts/agent_loop/execution.py` now binds that lifecycle to an existing TaskStore packet revision, persists a bounded record after each accepted event, and projects the record into the RunManifest role-run shape. `scripts/agent_loop/validate_packet.py` owns the reusable ContextBrief contract; `scripts/agent_loop/launch.py` validates the structured input before an external Runner can start; `scripts/agent_loop/external.py` validates the transport response; `scripts/agent_loop/handoff.py` validates the Owner-to-Verification boundary; `scripts/agent_loop/verification.py` resolves the allowlisted verification plan; and `scripts/agent_loop/report_validation.py` validates the evidence before PASS can advance state. None of these layers launches Codex, Docker, or a model. The next implementation is a platform-specific external transport, which must reuse these contracts and remain bounded by the same packet, snapshot, scope, and budget fields.
+At the 2026-09-13 baseline, the deterministic lifecycle contract was implemented
+in `scripts/agent_loop/runner.py` and covered by negative tests. The execution,
+launch, transport, handoff, verification, and report-validation layers were
+then the boundary before a platform-specific external transport. This
+transition note is superseded by [`CODEX_TRANSPORT.md`](agent-loop/CODEX_TRANSPORT.md)
+and [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md), which record the
+later CLI bridge and bounded loop evidence.
 
-### 13.5 Pilot 002 boundary
+### 13.5 Historical Pilot 002 boundary (superseded)
 
-Pilot 002 is the first real Product Owner to Test/Verification handoff. It passed frontend build, canonical Docker pytest, and architecture checks. It does not satisfy the real Codex child-session requirement; the next stage must prove one bounded external Runner lifecycle before any automatic repair or cross-domain orchestration.
+Pilot 002 was the first Product Owner to Test/Verification handoff. It passed
+the checks available at that time but did not satisfy the real Codex child-session
+requirement; that gap was later covered by Pilots 004–005.

@@ -1,8 +1,10 @@
 import unittest
+from tempfile import TemporaryDirectory
+from pathlib import Path
 
 from scripts.agent_loop.errors import ValidationError
 from scripts.agent_loop.external import ExternalRunnerAdapter, ExternalRunnerError
-from scripts.agent_loop.execution import RunnerExecution
+from scripts.agent_loop.execution import ExecutionJournal, RunnerExecution
 from scripts.agent_loop.runner import DeterministicRunner, RunnerRequest, runner_event_dict
 from scripts.agent_loop.test_launch import build
 
@@ -30,6 +32,11 @@ class MemoryTransport:
     def wait(self, runner_ref):
         return runner_event_dict(self.runner.wait(runner_ref))
 
+    def rebind(self, payload, runner_ref):
+        event = runner_event_dict(self.runner.wait(runner_ref))
+        event["event"] = "rebound"
+        return event
+
     def interrupt(self, runner_ref, *, reason):
         return runner_event_dict(self.runner.interrupt(runner_ref, reason=reason))
 
@@ -45,6 +52,27 @@ class MemoryTransport:
 
 
 class ExternalRunnerTests(unittest.TestCase):
+    def test_execution_rebind_hydrates_journal_without_opening_runner(self):
+        spec = build()
+        transport = MemoryTransport()
+        with TemporaryDirectory() as temp:
+            journal = ExecutionJournal(Path(temp) / "runner.json")
+            original = RunnerExecution(
+                ExternalRunnerAdapter(spec, transport), spec.request, journal=journal
+            )
+            opened = original.open()
+            original.wait()
+
+            rebound = RunnerExecution.rebind(
+                ExternalRunnerAdapter(spec, transport),
+                spec.request,
+                journal.load(),
+                journal=journal,
+            )
+            self.assertEqual(rebound.record.runner_ref, opened.runner_ref)
+            self.assertEqual(rebound.record.status, "running")
+            self.assertEqual(rebound.record.events[-1]["event"], "rebound")
+
     def test_adapter_round_trip_uses_structured_launch_payload(self):
         spec = build()
         transport = MemoryTransport()
