@@ -67,6 +67,14 @@ class CodexCliBridgeTests(unittest.TestCase):
             "profile": {"docker": {"allowed": True}},
         }
         self.assertEqual(CodexCliBridge._sandbox_mode(base), "danger-full-access")
+        structured = {
+            "task": base["task"],
+            "structured_inputs": {
+                "task_packet": base["task_packet"],
+                "profile": base["profile"],
+            },
+        }
+        self.assertEqual(CodexCliBridge._sandbox_mode(structured), "danger-full-access")
 
         ordinary = {
             **base,

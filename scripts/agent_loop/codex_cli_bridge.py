@@ -755,6 +755,12 @@ class CodexCliBridge:
         profile = payload.get("profile")
         if not isinstance(task, Mapping):
             raise CodexCliBridgeError("sandbox selection requires task identity")
+        structured_inputs = payload.get("structured_inputs")
+        if isinstance(structured_inputs, Mapping):
+            if not isinstance(packet, Mapping):
+                packet = structured_inputs.get("task_packet")
+            if not isinstance(profile, Mapping):
+                profile = structured_inputs.get("profile")
         # Older low-level bridge callers do not carry structured TaskPacket
         # data. They remain safe by receiving only the default workspace
         # sandbox; Docker access requires the full validated launch payload.
