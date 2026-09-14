@@ -8,7 +8,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from scripts.agent_loop.codex_bridge import parse_codex_thread_handle
-from scripts.agent_loop.codex_cli_bridge import CodexCliBridge
+from scripts.agent_loop.codex_cli_bridge import CodexCliBridge, CodexCliBridgeError
 
 
 FAKE_CODEX = r'''
@@ -57,6 +57,30 @@ print(json.dumps(result, sort_keys=True))
 
 
 class CodexCliBridgeTests(unittest.TestCase):
+    def test_host_docker_sandbox_requires_explicit_test_capability(self):
+        base = {
+            "task": {"role": "test-verification"},
+            "task_packet": {
+                "execution": {"host_docker": True},
+                "acceptance": {"verification_commands": ["python3 scripts/check.py docker-test"]},
+            },
+            "profile": {"docker": {"allowed": True}},
+        }
+        self.assertEqual(CodexCliBridge._sandbox_mode(base), "danger-full-access")
+
+        ordinary = {
+            **base,
+            "task_packet": {
+                "execution": {"host_docker": False},
+                "acceptance": {"verification_commands": []},
+            },
+        }
+        self.assertEqual(CodexCliBridge._sandbox_mode(ordinary), "workspace-write")
+
+        product = {**base, "task": {"role": "product"}}
+        with self.assertRaisesRegex(CodexCliBridgeError, "restricted to test-verification"):
+            CodexCliBridge._sandbox_mode(product)
+
     def test_new_bridge_process_rebinds_existing_host_session(self):
         with TemporaryDirectory() as temp:
             root = Path(temp)

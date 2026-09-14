@@ -38,6 +38,12 @@ class HostRegistryTests(unittest.TestCase):
             self.assertEqual(loaded, saved)
             self.assertEqual(len(list((Path(temp) / "registry").glob("*.json"))), 1)
 
+    def test_round_trip_preserves_docker_capable_sandbox_mode(self):
+        payload = record().as_dict()
+        payload["sandbox_mode"] = "danger-full-access"
+        restored = HostSessionRecord.from_dict(payload)
+        self.assertEqual(restored.sandbox_mode, "danger-full-access")
+
     def test_tampered_reference_is_rejected(self):
         with TemporaryDirectory() as temp:
             registry = HostSessionRegistry(Path(temp) / "registry")

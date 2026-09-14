@@ -72,6 +72,7 @@ class _CliSession:
     exit_code: int | None = None
     host_id: str = "local"
     is_clone: bool = False
+    sandbox_mode: str = "workspace-write"
 
 
 class _AttachedProcess:
@@ -184,6 +185,7 @@ class CodexCliBridge:
         write_scope = tuple(str(path).strip("/") for path in task.get("write_scope", ()))
         if not write_scope or any(not path for path in write_scope):
             raise CodexCliBridgeError("Codex task write_scope must not be empty")
+        sandbox_mode = self._sandbox_mode(payload)
         self._git(project_root, "rev-parse", "--verify", f"{snapshot}^{{commit}}")
         self.worktree_root.mkdir(parents=True, exist_ok=True)
         session_dir = Path(tempfile.mkdtemp(prefix=f"{task_id}-{attempt_id}-", dir=self.worktree_root))
@@ -211,11 +213,12 @@ class CodexCliBridge:
             stdout_path=stdout_path,
             write_scope=write_scope,
             is_clone=is_clone,
+            sandbox_mode=sandbox_mode,
         )
         try:
             self._materialize_inputs(worktree, payload)
             self._start(session, [
-                "exec", "--json", "--sandbox", "workspace-write",
+                "exec", "--json", "--sandbox", session.sandbox_mode,
                 "-C", str(worktree), "--output-last-message", str(output_path),
                 self._text(payload.get("prompt"), "prompt"),
             ])
@@ -284,7 +287,7 @@ class CodexCliBridge:
             raise CodexCliBridgeError("resume requires non-empty artifact_refs")
         session.thread_ready.clear()
         self._start(session, [
-            "exec", "resume", session.thread_id, "--json",
+            "exec", "resume", session.thread_id, "--json", "--sandbox", session.sandbox_mode,
             "--output-last-message", str(session.output_path),
             "Continue the bounded task. Read these persisted artifacts before acting: "
             + ", ".join(str(ref) for ref in artifact_refs),
@@ -310,6 +313,7 @@ class CodexCliBridge:
             raise CodexCliBridgeError(f"Codex thread already bound: {handle.thread_id}")
         record = self.session_registry.require(handle.runner_ref)
         self._validate_registry_identity(record, handle, payload)
+        sandbox_mode = self._sandbox_mode(payload)
         project_root = self.project_roots.get(record.project_id)
         if project_root is None or not project_root.is_dir():
             raise CodexCliBridgeError(f"unknown or missing Codex project: {record.project_id}")
@@ -355,6 +359,7 @@ class CodexCliBridge:
             host_id=record.host_id,
             pid=record.pid,
             elapsed_base=record.elapsed_seconds,
+            sandbox_mode=sandbox_mode,
         )
         session.loss_reason = record.reason
         session.report_ref = record.report_ref
@@ -724,6 +729,7 @@ class CodexCliBridge:
                 final_snapshot=session.final_snapshot,
                 changed_paths=session.changed_paths,
                 reason=session.loss_reason,
+                sandbox_mode=session.sandbox_mode,
             )
         )
 
@@ -733,6 +739,46 @@ class CodexCliBridge:
         except ValueError:
             return False
         return True
+
+    @staticmethod
+    def _sandbox_mode(payload: Mapping[str, Any]) -> str:
+        """Resolve the least-privileged Codex sandbox for one task.
+
+        Docker is an explicit Test/Verification capability. The default
+        workspace sandbox intentionally cannot reach the host Docker socket;
+        only a validated host-docker packet may request the Docker-capable
+        sandbox. The bridge still enforces the declared write scope at close.
+        """
+
+        task = payload.get("task")
+        packet = payload.get("task_packet")
+        profile = payload.get("profile")
+        if not isinstance(task, Mapping):
+            raise CodexCliBridgeError("sandbox selection requires task identity")
+        # Older low-level bridge callers do not carry structured TaskPacket
+        # data. They remain safe by receiving only the default workspace
+        # sandbox; Docker access requires the full validated launch payload.
+        if not isinstance(packet, Mapping):
+            return "workspace-write"
+        role = str(task.get("role") or "").strip()
+        execution = packet.get("execution")
+        if not isinstance(execution, Mapping):
+            raise CodexCliBridgeError("sandbox selection requires TaskPacket execution")
+        if not bool(execution.get("host_docker", False)):
+            return "workspace-write"
+        if role != "test-verification":
+            raise CodexCliBridgeError("host Docker sandbox is restricted to test-verification")
+        if not isinstance(profile, Mapping) or not bool(
+            (profile.get("docker") or {}).get("allowed", False)
+        ):
+            raise CodexCliBridgeError("host Docker sandbox requires an allowed Test/Verification profile")
+        acceptance = packet.get("acceptance")
+        commands = acceptance.get("verification_commands", []) if isinstance(acceptance, Mapping) else []
+        if not isinstance(commands, list) or not any("docker-test" in str(command) for command in commands):
+            raise CodexCliBridgeError(
+                "host Docker sandbox requires an explicit docker-test verification command"
+            )
+        return "danger-full-access"
 
     @staticmethod
     def _validate_registry_identity(
@@ -765,6 +811,15 @@ class CodexCliBridge:
         for actual, wanted, label in checks:
             if actual != wanted:
                 raise CodexCliBridgeError(f"rebind {label} mismatch")
+        packet = payload.get("task_packet")
+        execution = packet.get("execution") if isinstance(packet, Mapping) else None
+        expected_sandbox = (
+            "danger-full-access"
+            if isinstance(execution, Mapping) and bool(execution.get("host_docker", False))
+            else "workspace-write"
+        )
+        if record.sandbox_mode != expected_sandbox:
+            raise CodexCliBridgeError("rebind sandbox_mode mismatch")
         try:
             revision = int(expected["task_revision"])
         except (TypeError, ValueError) as exc:

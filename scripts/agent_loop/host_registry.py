@@ -88,6 +88,7 @@ class HostSessionRecord:
     changed_paths: tuple[str, ...] = ()
     reason: str | None = None
     updated_at: str = ""
+    sandbox_mode: str = "workspace-write"
 
     def __post_init__(self) -> None:
         for value, label in (
@@ -118,6 +119,8 @@ class HostSessionRecord:
         _non_negative_int(self.input_tokens, "input_tokens")
         _non_negative_int(self.output_tokens, "output_tokens")
         _non_negative_float(self.elapsed_seconds, "elapsed_seconds")
+        if self.sandbox_mode not in {"workspace-write", "danger-full-access"}:
+            raise HostRegistryError("unsupported sandbox_mode")
         if any(not str(path).strip() for path in self.changed_paths):
             raise HostRegistryError("changed_paths cannot contain empty values")
 
@@ -150,6 +153,7 @@ class HostSessionRecord:
             "final_snapshot": self.final_snapshot,
             "changed_paths": list(self.changed_paths),
             "reason": self.reason,
+            "sandbox_mode": self.sandbox_mode,
             "updated_at": self.updated_at or datetime.now(timezone.utc).isoformat(timespec="seconds"),
         }
 
@@ -196,6 +200,7 @@ class HostSessionRecord:
             changed_paths=tuple(_text(item, "changed_paths item") for item in raw_changed),
             reason=optional["reason"],
             updated_at=_text(payload.get("updated_at"), "updated_at"),
+            sandbox_mode=str(payload.get("sandbox_mode") or "workspace-write"),
         )
 
 

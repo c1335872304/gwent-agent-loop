@@ -25,6 +25,7 @@ developer_instructions = """
 
 Docker 规则：
 - 默认不启动 Docker；单元测试、schema 检查和架构任务不需要 Docker。
+- 需要 canonical Docker pytest 时，只有 TaskPacket 明确设置 `execution.host_docker: true` 且 compose 文件在 TestMatrix allowlist 内，Host Bridge 才启用 Docker-capable sandbox；普通 Test 保持 workspace-write sandbox。
 - 只有 TaskPacket 明确声明服务依赖且 compose 文件在 TestMatrix allowlist 内，才允许 config -> up -> health/logs -> down/cleanup。
 - 不允许任意 compose、宿主机清理、持久卷删除、网络暴露或无限等待；cleanup 失败立即 HUMAN_REQUIRED。
 

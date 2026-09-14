@@ -12,6 +12,15 @@ The pinned Docker test image is the canonical environment for Python pytest. It 
 
 Host pytest may be used only to diagnose host dependency problems. A host PASS or FAIL is not the authoritative Product, Teacher, or Agent Loop test result. The container is intentionally run with `--rm`; dependencies persist in the image, while container state does not.
 
+The Test Agent itself starts in the Codex `workspace-write` sandbox. A task that
+needs the canonical Docker command must explicitly set
+`TaskPacket.execution.host_docker: true`; the Host Bridge then selects the
+Docker-capable sandbox only for `test-verification`, after validating the
+profile and the declared `docker-test` command. Ordinary Test tasks retain the
+workspace sandbox, and the capability is persisted across Host rebind. This
+does not grant Docker access if the Host process itself lacks the Docker socket
+group; that condition is reported as `PERMISSION_REQUIRED`.
+
 状态：Agent 配置和本地 Codex CLI Runner 已实现；Pilot 005 已完成一次真实
 Runner 丢失后的同一责任链有界恢复，并由独立 Test Agent 在 Owner 最终
 snapshot 上验证通过。Pilot 006 还完成了父工作树集成后的第二轮独立验证，

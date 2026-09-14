@@ -143,6 +143,12 @@ class RunnerLaunchTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "raw conversation"):
             build(context_brief=brief)
 
+    def test_host_docker_capability_is_restricted_to_test_agent(self):
+        task_packet = packet()
+        task_packet["execution"]["host_docker"] = True
+        with self.assertRaisesRegex(ValidationError, "restricted to test-verification"):
+            build(task_packet=task_packet)
+
 
 if __name__ == "__main__":
     unittest.main()

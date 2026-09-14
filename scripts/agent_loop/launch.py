@@ -122,6 +122,12 @@ def build_launch_spec(
     task_revision = int(task_packet["revision"])
     snapshot = _require_text(task_packet["workspace"]["snapshot_ref"], "TaskPacket snapshot")
     role = _require_text(profile.get("agent_id"), "AgentProfile agent_id")
+    execution = task_packet["execution"]
+    if bool(execution.get("host_docker", False)):
+        if role != "test-verification":
+            raise ValidationError("host Docker access is restricted to test-verification")
+        if not bool(profile.get("docker", {}).get("allowed", False)):
+            raise ValidationError("host Docker access requires an allowed Test/Verification profile")
     _validate_context_brief(
         context_brief,
         task_id=task_id,
@@ -138,7 +144,6 @@ def build_launch_spec(
     if int(subtask_depth) < 0:
         raise ValidationError("RunnerLaunchSpec subtask_depth cannot be negative")
 
-    execution = task_packet["execution"]
     profile_limits = profile["execution_limits"]
     limits = (
         ("max_turns", max_turns, "max_model_turns", execution["max_model_turns"]),
