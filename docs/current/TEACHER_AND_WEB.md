@@ -89,4 +89,7 @@ LLM Provider 只负责语言生成。稳定边界是：
 - prompt contract；
 - output schema。
 
+其中 provider-neutral prompt 只供 Teacher 内部调用和审计使用；Teacher
+Runtime 与 BFF 的浏览器响应必须删除 `prompt`，包括行动链步骤中的嵌套字段。
+
 替换本地 LLM 或 API Provider 不应影响 Strategy Core。

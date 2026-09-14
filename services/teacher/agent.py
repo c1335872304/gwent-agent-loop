@@ -252,7 +252,7 @@ class TeacherAgent:
                 alt_text,
                 f"公开局面证据：{facts}。" if facts else "",
                 f"卡牌证据：{e.card_fact}" if e.card_fact else "",
-                "高级模式同时返回 grounded_facts、候选列表和 provider-neutral prompt，便于审计或接入外部 LLM。",
+                "高级模式额外返回 grounded_facts 和候选列表；provider-neutral prompt 只在 Teacher 内部生成，不下发浏览器。",
             ]
             if x
         )

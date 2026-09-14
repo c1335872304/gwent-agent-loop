@@ -36,6 +36,29 @@ def test_teacher_http_health_and_explain():
     assert body["policy_probability"] == 1.0
 
 
+def test_teacher_http_does_not_expose_advanced_provider_prompt():
+    client = TestClient(app)
+    response = client.post(
+        "/v1/explain",
+        json={
+            "decision_packet": {
+                "decision_serial": 2,
+                "actor_id": 0,
+                "decision_kind": "play_or_pass",
+                "recommended_option_index": 0,
+                "candidates": [
+                    {"option_index": 0, "probability": 1.0, "option_kind": "pass", "card_id": 0}
+                ],
+            },
+            "level": "advanced",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()["response"]
+    assert "prompt" not in body
+
+
 def test_teacher_http_explains_a_current_turn_trace():
     client = TestClient(app)
     response = client.post(
@@ -72,3 +95,38 @@ def test_teacher_http_explains_a_current_turn_trace():
     body = response.json()["response"]
     assert body["stopped_reason"] == "action_chain_resolved"
     assert len(body["steps"]) == 1
+    assert "prompt" not in body["steps"][0]
+
+
+def test_teacher_http_does_not_expose_nested_advanced_provider_prompts():
+    client = TestClient(app)
+    response = client.post(
+        "/v1/explain-turn",
+        json={
+            "level": "advanced",
+            "turn_trace": {
+                "schema_version": "counterfactual-action-chain-v2",
+                "boundary": "one_root_action_with_required_choices",
+                "root": {"decision_serial": 1, "kind": "pass", "card_id": -1, "source_object_index": -1},
+                "stopped_reason": "action_chain_resolved",
+                "steps": [
+                    {
+                        "decision_serial": 1,
+                        "parent_decision_serial": None,
+                        "role": "root_action",
+                        "actor_id": 0,
+                        "index": 0,
+                        "kind": "pass",
+                        "card_id": -1,
+                        "confidence": 1.0,
+                        "value": 0.0,
+                        "summary_before": {"round": 1, "p0": {"score": 0, "hand": 8}, "p1": {"score": 0, "hand": 8}},
+                    }
+                ],
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    step = response.json()["response"]["steps"][0]
+    assert "prompt" not in step

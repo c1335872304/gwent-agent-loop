@@ -148,7 +148,6 @@ export interface TeacherResponse {
   alternatives: TeacherAlternative[]
   grounded_facts: string[]
   caveats: string[]
-  prompt: string | null
 }
 
 export interface TeacherExplainResult {

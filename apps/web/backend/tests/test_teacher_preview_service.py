@@ -30,7 +30,11 @@ class FakeTeacher:
     async def explain_turn(self, _payload):
         self.calls += 1
         await asyncio.sleep(0)
-        return {"schema_version": "gwent-teacher-turn-response-v1", "steps": []}
+        return {
+            "schema_version": "gwent-teacher-turn-response-v1",
+            "prompt": "provider secret",
+            "steps": [{"action_label": "PASS", "prompt": "nested provider secret"}],
+        }
 
 
 @pytest.mark.asyncio
@@ -40,15 +44,18 @@ async def test_preview_cache_singleflights_and_invalidates_after_real_state_chan
     service = TeacherPreviewService(game, teacher)
     first = SimpleNamespace(match_id="a" * 32, revision=0)
 
-    await asyncio.gather(
+    _, first_response = await asyncio.gather(
         service.preview_turn(first, "beginner", 3),
         service.preview_turn(first, "beginner", 3),
     )
+    assert "prompt" not in first_response
+    assert "prompt" not in first_response["steps"][0]
     assert game.calls == [("a" * 32, 0)]
     assert teacher.calls == 1
 
     await service.invalidate_except("a" * 32, 1)
     second = SimpleNamespace(match_id="a" * 32, revision=1)
-    await service.preview_turn(second, "beginner", 3)
+    _, second_response = await service.preview_turn(second, "beginner", 3)
+    assert "prompt" not in second_response
     assert game.calls == [("a" * 32, 0), ("a" * 32, 1)]
     assert teacher.calls == 2

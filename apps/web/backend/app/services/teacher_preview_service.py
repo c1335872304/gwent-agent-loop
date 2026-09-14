@@ -5,7 +5,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any, TypeVar
 
 from app.clients.gwent_core import GwentCoreProtocolError
-from app.clients.teacher import TeacherClient
+from app.clients.teacher import TeacherClient, redact_browser_response
 from app.models.core_contract import CounterfactualActionChainTrace, GameState
 from app.services.game_service import GameService
 
@@ -109,7 +109,7 @@ class TeacherPreviewService:
         )
 
         async def create() -> dict[str, Any]:
-            return await self._teacher.explain_turn(
+            response = await self._teacher.explain_turn(
                 {
                     "turn_trace": trace.model_dump(mode="json"),
                     "level": level,
@@ -117,5 +117,6 @@ class TeacherPreviewService:
                     "top_k": top_k,
                 }
             )
+            return redact_browser_response(response)
 
         return trace, await self._singleflight(self._teacher_cache, self._teacher_inflight, key, create)

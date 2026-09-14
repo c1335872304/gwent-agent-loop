@@ -9,6 +9,27 @@ class TeacherError(RuntimeError):
     pass
 
 
+def redact_browser_response(payload: dict[str, Any]) -> dict[str, Any]:
+    """Remove provider-internal fields before a response reaches the UI.
+
+    The Teacher service applies the same boundary.  Keeping this second,
+    BFF-side filter makes the browser contract fail closed if a compatible
+    Teacher implementation accidentally returns an internal prompt.
+    """
+
+    def redact(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {key: redact(item) for key, item in value.items() if key != "prompt"}
+        if isinstance(value, list):
+            return [redact(item) for item in value]
+        return value
+
+    result = redact(payload)
+    if not isinstance(result, dict):  # pragma: no cover - payload is validated by callers
+        raise TeacherError("Teacher response must be an object")
+    return result
+
+
 class TeacherClient:
     """HTTP client for the optional read-only Teacher Agent service."""
 
@@ -62,10 +83,10 @@ class TeacherClient:
         body = await self._request_json("POST", "/v1/explain", json=payload)
         if not isinstance(body, dict) or not isinstance(body.get("response"), dict):
             raise TeacherError("Teacher explain payload is missing response")
-        return dict(body["response"])
+        return redact_browser_response(dict(body["response"]))
 
     async def explain_turn(self, payload: dict[str, Any]) -> dict[str, Any]:
         body = await self._request_json("POST", "/v1/explain-turn", json=payload)
         if not isinstance(body, dict) or not isinstance(body.get("response"), dict):
             raise TeacherError("Teacher turn explanation payload is missing response")
-        return dict(body["response"])
+        return redact_browser_response(dict(body["response"]))

@@ -49,6 +49,18 @@ class TeacherResponse:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+    def to_public_dict(self) -> dict[str, Any]:
+        """Serialize the browser-safe response contract.
+
+        The provider prompt is retained on the internal response for local
+        auditing and provider invocation, but it is never part of the public
+        Teacher HTTP payload.
+        """
+
+        payload = self.to_dict()
+        payload.pop("prompt", None)
+        return payload
+
 
 @dataclass(frozen=True)
 class TeacherTurnRequest:
@@ -75,3 +87,12 @@ class TeacherTurnResponse:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+    def to_public_dict(self) -> dict[str, Any]:
+        """Serialize a turn response without nested provider prompts."""
+
+        payload = self.to_dict()
+        for step in payload.get("steps", []):
+            if isinstance(step, dict):
+                step.pop("prompt", None)
+        return payload

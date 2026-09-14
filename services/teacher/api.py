@@ -59,7 +59,7 @@ def explain(req: ExplainRequest) -> ExplainResponse:
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    return ExplainResponse(response=result.to_dict())
+    return ExplainResponse(response=result.to_public_dict())
 
 
 @app.post("/v1/explain-turn", response_model=ExplainResponse)
@@ -75,4 +75,4 @@ def explain_turn(req: ExplainTurnRequest) -> ExplainResponse:
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    return ExplainResponse(response=result.to_dict())
+    return ExplainResponse(response=result.to_public_dict())
