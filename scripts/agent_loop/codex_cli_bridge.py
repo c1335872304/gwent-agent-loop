@@ -71,6 +71,7 @@ class _CliSession:
     pid: int | None = None
     exit_code: int | None = None
     host_id: str = "local"
+    is_clone: bool = False
 
 
 class _AttachedProcess:
@@ -188,7 +189,7 @@ class CodexCliBridge:
         session_dir = Path(tempfile.mkdtemp(prefix=f"{task_id}-{attempt_id}-", dir=self.worktree_root))
         worktree = session_dir / "worktree"
         session_dir.rmdir()
-        self._add_isolated_worktree(project_root, worktree, snapshot)
+        is_clone = self._add_isolated_worktree(project_root, worktree, snapshot)
         session_dir.mkdir(parents=True, exist_ok=True)
         output_path = session_dir / "last-message.json"
         stderr_path = session_dir / "stderr.log"
@@ -209,6 +210,7 @@ class CodexCliBridge:
             stderr_path=stderr_path,
             stdout_path=stdout_path,
             write_scope=write_scope,
+            is_clone=is_clone,
         )
         try:
             self._materialize_inputs(worktree, payload)
@@ -344,6 +346,7 @@ class CodexCliBridge:
             stderr_path=stderr_path,
             stdout_path=stdout_path,
             write_scope=record.write_scope,
+            is_clone=(worktree / ".git").is_dir(),
             process=process,
             status=record.status,
             resume_count=record.resume_count,
@@ -682,7 +685,10 @@ class CodexCliBridge:
 
     def _remove_worktree(self, session: _CliSession) -> None:
         if session.worktree.exists():
-            self._git(session.project_root, "worktree", "remove", "--force", str(session.worktree))
+            if session.is_clone or (session.worktree / ".git").is_dir():
+                shutil.rmtree(session.worktree, ignore_errors=True)
+            else:
+                self._git(session.project_root, "worktree", "remove", "--force", str(session.worktree))
         shutil.rmtree(session.session_dir, ignore_errors=True)
 
     def _sync_registry(self, session: _CliSession) -> None:
@@ -768,7 +774,7 @@ class CodexCliBridge:
 
     def _add_isolated_worktree(
         self, project_root: Path, worktree: Path, snapshot: str
-    ) -> None:
+    ) -> bool:
         """Add a child worktree, allowing a duplicate detached commit only.
 
         Git normally rejects checking out a commit already present in another
@@ -779,19 +785,51 @@ class CodexCliBridge:
         """
         try:
             self._git(project_root, "worktree", "add", "--detach", str(worktree), snapshot)
+            return False
         except subprocess.CalledProcessError as exc:
             detail = "\n".join(item for item in (exc.stdout, exc.stderr) if item)
-            if "already used by worktree" not in detail:
+            if "already used by worktree" in detail:
+                try:
+                    self._git(
+                        project_root,
+                        "worktree",
+                        "add",
+                        "--force",
+                        "--detach",
+                        str(worktree),
+                        snapshot,
+                    )
+                    return False
+                except subprocess.CalledProcessError as forced_exc:
+                    forced_detail = "\n".join(
+                        item for item in (forced_exc.stdout, forced_exc.stderr) if item
+                    )
+                    if not self._is_read_only_git_metadata(forced_detail):
+                        raise
+            elif not self._is_read_only_git_metadata(detail):
                 raise
-            self._git(
-                project_root,
-                "worktree",
-                "add",
-                "--force",
-                "--detach",
-                str(worktree),
-                snapshot,
-            )
+            self._add_isolated_clone(project_root, worktree, snapshot)
+            return True
+
+    def _add_isolated_clone(
+        self, project_root: Path, worktree: Path, snapshot: str
+    ) -> None:
+        """Create a self-contained fallback when linked-worktree metadata is read-only."""
+        result = subprocess.run(
+            ["git", "clone", "--no-local", "--no-hardlinks", str(project_root), str(worktree)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            detail = "\n".join(item for item in (result.stdout, result.stderr) if item)
+            raise CodexCliBridgeError(f"isolated clone failed: {detail[-1200:]}")
+        self._git(worktree, "checkout", "--detach", snapshot)
+
+    @staticmethod
+    def _is_read_only_git_metadata(detail: str) -> bool:
+        lowered = str(detail).lower()
+        return "read-only file system" in lowered or "permission denied" in lowered
 
     def _session(self, handle: CodexThreadHandle) -> _CliSession:
         try:

@@ -1,6 +1,9 @@
 # Pilot 011：真实 Host 多角色现场任务设计
 
-> **状态：DESIGN_READY，尚未执行**
+> **状态：已执行；结果 HUMAN_REQUIRED（2026-09-14）**
+>
+> 现场记录见 [`PILOT_011_REPORT.md`](PILOT_011_REPORT.md)，完整运行证据见
+> `.agent-loop/live-runs/GW-STAGE3-LIVE-011/`。
 >
 > 本文件是任务设计，不是可直接启动的 TaskPacket。正式启动前必须把
 > `workspace.snapshot_ref` 绑定到一个真实、可复现的 Git commit；禁止使用
@@ -132,5 +135,8 @@ parallelism: forbidden
 4. Host 侧状态、报告和最终 snapshot 可被 RunManifest 引用；
 5. 使用一个明确、干净的 candidate commit 作为 TaskPacket snapshot。
 
-否则只能继续执行 Pilot 010 的模型无关 canary，不能声称真实多角色现场
-PASS。
+本次现场已经满足并验证了这些 Host 条件中的 create/wait/close、进程重启
+rebind 和 Product → Teacher handoff；但 Teacher 隐私审查发现现有浏览器响应
+仍携带高级 prompt 字段，且 Teacher 实际输入超过 64k 预算，因此 Pilot 011
+停在 `HUMAN_REQUIRED`，不能声称真实多角色现场 PASS。修复隐私 contract 后
+需要创建新 revision 再重新执行，不得复用本次已消耗的 role runs。

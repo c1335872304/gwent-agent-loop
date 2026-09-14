@@ -26,11 +26,12 @@ files and the repository rules from the selected snapshot.
 
 `scripts/agent_loop/codex_cli_bridge.py` implements the Host Bridge contract
 against the installed Codex CLI. It resolves an explicit project id, verifies
-the Git snapshot, creates a detached temporary worktree, starts `codex exec
---json`, and maps the process to create/wait/interrupt/resume/close. On close
+the Git snapshot, creates a detached temporary worktree (or a self-contained
+clone when linked Git worktree metadata is explicitly read-only), starts
+`codex exec --json`, and maps the process to create/wait/interrupt/resume/close. On close
 it validates changed paths, commits only the declared scope, returns the final
 commit, copies the structured final response to an ignored artifact directory,
-and removes only the temporary worktree it created. It also persists a
+and removes only the temporary worktree/clone it created. It also persists a
 Host-owned session record under the configured registry root, including the
 thread, PID, worktree, stdout/stderr and task identity. A new bridge process
 can call `rebind_task` with the original `runner_ref`; it validates identity,
@@ -48,9 +49,11 @@ integration may implement `CodexHostBridge` with the app's create/wait/resume
 and durable `rebind_task` operations and provide normalized responses to
 `CodexHostTransport`, which maps them to the existing `ExternalRunnerAdapter`
 event contract. The local CLI bridge is the reference implementation for the
-same contract. The code-level independent-process rebind regression passes;
-the live multi-role Product → Teacher/Test canary is still a separate field
-run and must record its real RunManifest evidence.
+same contract. The code-level independent-process rebind regression passes.
+Pilot 011 then exercised the live multi-role Product → Teacher path: create,
+process restart/rebind, Product close and contract handoff passed, while the
+Teacher privacy/budget gate stopped the run before independent Test. Its
+`human_required` RunManifest is the authoritative field result.
 
 No model or reasoning override is included. The temporary model scope remains
 in force. A non-Git project or a file-hash/working-tree snapshot is rejected

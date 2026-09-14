@@ -212,6 +212,15 @@ class CodexHostTransport:
             "closed", status, reason=reason, report_ref=report_ref, response=response
         )
 
+    def cleanup(self, runner_ref: str) -> None:
+        """Release a Host session after a fail-closed cancellation."""
+        handle = self._require_ref(runner_ref)
+        cleanup = getattr(self.bridge, "cleanup_task", None)
+        if not callable(cleanup):
+            raise CodexHostTransportError("configured Codex Host bridge does not support cleanup")
+        cleanup(handle)
+        self._status = "closed"
+
     def _require_ref(self, runner_ref: str) -> CodexThreadHandle:
         if self._handle is None:
             raise CodexHostTransportError("Codex host transport is not open")

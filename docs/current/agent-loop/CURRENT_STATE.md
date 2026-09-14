@@ -2,7 +2,7 @@
 
 > **Canonical current-state document**
 > **Last verified:** 2026-09-14
-> **Status:** Stage 3 P0 serial and model-free multi-role Scheduler canary passed; live Host-backed multi-role operation remains in progress / approved external-main paths integrated
+> **Status:** Stage 3 P0 serial and model-free multi-role Scheduler canary passed; live Host-backed Pilot 011 executed and stopped at HUMAN_REQUIRED on a real Teacher privacy/budget gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
 This is the only document that describes the current Agent Loop status. Phase
@@ -44,8 +44,13 @@ proved explicit product/core role routing, fail-closed Scheduler restore/rebind,
 serial completion, and a cross-domain contract handoff. The canary was
 model-free and did not start Docker. The Host now persists session identity,
 PID, worktree and output logs and supports lookup/rebind from a new bridge
-process; the code-level independent-process regression passes. A live
-Host-backed multi-role canary remains the final platform-specific proof.
+process; the code-level independent-process regression passes. Pilot 011 then
+ran a real Product task through a separate Scheduler process, closed Product,
+and created the Product → Teacher handoff. Teacher stopped fail-closed after
+finding that advanced preview responses still serialize `prompt` into the
+browser response, and its real input usage exceeded the 64k Teacher packet
+budget; independent Test was not started. The field result is
+`HUMAN_REQUIRED`, not PASS.
 
 ## Verified evidence
 
@@ -76,6 +81,12 @@ Host-backed multi-role canary remains the final platform-specific proof.
 - Host rebind regression: a second bridge process looked up the original
   `runner_ref`, attached to the original PID/worktree, and returned `running`
   without invoking create; covered by `test_codex_cli_bridge.py`;
+- Pilot 011 live Host evidence: Product created from candidate
+  `53fabec954b549f1cdce46720c3461470230ed6e`, rebind succeeded across the
+  Scheduler process boundary, Product final snapshot was
+  `e1d7d6793ca1f651eedf5e2e34828a4e885c5d5`, Teacher used `512,884` input /
+  `10,581` output tokens and stopped on the privacy finding; see
+  `PILOT_011_REPORT.md` and the ignored RunManifest path recorded there;
 - Model scope: temporary model input is frozen; no local model or Torch load is
   required by the architecture gate.
 
@@ -100,9 +111,9 @@ Host-backed multi-role canary remains the final platform-specific proof.
 | Host lifecycle mapping | implemented with injected bridge | `codex_host_transport.py` |
 | Real Codex create / wait / resume / close | implemented via Codex CLI bridge | `codex_cli_bridge.py` |
 | Single-domain Owner -> Test orchestration | implemented with bounded waits and evidence gates | `bounded_loop.py` |
-| Main scheduler calling the real platform | constrained multi-role backend and durable Host rebind boundary implemented through explicit per-role Runner factories; live canary remains pending | `scheduler_backend.py`, `codex_cli_bridge.py`, `PILOT_010_REPORT.md` |
+| Main scheduler calling the real platform | real Product create + separate-process rebind + Product → Teacher handoff exercised; independent Test remains blocked by Teacher privacy/budget gate | `scheduler_backend.py`, `codex_cli_bridge.py`, `PILOT_011_REPORT.md` |
 | Worktree integration planning, conflict/scope detection and rollback rehearsal | implemented; disjoint isolated auto-integration and isolated rollback passed, direct parent mutation remains human-owned | `integration.py`, `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `PILOT_006_REPORT.md`, `PILOT_007_REPORT.md` |
-| Real Owner and independent Test child tasks | live phase-two pilot, Codex-worktree integration, isolated integration, service-backed verification, post-integration verification and recalibrated budget audit passed; approved external-main paths integrated | `PILOT_005_REPORT.md`, `PILOT_006_REPORT.md`, `PILOT_007_REPORT.md`, `PILOT_008_REPORT.md`, local RunManifest |
+| Real Owner and independent Test child tasks | prior Product/Test pilots passed; Pilot 011 real Product passed its scope/handoff gates, but Teacher stopped before independent Test on a privacy contract blocker | `PILOT_005_REPORT.md`, `PILOT_008_REPORT.md`, `PILOT_011_REPORT.md`, local RunManifest |
 | Cross-domain parallel orchestration | intentionally deferred | Phase 6 |
 
 ## Actual execution boundary
@@ -187,16 +198,16 @@ change is allowed in this experiment.
   references, consumer scope and the same final snapshot evidence;
 - run the model-free multi-role canary recorded in `PILOT_010_REPORT.md`.
 
-### Remaining: Stage 3 live Host operation
+### Remaining: Stage 3 live Host closure
 
-- wire the live Codex Host factory for each role to the durable lookup/hydration
-  path for `runner_ref` after a separate process restart; the local CLI
-  reference implementation and code-level regression are complete;
-- execute the ready low-risk task design in
-  [`PILOT_011_TASK_DESIGN.md`](PILOT_011_TASK_DESIGN.md): Product UI evidence
-  change → Teacher consumer review → independent Test;
-- run one low-risk live Product → Core (or Product → Teacher) Scheduler canary,
-  including RunManifest metrics and independent verification;
+- optionally wire an external Desktop/MCP Codex Host factory to the same durable
+  lookup/hydration path; the local CLI reference implementation and its
+  separate-process regression are complete;
+- use a new TaskPacket revision to repair the Teacher browser-response privacy
+  contract, then rerun the low-risk Product → Teacher → independent Test canary;
+- repair the Teacher browser-response privacy contract, create a new TaskPacket
+  revision, and rerun the low-risk live Product → Teacher → independent Test
+  canary with RunManifest metrics;
 - preserve the fail-closed decision when any role or platform rebind is absent;
 - keep cross-domain parallelism, automatic repair, deployment, promotion, and
   model changes disabled until those bounded checks pass.

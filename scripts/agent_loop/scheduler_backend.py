@@ -184,7 +184,19 @@ class RunnerExecutionBackend(SchedulerBackend):
     def cancel(self, task: ScheduledTask, *, reason: str) -> None:
         binding = self._binding(task)
         if binding.execution.record.status == "running":
-            event = binding.execution.interrupt(reason)
+            try:
+                event = binding.execution.interrupt(reason)
+            except Exception:
+                # The Host may have exited between poll and cancellation, and
+                # its final metrics can then be lower than the last accepted
+                # event.  Cleanup is still safe and must not turn a bounded
+                # budget stop into an orphaned process/worktree.
+                cleanup = getattr(binding.execution.adapter, "cleanup", None)
+                runner_ref = binding.execution.record.runner_ref
+                if not callable(cleanup) or not runner_ref:
+                    raise
+                cleanup(runner_ref)
+                return
             if event.status not in {"interrupted", "lost", "blocked"}:
                 raise RunnerExecutionBackendError(
                     f"RunnerExecution did not cancel cleanly: {event.status}"

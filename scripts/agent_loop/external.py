@@ -153,6 +153,15 @@ class ExternalRunnerAdapter:
         self._closed = True
         return event
 
+    def cleanup(self, runner_ref: str) -> None:
+        """Best-effort host cleanup for a failed cancellation boundary."""
+        self._require_ref(runner_ref)
+        cleanup = getattr(self.transport, "cleanup", None)
+        if not callable(cleanup):
+            raise ExternalRunnerError("external transport does not support cleanup")
+        cleanup(runner_ref)
+        self._closed = True
+
     def _require_ref(self, runner_ref: str) -> None:
         if self._closed:
             raise ExternalRunnerError("external Runner adapter is closed")
