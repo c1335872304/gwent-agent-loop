@@ -173,7 +173,7 @@ def build_codex_thread_launch(
                 "For a TestReport, use these exact top-level fields: task_id, packet_revision, tested_snapshot, tester, overall, results, environment, failures, manual_checks, changed_test_paths.",
                 f"Set tested_snapshot exactly to {snapshot}; set tester exactly to test-verification.",
                 "Each results item must use the exact full command string from TaskPacket.acceptance.verification_commands; never abbreviate it with ellipses and do not use a commands field.",
-                "Each results item must include command, cwd, status, exit_code, and evidence_ref. For a non-Docker host run, environment.runner is host-diagnostic, missing_dependencies is [], and environment.docker.used is false.",
+                "Each results item must include command, cwd, status, exit_code, and evidence_ref. For a non-Docker host run, environment.runner is host-diagnostic, missing_dependencies is [], and environment.docker.used is false. For a Docker-backed run, set environment.runner exactly to docker (never host-docker), set environment.docker.used to true, and include compose_files as a non-empty list, health as passed, cleanup as complete, and a non-empty evidence_refs list.",
                 "Use failures as a list (empty for PASS), manual_checks as a list, and changed_test_paths as a list. Do not substitute final_snapshot for tested_snapshot.",
             ]
         )

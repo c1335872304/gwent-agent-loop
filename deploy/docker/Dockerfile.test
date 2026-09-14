@@ -22,4 +22,7 @@ RUN python -m pip install --no-cache-dir --upgrade pip \
 # Source and tests are mounted by the Compose test service.  Keeping the
 # dependency image separate means code edits do not invalidate pytest/Torch
 # layers, while the test command always reads the current working tree.
-CMD ["python", "-m", "pytest", "-q", "scripts/agent_loop", "tools/server/tests", "services/teacher/tests", "apps/web/backend/tests"]
+# The repository is bind-mounted by Compose. Disable pytest's cache provider
+# so the one-shot container cannot leave nobody-owned .pytest_cache files in
+# the Host worktree after `docker compose run --rm` cleanup.
+CMD ["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "scripts/agent_loop", "tools/server/tests", "services/teacher/tests", "apps/web/backend/tests"]

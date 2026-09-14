@@ -88,7 +88,9 @@ def check_agent_package() -> None:
 
 def check_docs() -> None:
     link_re = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
-    skip = {"build", "build-release", "build-debug", ".build", ".git", "node_modules", "dist", ".venv", "__pycache__"}
+    # .agent-loop contains ignored runtime snapshots and child worktrees;
+    # only committed/current docs should participate in the link gate.
+    skip = {"build", "build-release", "build-debug", ".build", ".git", ".agent-loop", "node_modules", "dist", ".venv", "__pycache__"}
     broken: list[str] = []
     checked = 0
     for md in ROOT.rglob("*.md"):

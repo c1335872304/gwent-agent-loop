@@ -19,7 +19,10 @@ Docker-capable sandbox only for `test-verification`, after validating the
 profile and the declared `docker-test` command. Ordinary Test tasks retain the
 workspace sandbox, and the capability is persisted across Host rebind. This
 does not grant Docker access if the Host process itself lacks the Docker socket
-group; that condition is reported as `PERMISSION_REQUIRED`.
+group; that condition is reported as `PERMISSION_REQUIRED`. When Docker is used,
+the TestReport must use `environment.runner: docker` exactly, with plural
+`compose_files`, `health: passed`, `cleanup: complete`, and non-empty
+`evidence_refs`; `host-docker` is not a valid report runner value.
 
 状态：Agent 配置和本地 Codex CLI Runner 已实现；Pilot 005 已完成一次真实
 Runner 丢失后的同一责任链有界恢复，并由独立 Test Agent 在 Owner 最终
