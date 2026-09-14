@@ -25,7 +25,7 @@ docker:
   cleanup_required: true
   max_runtime_minutes: 30
 model_policy: {model: "runner-defined", reasoning: "runner-defined", prompt_revision: "", skill_revisions: []}
-execution_limits: {max_attempts: 2, max_elapsed_minutes: 90, max_input_tokens: 64000, max_output_tokens: 16000, may_spawn_subtasks: false, max_subtask_depth: 0}
+execution_limits: {max_attempts: 2, max_elapsed_minutes: 90, max_input_tokens: 1000000, max_output_tokens: 16000, may_spawn_subtasks: false, max_subtask_depth: 0}
 required_outputs: ["ChangeReport", "evidence/privacy verification", "Product handoff for UI/API changes"]
 required_verification: ["Teacher Skill checker and relevant Teacher tests"]
 stop_conditions: ["evidence is missing", "hidden information may leak", "Teacher would need to decide gameplay", "budget is exhausted"]
