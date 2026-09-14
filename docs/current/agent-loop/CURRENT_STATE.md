@@ -1,8 +1,8 @@
 # Agent Loop Current State
 
 > **Canonical current-state document**
-> **Last verified:** 2026-09-14
-> **Status:** Stage 3 P0 serial and model-free multi-role Scheduler canary passed; live Host-backed Pilot 011 executed and stopped at HUMAN_REQUIRED on a real Teacher privacy/budget gate
+> **Last verified:** 2026-09-15
+> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；直接父工作树集成仍保持人工 gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
 This is the only document that describes the current Agent Loop status. Phase
@@ -13,9 +13,17 @@ infer the latest implementation state.
 
 The context contracts, deterministic control plane, evidence gates, Docker
 canonical test entry point, bounded recovery policy, Codex project-task request
-builder, concrete Codex CLI Host Bridge, bounded single-domain orchestration,
-recovery journaling, and IntegrationManifest gate are implemented and
-verified. Live pilot `GW-REAL-PRODUCT-001` completed one Product Owner with a
+builder, concrete Codex CLI Host Bridge, bounded multi-role orchestration,
+recovery journaling, contract handoff and IntegrationManifest gate are
+implemented and verified. The latest live canary is recorded in
+[`PILOT_018_REPORT.md`](PILOT_018_REPORT.md): a real Product Owner was created,
+rebound from a new Scheduler process, handed to an independent Teacher review,
+verified by two independent Docker Test runs, integrated in an isolated
+branch/worktree, rolled back in isolation, and closed with a completed
+RunManifest. Direct mutations outside an explicitly approved path remain
+`HUMAN_REQUIRED`; the external dirty `main` was not touched.
+
+Historical live pilot `GW-REAL-PRODUCT-001` completed one Product Owner with a
 controlled Runner loss and same-runner bounded resume, followed by one
 independent Test/Verification run. The candidate was integrated into the
 phase-two Codex worktree after the explicit human decision and passed a second
@@ -50,16 +58,18 @@ and created the Product → Teacher handoff. Teacher stopped fail-closed after
 finding that advanced preview responses still serialize `prompt` into the
 browser response, and its real input usage exceeded the 64k Teacher packet
 budget; independent Test was not started. The field result is
-`HUMAN_REQUIRED`, not PASS.
+`HUMAN_REQUIRED`, not PASS. Pilot 011 remains historical; Pilot 018 supersedes
+its blocked field condition after the privacy filter was fixed, the Teacher
+input budget was aligned to 1,000,000, and the review scope was bounded.
 
 ## Verified evidence
 
-- Architecture gate: 97 deterministic Agent Loop tests passed;
-- Docker canonical pytest: 121 tests passed, with 2 existing deprecation warnings;
-- Documentation links: 334 local links passed;
-- Budget audit: Owner/Test total input `944,919 / 1,000,000`, output
-  `21,051 / 32,000`, elapsed `361.315s`, 3 model turns; budget gate passed;
-- Python syntax gate: 110 files passed;
+- Architecture gate: 105 deterministic Agent Loop tests passed;
+- Docker canonical pytest: 145 tests passed, with 2 existing warnings;
+- Documentation links: 166 local links passed;
+- Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
+  elapsed `364.257s`, 4 model turns; budget gate passed;
+- Python syntax gate: 115 files passed;
 - Live phase-two Product pilot: Owner recovered once after an injected loss;
   candidate integration and post-integration independent Test/Verification
   passed in the Codex worktree; the disjoint candidate was also applied to
@@ -87,6 +97,12 @@ budget; independent Test was not started. The field result is
   `e1d7d6793ca1f651eedf5e2e34828a4e885c5d5`, Teacher used `512,884` input /
   `10,581` output tokens and stopped on the privacy finding; see
   `PILOT_011_REPORT.md` and the ignored RunManifest path recorded there;
+- Pilot 018 live Host evidence: revision-5 Product/Teacher/Test chain completed;
+  Product candidate `c95584faff0747027b9521188a3dcaa4a8c45384`, isolated applied
+  snapshot `207fe91f58f545f8614716905230b3db7b0cb35e`, same-runner process rebind,
+  two Docker TestReport PASS results, and isolated rollback PASS; see
+  `PILOT_018_REPORT.md` and the ignored RunManifest/IntegrationManifest directory
+  recorded there;
 - Model scope: temporary model input is frozen; no local model or Torch load is
   required by the architecture gate.
 
@@ -111,9 +127,9 @@ budget; independent Test was not started. The field result is
 | Host lifecycle mapping | implemented with injected bridge | `codex_host_transport.py` |
 | Real Codex create / wait / resume / close | implemented via Codex CLI bridge | `codex_cli_bridge.py` |
 | Single-domain Owner -> Test orchestration | implemented with bounded waits and evidence gates | `bounded_loop.py` |
-| Main scheduler calling the real platform | real Product create + separate-process rebind + Product → Teacher handoff exercised; independent Test remains blocked by Teacher privacy/budget gate | `scheduler_backend.py`, `codex_cli_bridge.py`, `PILOT_011_REPORT.md` |
+| Main scheduler calling the real platform | real Product create, separate-process rebind, Teacher review, two independent Docker Test runs, isolated integration and rollback passed; direct parent mutation remains human-owned | `scheduler_backend.py`, `codex_cli_bridge.py`, `PILOT_018_REPORT.md` |
 | Worktree integration planning, conflict/scope detection and rollback rehearsal | implemented; disjoint isolated auto-integration and isolated rollback passed, direct parent mutation remains human-owned | `integration.py`, `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `PILOT_006_REPORT.md`, `PILOT_007_REPORT.md` |
-| Real Owner and independent Test child tasks | prior Product/Test pilots passed; Pilot 011 real Product passed its scope/handoff gates, but Teacher stopped before independent Test on a privacy contract blocker | `PILOT_005_REPORT.md`, `PILOT_008_REPORT.md`, `PILOT_011_REPORT.md`, local RunManifest |
+| Real Owner and independent Test child tasks | revision-5 Product, Teacher, Test 1 and Test 2 all closed and passed in Pilot 018; Test runs were Docker-backed and independent | `PILOT_018_REPORT.md`, local RunManifest |
 | Cross-domain parallel orchestration | intentionally deferred | Phase 6 |
 
 ## Actual execution boundary
@@ -198,19 +214,19 @@ change is allowed in this experiment.
   references, consumer scope and the same final snapshot evidence;
 - run the model-free multi-role canary recorded in `PILOT_010_REPORT.md`.
 
-### Remaining: Stage 3 live Host closure
+### Remaining: bounded local operation and optional host adapters
 
+- the revision-5 local Codex CLI Host-backed serial multi-role canary passed;
+  `PILOT_018_REPORT.md` is the current field evidence;
 - optionally wire an external Desktop/MCP Codex Host factory to the same durable
   lookup/hydration path; the local CLI reference implementation and its
   separate-process regression are complete;
-- use a new TaskPacket revision to repair the Teacher browser-response privacy
-  contract, then rerun the low-risk Product → Teacher → independent Test canary;
-- repair the Teacher browser-response privacy contract, create a new TaskPacket
-  revision, and rerun the low-risk live Product → Teacher → independent Test
-  canary with RunManifest metrics;
+- direct integration into `/mnt/c/codes/gwent_v4` `main` remains a human gate;
+  the approved candidate is already applied and verified in an isolated
+  branch/worktree;
 - preserve the fail-closed decision when any role or platform rebind is absent;
 - keep cross-domain parallelism, automatic repair, deployment, promotion, and
-  model changes disabled until those bounded checks pass.
+  model changes disabled until they receive separate bounded canaries.
 
 ## Explicit non-goals for the current phase
 

@@ -1,7 +1,7 @@
 # 理想 Agent Loop 三阶段路线图
 
 > **当前版本：** 0.1
-> **当前所在：** 阶段一现场试点已通过，阶段二受控恢复、隔离集成和 service-backed Docker 试点已通过；直接父工作树集成闸门仍需人工处理
+> **当前所在：** 阶段三本地 Codex CLI Host 多角色串行 canary 已通过；直接父工作树集成闸门仍需人工处理
 > **权威现状：** [`CURRENT_STATE.md`](CURRENT_STATE.md)
 
 这份文档把原来的 Phase 0–7 压缩成三个可验收的工程阶段。以后推进只
@@ -168,17 +168,14 @@ Test/Verification 组合成可重复的多 Agent 工作流。
 
 ## 当前推进位置与下一步
 
-当前已通过阶段一最小现场试点，并完成阶段二的一次真实受控恢复试点：确定性
-控制平面、TestReport 闸门、Recovery Policy 与 RunnerExecution 恢复决策日志、
-Codex 请求构建器、Codex CLI bridge、单领域 Product → Test/Verification 编排和
-IntegrationManifest 均已实现；`PILOT_005_REPORT.md` 至
-`PILOT_007_REPORT.md` 记录了真实 Owner 丢失、同一 Runner 有界恢复、父工作树
-集成、隔离分支自动集成、两轮独立 Test 和 Docker canonical test。真实
-token/elapsed 指标也已接通，预算口径调整后的无超预算审计已通过。
-声明服务依赖任务的 Docker/service-backed health/failure/cleanup 证据已由
-`PILOT_008_REPORT.md` 通过；预算口径调整后的无超预算审计已通过；成功候选的 rollback 已在隔离 clone 中
-完成演练，脏 parent 的 disjoint candidate 已由隔离分支路径自动应用，父工作树
-候选本身仍由人工决定是否回退或直接合入。
+当前已通过阶段一最小现场试点、阶段二受控恢复与隔离集成试点，以及阶段三
+本地 Codex CLI Host-backed 多角色串行 canary。`PILOT_018_REPORT.md` 记录了
+revision-5 的真实 Product Owner、新 Scheduler 进程 restore/rebind、Teacher
+contract/privacy review、两轮独立 Docker Test、隔离 branch/worktree 集成、
+rollback 和完整 RunManifest。真实 token/elapsed 指标、Docker health/failure/
+cleanup 证据和 changed-path/contract gate 均已收口。直接父工作树集成仍是
+人工闸门；外部 Desktop/MCP Host 适配、并行编排、自动修复和生产写入仍不在
+当前受限运行模式内。
 
 阶段三 P0 的串行 Scheduler 已实现并由 `PILOT_009_REPORT.md` 验证：
 `max_concurrency=1` 下按 owner 路由、FIFO 排队，暂停任务继续占用调度槽，
