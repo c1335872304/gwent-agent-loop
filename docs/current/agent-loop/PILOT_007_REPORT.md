@@ -74,8 +74,11 @@ contract 和 TestReport 均通过。
 
 ## 证据
 
-- [Final budget RunManifest](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-budget-final-manifest.json)
-- [Owner journal](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-owner-019.json)
-- [Test journal](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-verifier-020.json)
-- [TestReport](../../../.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-020.json)
-- [External main IntegrationManifest](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-external-main-integration-manifest.json)
+以下是执行主机上的历史运行时证据路径。`.agent-loop/` 被 Git 忽略，干净
+snapshot 不携带这些文件，因此这里保留可审计路径文本而不创建失效链接：
+
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-budget-final-manifest.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-owner-019.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-verifier-020.json`
+- `.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-020.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-external-main-integration-manifest.json`

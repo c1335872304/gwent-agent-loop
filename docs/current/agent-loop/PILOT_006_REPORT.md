@@ -79,10 +79,13 @@ rollback 演练均已完成。最终退出仍被预算审计阻断，且本次 P
 
 ## 证据索引
 
-- [IntegrationManifest](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-integration-manifest.json)
-- [External main IntegrationManifest](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-external-main-integration-manifest.json)
-- [Post-integration RunManifest](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-post-integration-run-manifest.json)
-- [Post-integration TestReport](../../../.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-008.json)
-- [Metric Owner journal](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-owner-013.json)
-- [Metric Test journal](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-verifier-014.json)
-- [Metric TestReport](../../../.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-014.json)
+以下是执行主机上的历史运行时证据路径。`.agent-loop/` 被 Git 忽略，干净
+snapshot 不携带这些文件，因此这里保留可审计路径文本而不创建失效链接：
+
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-integration-manifest.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-external-main-integration-manifest.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-post-integration-run-manifest.json`
+- `.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-008.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-owner-013.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-verifier-014.json`
+- `.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-014.json`

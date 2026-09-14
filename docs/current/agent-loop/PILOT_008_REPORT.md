@@ -49,10 +49,13 @@ Cleanup 阶段：
 
 ## TestReport
 
-- [TestReport](../../../.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/service-verifier-022/TestReport.json)
-- [完整 service pilot evidence](../../../.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/service-verifier-022/service-pilot-evidence.json)
-- [service TaskPacket](../../../.agent-loop/runtime/GW-REAL-PRODUCT-001-SERVICE/task-packet.yaml)
-- [service ContextBrief](../../../.agent-loop/runtime/GW-REAL-PRODUCT-001-SERVICE/context-brief.yaml)
+以下是执行主机上的历史运行时证据路径。`.agent-loop/` 被 Git 忽略，干净
+snapshot 不携带这些文件，因此这里保留可审计路径文本而不创建失效链接：
+
+- `.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/service-verifier-022/TestReport.json`
+- `.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/service-verifier-022/service-pilot-evidence.json`
+- `.agent-loop/runtime/GW-REAL-PRODUCT-001-SERVICE/task-packet.yaml`
+- `.agent-loop/runtime/GW-REAL-PRODUCT-001-SERVICE/context-brief.yaml`
 
 TestReport schema validation 为 `PASS`，changed test paths 为空。此次证据解决了
 阶段二此前缺少的 service-backed Docker health/failure/cleanup 项。

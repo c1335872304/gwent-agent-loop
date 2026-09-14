@@ -80,8 +80,11 @@ rollout 恢复”的现场边界。
 
 ## 证据索引
 
-- [Stage 2 RunManifest](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-run-manifest.json)
-- [IntegrationManifest](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-integration-manifest.json)
-- [Owner ExecutionJournal](../../../.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-owner-006.json)
-- [Owner ChangeReport](../../../.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/owner-006.json)
-- [Independent TestReport](../../../.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-007.json)
+以下是执行主机上的历史运行时证据路径。`.agent-loop/` 被 Git 忽略，干净
+snapshot 不携带这些文件，因此这里保留可审计路径文本而不创建失效链接：
+
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-run-manifest.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/stage2-integration-manifest.json`
+- `.agent-loop/tasks/GW-REAL-PRODUCT-001/artifacts/runner-owner-006.json`
+- `.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/owner-006.json`
+- `.agent-loop/host-artifacts/GW-REAL-PRODUCT-001/verifier-007.json`
