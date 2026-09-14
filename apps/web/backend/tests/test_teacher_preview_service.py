@@ -44,7 +44,7 @@ async def test_preview_cache_singleflights_and_invalidates_after_real_state_chan
     service = TeacherPreviewService(game, teacher)
     first = SimpleNamespace(match_id="a" * 32, revision=0)
 
-    _, first_response = await asyncio.gather(
+    (__, first_response), _ = await asyncio.gather(
         service.preview_turn(first, "beginner", 3),
         service.preview_turn(first, "beginner", 3),
     )
