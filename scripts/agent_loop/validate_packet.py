@@ -19,6 +19,8 @@ DOMAIN_OWNERS = {"core", "trainer", "product", "teacher"}
 PROFILE_ROLES = DOMAIN_OWNERS | {"test-verification", "context-integration"}
 TASK_OWNERS = DOMAIN_OWNERS | {"context-integration"}
 _CONTEXT_FORBIDDEN_KEYS = {"conversation", "chat_history", "raw_transcript", "full_transcript"}
+_ADVISORY_STATUSES = {"empty", "applied", "unavailable", "blocked"}
+_ADVISORY_LESSON_STATUSES = {"confirmed", "promoted"}
 
 
 def load_yaml(path: str | Path) -> Any:
@@ -242,6 +244,100 @@ def _reject_context_transcript(value: Any, path: str = "ContextBrief") -> None:
             _reject_context_transcript(child, f"{path}[{index}]")
 
 
+def _validate_advisory(value: Any) -> None:
+    advisory = _require_mapping(value, "ContextBrief.advisory")
+    _require_keys(
+        advisory,
+        {"enabled", "status", "source_report_ref", "items", "omitted", "limits", "adoption"},
+        "ContextBrief.advisory",
+    )
+    if not isinstance(advisory["enabled"], bool):
+        raise ValidationError("ContextBrief.advisory.enabled must be boolean")
+    if advisory["status"] not in _ADVISORY_STATUSES:
+        raise ValidationError("ContextBrief.advisory.status is invalid")
+    if not str(advisory["source_report_ref"] or "").strip():
+        raise ValidationError("ContextBrief.advisory.source_report_ref must not be empty")
+    items = _list(advisory["items"], "ContextBrief.advisory.items")
+    item_ids: list[str] = []
+    used_tokens = 0
+    for index, raw_item in enumerate(items):
+        item = _require_mapping(raw_item, f"ContextBrief.advisory.items[{index}]")
+        _require_keys(
+            item,
+            {
+                "lesson_id",
+                "status",
+                "advisory_only",
+                "statement",
+                "when",
+                "avoid",
+                "prefer",
+                "preflight",
+                "evidence_snapshot",
+                "source_refs",
+                "estimated_tokens",
+            },
+            f"ContextBrief.advisory.items[{index}]",
+        )
+        lesson_id = str(item["lesson_id"]).strip()
+        if not lesson_id:
+            raise ValidationError(f"ContextBrief.advisory.items[{index}].lesson_id must not be empty")
+        if lesson_id in item_ids:
+            raise ValidationError("ContextBrief.advisory lesson ids must be unique")
+        item_ids.append(lesson_id)
+        if item["status"] not in _ADVISORY_LESSON_STATUSES or item["advisory_only"] is not True:
+            raise ValidationError("ContextBrief.advisory item is not an eligible advisory")
+        for field in ("statement", "evidence_snapshot"):
+            if not str(item[field] or "").strip():
+                raise ValidationError(f"ContextBrief.advisory.items[{index}].{field} must not be empty")
+        for field in ("when", "avoid", "prefer", "preflight", "source_refs"):
+            values = _list(item[field], f"ContextBrief.advisory.items[{index}].{field}")
+            if field in {"avoid", "prefer", "preflight", "source_refs"} and not values:
+                raise ValidationError(f"ContextBrief.advisory.items[{index}].{field} must be non-empty")
+        try:
+            estimate = int(item["estimated_tokens"])
+        except (TypeError, ValueError) as exc:
+            raise ValidationError("ContextBrief.advisory estimated_tokens must be an integer") from exc
+        if estimate < 1:
+            raise ValidationError("ContextBrief.advisory estimated_tokens must be positive")
+        used_tokens += estimate
+
+    omitted = _list(advisory["omitted"], "ContextBrief.advisory.omitted")
+    for index, raw_item in enumerate(omitted):
+        item = _require_mapping(raw_item, f"ContextBrief.advisory.omitted[{index}]")
+        if not str(item.get("lesson_id", "")).strip() or not str(item.get("reason", "")).strip():
+            raise ValidationError("ContextBrief.advisory.omitted requires lesson_id and reason")
+
+    limits = _require_mapping(advisory["limits"], "ContextBrief.advisory.limits")
+    for field in ("max_items", "max_tokens"):
+        try:
+            if int(limits.get(field, 0)) < 1:
+                raise ValidationError(f"ContextBrief.advisory.limits.{field} must be positive")
+        except (TypeError, ValueError) as exc:
+            raise ValidationError(f"ContextBrief.advisory.limits.{field} must be positive") from exc
+    if len(items) > int(limits["max_items"]) or used_tokens > int(limits["max_tokens"]):
+        raise ValidationError("ContextBrief advisory exceeds its limits")
+    if int(limits.get("used_items", -1)) != len(items) or int(limits.get("used_tokens", -1)) != used_tokens:
+        raise ValidationError("ContextBrief advisory usage counters do not match items")
+
+    adoption = _require_mapping(advisory["adoption"], "ContextBrief.advisory.adoption")
+    _require_keys(adoption, {"status", "adopted_lesson_ids", "not_adopted_lesson_ids", "evidence_ref"}, "ContextBrief.advisory.adoption")
+    if adoption["status"] not in {"not_recorded", "recorded"}:
+        raise ValidationError("ContextBrief.advisory.adoption.status is invalid")
+    adopted = _list(adoption["adopted_lesson_ids"], "ContextBrief.advisory.adoption.adopted_lesson_ids")
+    not_adopted = _list(adoption["not_adopted_lesson_ids"], "ContextBrief.advisory.adoption.not_adopted_lesson_ids")
+    if not set(str(item) for item in [*adopted, *not_adopted]).issubset(set(item_ids)):
+        raise ValidationError("ContextBrief.advisory adoption references an unknown lesson")
+    if set(str(item) for item in adopted) & set(str(item) for item in not_adopted):
+        raise ValidationError("ContextBrief.advisory adoption cannot classify a lesson twice")
+    if adoption["status"] == "recorded" and not str(adoption["evidence_ref"] or "").strip():
+        raise ValidationError("recorded advisory adoption requires evidence_ref")
+    if not advisory["enabled"] and items:
+        raise ValidationError("disabled ContextBrief advisory cannot contain items")
+    if advisory["status"] == "applied" and (not advisory["enabled"] or not items):
+        raise ValidationError("applied ContextBrief advisory requires enabled items")
+
+
 def validate_context_brief(context_brief: Mapping[str, Any]) -> None:
     """Validate the reusable minimum ContextBrief contract."""
     _require_keys(
@@ -271,6 +367,8 @@ def validate_context_brief(context_brief: Mapping[str, Any]) -> None:
         item = _require_mapping(source, f"ContextBrief source_graph[{index}]")
         if not str(item.get("path", "")).strip():
             raise ValidationError(f"ContextBrief source_graph[{index}] requires path")
+    if "advisory" in context_brief:
+        _validate_advisory(context_brief["advisory"])
     _reject_context_transcript(context_brief)
 
 

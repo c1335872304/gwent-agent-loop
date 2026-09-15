@@ -1,6 +1,6 @@
 # Agent Loop 自进化阶段计划
 
-> **状态：E0–E1 candidate-only、E2 shadow-only 已实现；E3–E6 尚未启用**
+> **状态：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory 已实现；E4–E6 尚未启用**
 > **最后整理：2026-09-15**
 > **默认读取：是；历史讨论：见 [`archive/SELF_EVOLUTION_DISCUSSION_20260915.md`](archive/SELF_EVOLUTION_DISCUSSION_20260915.md)**
 
@@ -375,28 +375,30 @@ Rollback Success Rate
 
 > 在相同前置条件下，不重复已经被证据证明可以避免的失败；在不同条件下，不误用旧规则。
 
-## 8. E0–E2 实施边界与下一步
+## 8. E0–E3 实施边界与下一步
 
 E0–E1 已实现为 `scripts/agent_loop/experience.py`：它只接收结构化 Trace 和可选的
 RunManifest/TestReport/ChangeReport，生成 PathAnalysis、DetourRecord、Candidate Lesson
 和 candidate-only ExperienceManifest。E2 已实现为 `scripts/agent_loop/retrieval.py`：它只对
 显式字段做 Shadow Retrieval，记录 selected/excluded、排除原因和成本。当前实现不读取原始
-对话、不调用模型、不注入 ContextBrief，也不修改 Skill、Routing、Scheduler、contract、
-生产代码或模型。
+对话、不调用模型，也不修改 Skill、Routing、Scheduler、contract、生产代码或模型。E3 已实现
+为 `scripts/agent_loop/injection.py`：只把 E2 selected 的 confirmed/promoted 记录放入
+ContextBrief 的独立 advisory 区域，并记录后续是否采用；`context_floor_refs` 和其他任务
+控制字段保持不变。
 
-## 9. 下一项实施任务：E3 Advisory Injection
+## 9. 下一项实施任务：E4 固定回归与 Promotion
 
-E0–E2 的确定性分析和旁路检索已经完成。下一项 TaskPacket 应限定为：
+E0–E3 的确定性分析、旁路检索和受限 advisory 已经完成。下一项 TaskPacket 应限定为：
 
-> 仅将已确认的 Shadow Retrieval 结果以有限 advisory 形式加入 ContextBrief；candidate 不得
-> 被注入，经验不能覆盖当前 authority、权限、预算、并发和停止条件。
+> 在固定 Baseline/Evolved 回归集上验证 advisory 是否减少已知弯路且不产生负迁移，再生成
+> PromotionReport；不得自动修改 Skill、Routing、Scheduler、contract 或模型。
 
 必须交付：
 
-- advisory 专用 ContextBrief 区域和严格数量/Token 上限；
-- 只允许 `confirmed` 经验进入 advisory，candidate、过期、冲突和不兼容记录必须排除；
-- 记录经验是否被采用，但不改变 authority、权限、预算、并发和停止条件；
-- 独立回归：相关命中、无关排除、过期排除、冲突排除、candidate 不可注入；
+- Baseline/Evolved 双轨固定回归和 PromotionReport；
+- 统计弯路率、任务成功率、negative transfer、false avoidance 和安全指标；
+- canary、人工批准、拒绝和 rollback 证据；
+- 独立回归：相关 advisory 减少弯路、无关任务不受影响、candidate 不可注入；
 - 不新增 Agent、不引入并行、不改变当前串行安全边界。
 
 E3 完成前，Shadow Retrieval 仍只生成报告，不影响 Agent 行为。

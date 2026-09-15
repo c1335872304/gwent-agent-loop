@@ -1,7 +1,7 @@
 # Experience Layer Protocol
 
-> **当前实现：E0–E1 candidate-only、E2 shadow-only**
-> **当前状态：** 分析已结束任务的执行路径并保存候选经验；E2 只做旁路检索和报告，E3 注入、E4 Promotion 均未启用。
+> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory**
+> **当前状态：** 分析已结束任务的执行路径并保存候选经验；E2 只做旁路检索，E3 只做受限 advisory 注入，E4 Promotion 尚未启用。
 
 本协议是 [`SELF_EVOLUTION_PLAN.md`](SELF_EVOLUTION_PLAN.md) 的运行时补充。它不新增 Agent，
 不改变当前串行 Scheduler，不读取原始对话，也不让经验覆盖 AGENTS、Skill、contract、
@@ -24,6 +24,7 @@ PathAnalysis
   -> Candidate Lesson（仅 verified fallback 的 avoidable detour）
   -> ExperienceManifest（candidate_only，injection=false）
   -> E2 Shadow Retrieval（selected/excluded report，仍不注入）
+  -> E3 Advisory ContextBrief（仅 confirmed/promoted，受限且可回溯）
 ```
 
 未被明确证明可避免的失败不会自动生成 Avoidance Rule。
@@ -141,8 +142,33 @@ changed paths、failure class、preconditions、contract versions 和 snapshot p
 命中率、估算 Token 和 `model_calls=0`。检索不可用时输出 `status=unavailable`，并声明
 `baseline.unchanged=true`；它不能阻断当前任务，也不能改变 ContextBrief。
 
-## 7. 后续阶段边界
+## 7. E3 Advisory Injection
 
-E3 才允许已确认经验以 advisory 形式进入 ContextBrief；
-E4 才允许与 Baseline 做固定回归并提交 Promotion Proposal。任何影响 Harness Policy 的规则
-仍然需要人工 Gate。
+E3 必须通过 `injection.py` 创建新的 ContextBrief 副本，不能原地修改基线。输入必须包含
+有效的 ContextBrief、完整的 E2 ShadowRetrieval 报告和 selected 对应的 Lesson 文件。只有
+`confirmed` 或 `promoted` Lesson 可以生成 advisory item；每项必须保留 statement、when、
+avoid、prefer、preflight、evidence snapshot 和 source refs。默认上限为 3 项、1500 estimated
+tokens，超出的 selected 进入 `advisory.omitted` 并记录原因。
+
+advisory 只能位于独立的 `ContextBrief.advisory` 区域，不能写入 `context_floor_refs`、事实
+来源、权限、预算、并发或停止条件。初次生成时 adoption 为 `not_recorded`；任务结束后使用
+`record_advisory_adoption` 绑定采用/未采用结果和证据引用。
+
+显式执行注入：
+
+```bash
+python3 scripts/agent_loop/injection.py \
+  --context-brief .agent-loop/tasks/<task>/ContextBrief.yaml \
+  --shadow-report .agent-loop/tasks/<task>/ShadowRetrieval.yaml \
+  --lesson .agent-loop/experience/confirmed/LESSON-<id>.yaml \
+  --source-report-ref .agent-loop/tasks/<task>/ShadowRetrieval.yaml \
+  --output .agent-loop/tasks/<task>/ContextBrief.advisory.yaml
+```
+
+多个 Lesson 时重复传入 `--lesson`。生成的新文件应作为后续 Owner 的显式 ContextBrief 输入，
+不会自动替换原始 ContextBrief。
+
+## 8. 后续阶段边界
+
+E4 才允许与 Baseline 做固定回归并提交 Promotion Proposal；E5 才允许形成 Skill、Routing 或
+Validation Proposal。任何影响 Harness Policy 的规则仍然需要人工 Gate。

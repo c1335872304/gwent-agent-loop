@@ -55,4 +55,22 @@ lessons:
   applied: []
   rejected_as_stale_or_irrelevant: []
 
+# E3 advisory：只能放置 E2 selected 的 confirmed/promoted 经验；不得进入 context_floor_refs。
+advisory:
+  enabled: false
+  status: "empty | applied | unavailable | blocked"
+  source_report_ref: "ShadowRetrieval.yaml"
+  items: []
+  omitted: []
+  limits:
+    max_items: 3
+    max_tokens: 1500
+    used_items: 0
+    used_tokens: 0
+  adoption:
+    status: "not_recorded | recorded"
+    adopted_lesson_ids: []
+    not_adopted_lesson_ids: []
+    evidence_ref: ""
+
 contradictions_or_blockers: []

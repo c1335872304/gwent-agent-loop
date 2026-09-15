@@ -206,6 +206,7 @@ def check_agent_loop() -> None:
         "scripts.agent_loop.test_documentation",
         "scripts.agent_loop.test_experience",
         "scripts.agent_loop.test_retrieval",
+        "scripts.agent_loop.test_injection",
         "scripts.agent_loop.test_packaging",
         "scripts.agent_loop.test_schema_validation",
         "scripts.agent_loop.test_persistence",

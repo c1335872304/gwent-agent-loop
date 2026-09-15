@@ -86,6 +86,7 @@ EXACT_FILES = {
     "config/rl_contract.json",
     "contracts/README.md",
     "docs/current/agent-loop/CONTEXT_INDEX.yaml",
+    "docs/current/agent-loop/CONTEXT_BRIEF_TEMPLATE.yaml",
     "docs/current/agent-loop/EXPERIENCE_MANIFEST_TEMPLATE.yaml",
     "docs/current/agent-loop/SHADOW_QUERY_TEMPLATE.yaml",
     "docs/current/agent-loop/SHADOW_RETRIEVAL_TEMPLATE.yaml",

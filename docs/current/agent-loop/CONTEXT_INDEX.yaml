@@ -87,7 +87,7 @@ entries:
     claim: "Self-evolution first analyzes avoidable execution detours and verified fallbacks; experience is advisory and cannot override current authority."
     source_refs:
       - {path: "docs/current/agent-loop/SELF_EVOLUTION_PLAN.md", locator: "第一优先级：弯路分析 and Promotion Gate", source_kind: "architecture"}
-      - {path: "docs/current/agent-loop/EXPERIENCE_PROTOCOL.md", locator: "E0–E2 的输入、输出和 Shadow Retrieval", source_kind: "protocol"}
+      - {path: "docs/current/agent-loop/EXPERIENCE_PROTOCOL.md", locator: "E0–E3 的输入、输出、Shadow Retrieval 和 bounded advisory", source_kind: "protocol"}
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "记录格式 and confirmed lessons", source_kind: "lesson_policy"}
       - {path: "AGENTS.md", locator: "Agent Loop boundaries and no Manager Agent", source_kind: "rule"}
     verified_at: "2026-09-15 0000"
@@ -99,7 +99,7 @@ entries:
     lesson_refs: []
     supersedes: []
     superseded_by: []
-    notes: "E0–E1 deterministic candidate extraction and E2 shadow-only retrieval are implemented; advisory injection and promotion remain disabled until their staged exit criteria pass."
+    notes: "E0–E1 deterministic candidate extraction, E2 shadow-only retrieval and E3 bounded advisory injection are implemented; fixed regression and promotion remain disabled until their staged exit criteria pass."
   - id: "core-legality-source"
     domain: "core"
     claim: "Core actions are the legality source; consumers must render and submit the returned option_index."
