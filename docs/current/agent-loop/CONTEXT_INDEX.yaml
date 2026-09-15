@@ -99,7 +99,7 @@ entries:
     lesson_refs: []
     supersedes: []
     superseded_by: []
-    notes: "E0–E1 deterministic candidate extraction, E2 shadow-only retrieval and E3 bounded advisory injection are implemented; fixed regression and promotion remain disabled until their staged exit criteria pass."
+    notes: "E0–E3 deterministic experience stages and E4 fixed Baseline/Evolved PromotionReport gates are implemented; actual promotion remains human-gated and E5/E6 are disabled."
   - id: "core-legality-source"
     domain: "core"
     claim: "Core actions are the legality source; consumers must render and submit the returned option_index."

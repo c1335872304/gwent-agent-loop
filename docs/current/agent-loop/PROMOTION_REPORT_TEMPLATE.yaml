@@ -1,0 +1,77 @@
+# E4 PromotionReport v1：只记录比较、闸门和人工决定，不自动晋级
+schema: "agent-loop.e4-promotion-report.v1"
+schema_version: 1
+regression_set:
+  regression_set_id: ""
+  snapshot: ""
+  frozen: true
+  source_refs: []
+  case_ids: []
+metrics:
+  baseline: {}
+  evolved: {}
+  by_kind: {}
+  delta: {}
+gates:
+  - id: "fixed_regression_set"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "independent_evidence"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "known_detours_reduced"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "task_success_non_decreasing"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "no_safety_regression"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "negative_transfer_zero"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "false_avoidance_zero"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "advisory_scope"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "canary_passed"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "rollback_ready"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+  - id: "human_approval"
+    status: "PASS | FAIL | BLOCKED"
+    details: ""
+    evidence_refs: []
+canary:
+  status: "not_run | passed | failed | rolled_back"
+  runner: ""
+  snapshot: ""
+  evidence_refs: []
+rollback:
+  status: "not_started | ready | executed | unavailable"
+  method: ""
+  evidence_refs: []
+decision:
+  status: "pending | approved | rejected | rolled_back"
+  decided_by: ""
+  evidence_ref: ""
+eligibility:
+  status: "not_ready | ready_for_human_gate | approved | rejected | rolled_back"
+  reason: ""
+derived_findings:
+  negative_transfer: []

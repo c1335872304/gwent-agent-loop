@@ -18,7 +18,8 @@ Loop 执行、停止和交付只看 [`START_HERE.md`](START_HERE.md)；当前能
 `RUN_MANIFEST_TEMPLATE.yaml`、`INTEGRATION_MANIFEST_TEMPLATE.yaml` 和
 `EXPERIENCE_MANIFEST_TEMPLATE.yaml`、`SHADOW_QUERY_TEMPLATE.yaml` 和
 `SHADOW_RETRIEVAL_TEMPLATE.yaml`；E3 生成的 ContextBrief advisory 区域按
-`CONTEXT_BRIEF_TEMPLATE.yaml` 的 `advisory` 字段校验。
+`CONTEXT_BRIEF_TEMPLATE.yaml` 的 `advisory` 字段校验。E4 固定回归使用
+`REGRESSION_SET_TEMPLATE.yaml`，比较结果使用 `PROMOTION_REPORT_TEMPLATE.yaml`。
 
 ## 使用规则
 

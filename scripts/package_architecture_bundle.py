@@ -88,6 +88,8 @@ EXACT_FILES = {
     "docs/current/agent-loop/CONTEXT_INDEX.yaml",
     "docs/current/agent-loop/CONTEXT_BRIEF_TEMPLATE.yaml",
     "docs/current/agent-loop/EXPERIENCE_MANIFEST_TEMPLATE.yaml",
+    "docs/current/agent-loop/REGRESSION_SET_TEMPLATE.yaml",
+    "docs/current/agent-loop/PROMOTION_REPORT_TEMPLATE.yaml",
     "docs/current/agent-loop/SHADOW_QUERY_TEMPLATE.yaml",
     "docs/current/agent-loop/SHADOW_RETRIEVAL_TEMPLATE.yaml",
     "python/pyproject.toml",

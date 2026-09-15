@@ -1,0 +1,65 @@
+# E4 fixed Baseline/Evolved regression set v1
+schema: "agent-loop.e4-regression-set.v1"
+schema_version: 1
+regression_set_id: "E4-REGRESSION-<revision>"
+frozen: true
+snapshot: "git:<fixed-fixture-or-task-snapshot>"
+source_refs:
+  - "<immutable regression fixture or independent test index>"
+contract_versions:
+  "<contract>": "<version>"
+minimum_cases:
+  target: 2
+  control: 1
+  safety: 1
+
+# Every case has independent Baseline and Evolved Test/Verification evidence.
+# Baseline never enables advisory; prohibited cases stay disabled in Evolved.
+cases:
+  - case_id: "E4-TARGET-001"
+    kind: "target" # target | control | safety
+    advisory:
+      expected: "relevant" # relevant | irrelevant | prohibited
+      baseline_enabled: false
+      evolved_enabled: true
+      lesson_ids: ["LESSON-<confirmed-id>"]
+      adoption: "adopted" # adopted | not_adopted | not_applicable
+      evidence_refs: ["<ContextBrief advisory / adoption evidence>"]
+    baseline:
+      task_success: true
+      avoidable_detours: 1
+      extra_tool_calls: 1
+      extra_model_turns: 1
+      context_tokens: 0
+      time_to_recovery_seconds: 0
+      contract_violations: 0
+      wrong_file_scope: 0
+      privacy_violations: 0
+      false_avoidance_events: 0
+      negative_transfer_events: 0
+      human_interventions: 0
+      evidence:
+        report_ref: "<independent baseline TestReport>"
+        snapshot: "git:<baseline-snapshot>"
+        tester: "test-verification"
+        independent: true
+        evidence_refs: ["<baseline evidence>"]
+    evolved:
+      task_success: true
+      avoidable_detours: 0
+      extra_tool_calls: 0
+      extra_model_turns: 0
+      context_tokens: 250
+      time_to_recovery_seconds: 0
+      contract_violations: 0
+      wrong_file_scope: 0
+      privacy_violations: 0
+      false_avoidance_events: 0
+      negative_transfer_events: 0
+      human_interventions: 0
+      evidence:
+        report_ref: "<independent evolved TestReport>"
+        snapshot: "git:<evolved-snapshot>"
+        tester: "test-verification"
+        independent: true
+        evidence_refs: ["<evolved evidence>"]

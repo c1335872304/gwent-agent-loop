@@ -33,6 +33,18 @@ class SchemaValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "raw conversation"):
             validate_context_brief(brief)
 
+    def test_context_brief_rejects_prompt_and_messages(self) -> None:
+        for field in ("prompt", "messages"):
+            brief = {
+                "task_id": "T1",
+                "packet_revision": 1,
+                "context_snapshot": "s1",
+                "fact_source_graph": [{"path": "AGENTS.md"}],
+                field: ["do not forward"],
+            }
+            with self.subTest(field=field), self.assertRaisesRegex(ValidationError, "raw conversation"):
+                validate_context_brief(brief)
+
     def test_task_packet_rejects_unknown_contract_and_latest_snapshot(self) -> None:
         packet = {
             "protocol_version": 1,

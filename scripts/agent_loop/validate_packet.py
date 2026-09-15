@@ -18,7 +18,14 @@ ROOT = Path(__file__).resolve().parents[2]
 DOMAIN_OWNERS = {"core", "trainer", "product", "teacher"}
 PROFILE_ROLES = DOMAIN_OWNERS | {"test-verification", "context-integration"}
 TASK_OWNERS = DOMAIN_OWNERS | {"context-integration"}
-_CONTEXT_FORBIDDEN_KEYS = {"conversation", "chat_history", "raw_transcript", "full_transcript"}
+_CONTEXT_FORBIDDEN_KEYS = {
+    "conversation",
+    "chat_history",
+    "raw_transcript",
+    "full_transcript",
+    "prompt",
+    "messages",
+}
 _ADVISORY_STATUSES = {"empty", "applied", "unavailable", "blocked"}
 _ADVISORY_LESSON_STATUSES = {"confirmed", "promoted"}
 

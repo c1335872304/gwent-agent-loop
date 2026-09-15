@@ -1,7 +1,7 @@
 # Experience Layer Protocol
 
-> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory**
-> **当前状态：** 分析已结束任务的执行路径并保存候选经验；E2 只做旁路检索，E3 只做受限 advisory 注入，E4 Promotion 尚未启用。
+> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory、E4 fixed regression**
+> **当前状态：** E4 只生成可审计 PromotionReport；实际晋级仍需要 canary、rollback 和明确人工 Gate。
 
 本协议是 [`SELF_EVOLUTION_PLAN.md`](SELF_EVOLUTION_PLAN.md) 的运行时补充。它不新增 Agent，
 不改变当前串行 Scheduler，不读取原始对话，也不让经验覆盖 AGENTS、Skill、contract、
@@ -25,6 +25,7 @@ PathAnalysis
   -> ExperienceManifest（candidate_only，injection=false）
   -> E2 Shadow Retrieval（selected/excluded report，仍不注入）
   -> E3 Advisory ContextBrief（仅 confirmed/promoted，受限且可回溯）
+  -> E4 PromotionReport（Baseline/Evolved 固定回归，仍不自动晋级）
 ```
 
 未被明确证明可避免的失败不会自动生成 Avoidance Rule。
@@ -168,7 +169,40 @@ python3 scripts/agent_loop/injection.py \
 多个 Lesson 时重复传入 `--lesson`。生成的新文件应作为后续 Owner 的显式 ContextBrief 输入，
 不会自动替换原始 ContextBrief。
 
-## 8. 后续阶段边界
+## 8. E4 Fixed Regression and PromotionReport
 
-E4 才允许与 Baseline 做固定回归并提交 Promotion Proposal；E5 才允许形成 Skill、Routing 或
-Validation Proposal。任何影响 Harness Policy 的规则仍然需要人工 Gate。
+E4 的输入必须是 `REGRESSION_SET_TEMPLATE.yaml` 形状的冻结回归集。每个 case 都要有
+独立的 Baseline 和 Evolved Test/Verification 证据，且两份 `report_ref` 不得相同。固定
+回归集至少包含两个 `target`、一个 `control` 和一个 `safety` case；Baseline advisory
+必须关闭，`prohibited` case 在 Evolved 中也必须关闭。
+
+每个结果只记录结构化指标：任务是否成功、avoidable detours、额外工具调用/模型回合、
+Context tokens、恢复耗时、contract/scope/privacy 违规、false avoidance、negative
+transfer 和人工介入次数。原始对话、完整 prompt 和未脱敏日志不得进入回归集。
+
+显式生成 PromotionReport：
+
+```bash
+python3 scripts/agent_loop/regression.py \
+  --regression-set .agent-loop/e4/RegressionSet.yaml \
+  --output .agent-loop/e4/PromotionReport.yaml \
+  --canary-status passed \
+  --canary-runner test-verification \
+  --canary-snapshot git:<canary-snapshot> \
+  --canary-evidence .agent-loop/e4/canary.log \
+  --rollback-status ready \
+  --rollback-method <explicit-reversible-method> \
+  --rollback-evidence .agent-loop/e4/rollback-plan.md
+```
+
+闸门必须同时检查：已冻结回归集、独立证据、目标弯路减少、任务成功率不下降、安全指标
+不回归、negative transfer 为零、false avoidance 为零、advisory 范围正确、canary 通过
+和 rollback 就绪。即使这些闸门全部通过，报告也只能是 `ready_for_human_gate`；只有显式
+记录 `decision.status=approved`、决定人和证据引用，才可标记 `approved`。`rejected` 和
+`rolled_back` 必须保留原报告及相应证据。E4 不修改 Skill、Routing、Scheduler、contract、
+生产代码或模型。
+
+## 9. 后续阶段边界
+
+E5 才允许形成 Skill、Routing 或 Validation Proposal。任何影响 Harness Policy 的规则仍然
+需要人工 Gate；E6 模型训练仍然不是当前范围。
