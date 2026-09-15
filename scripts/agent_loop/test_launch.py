@@ -149,6 +149,49 @@ class RunnerLaunchTests(unittest.TestCase):
         with self.assertRaisesRegex(ValidationError, "restricted to test-verification"):
             build(task_packet=task_packet)
 
+    def test_verification_docker_flag_is_carried_only_to_test_launch(self):
+        from scripts.agent_loop.launch import build_verification_launch_spec
+
+        owner_packet = packet()
+        owner_packet["acceptance"] = {
+            "verification_commands": ["python3 scripts/check.py docker-test"]
+        }
+        owner_spec = build(task_packet=owner_packet)
+        verifier_profile = profile()
+        verifier_profile["agent_id"] = "test-verification"
+        verifier_profile["profile_id"] = "test-verification-v1"
+        verifier_profile["role_type"] = "verification"
+        verifier_profile["docker"] = {
+            "allowed": True,
+            "compose_files": ["deploy/docker/compose.cpu.yml"],
+            "allowed_actions": ["config", "up", "down", "ps", "health", "logs"],
+            "cleanup_required": True,
+            "max_runtime_minutes": 30,
+        }
+        verifier_profile["capabilities"]["can_modify_production_code"] = False
+        verifier_profile["forbidden_roots"] = []
+        verifier_profile["execution_limits"]["max_input_tokens"] = 1000
+        verifier_profile["execution_limits"]["max_output_tokens"] = 800
+        verifier_profile["execution_limits"]["max_elapsed_minutes"] = 20
+        handoff = type("Handoff", (), {"final_snapshot": "snapshot-2"})()
+        spec = build_verification_launch_spec(
+            owner_spec,
+            handoff,
+            test_profile=verifier_profile,
+            attempt_id="verify-1",
+            task_packet_ref="tasks/TASK-1.yaml",
+            context_brief_ref="context/TASK-1.yaml",
+            profile_ref="profiles/test-verification.yaml",
+            write_scope=("apps/web/backend/tests",),
+            max_turns=2,
+            max_input_tokens=900,
+            max_output_tokens=700,
+            max_elapsed_minutes=15,
+            docker_enabled=True,
+        )
+        self.assertTrue(spec.task_packet["execution"]["host_docker"])
+        self.assertNotIn("host_docker", owner_spec.task_packet["execution"])
+
 
 if __name__ == "__main__":
     unittest.main()

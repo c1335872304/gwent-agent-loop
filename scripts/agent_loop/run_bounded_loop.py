@@ -133,6 +133,7 @@ def run(args: argparse.Namespace) -> dict:
             max_input_tokens=budgets[1],
             max_output_tokens=budgets[2],
             max_elapsed_minutes=budgets[3],
+            docker_enabled=args.docker,
         )
         return spec, make_execution(spec)
 

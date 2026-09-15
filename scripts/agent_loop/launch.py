@@ -240,6 +240,7 @@ def build_verification_launch_spec(
     max_input_tokens: int,
     max_output_tokens: int,
     max_elapsed_minutes: int,
+    docker_enabled: bool = False,
 ) -> RunnerLaunchSpec:
     """Build the independent verifier launch at the owner's final snapshot."""
     final_snapshot = str(getattr(handoff, "final_snapshot", "")).strip()
@@ -250,6 +251,17 @@ def build_verification_launch_spec(
     workspace["snapshot_kind"] = "git_commit"
     workspace["snapshot_ref"] = final_snapshot
     packet["workspace"] = workspace
+    if docker_enabled:
+        execution = dict(packet.get("execution", {}))
+        execution["host_docker"] = True
+        packet["execution"] = execution
+        acceptance = dict(packet.get("acceptance", {}))
+        verification_commands = list(acceptance.get("verification_commands", []))
+        if not any("docker-test" in str(command) for command in verification_commands):
+            raise ValidationError(
+                "Docker verification requires an explicit docker-test command"
+            )
+        packet["acceptance"] = acceptance
     context = copy.deepcopy(dict(owner_spec.context_brief))
     context["context_snapshot"] = final_snapshot
     return build_launch_spec(
