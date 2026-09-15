@@ -67,6 +67,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-input-tokens", type=int, default=None)
     parser.add_argument("--max-output-tokens", type=int, default=None)
     parser.add_argument("--max-elapsed-minutes", type=int, default=None)
+    parser.add_argument("--max-wait-seconds", type=float, default=None)
     parser.add_argument("--docker", action="store_true")
     parser.add_argument("--human-approved", action="store_true")
     return parser
@@ -87,6 +88,9 @@ def run(args: argparse.Namespace) -> dict:
     test_context_ref = args.test_context_brief_ref or f".agent-loop/runtime/{task_id}/verification-context.json"
     test_profile_ref = args.test_profile_ref or f".agent-loop/runtime/{task_id}/verification-profile.json"
     owner_budgets = _limits(packet, owner_profile, args)
+    max_wait_seconds = float(args.max_wait_seconds or int(packet["execution"]["max_elapsed_minutes"]) * 60)
+    if max_wait_seconds <= 0:
+        raise ValueError("--max-wait-seconds and TaskPacket max_elapsed_minutes must be positive")
     owner_spec = build_launch_spec(
         task_packet=packet,
         context_brief=context,
@@ -150,6 +154,7 @@ def run(args: argparse.Namespace) -> dict:
         report_loader=bridge.read_report,
         manifest_path=manifest_path,
         human_approved=args.human_approved,
+        max_wait_seconds=max_wait_seconds,
         verifier_factory=make_verifier,
     ).run()
     return {
