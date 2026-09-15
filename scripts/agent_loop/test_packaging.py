@@ -22,6 +22,7 @@ class ArchitectureBundleTests(unittest.TestCase):
 
         self.assertTrue(set(CONTEXT_ENTRYPOINTS).issubset(names))
         self.assertFalse(any(is_historical_doc(path) for path in files))
+        self.assertNotIn("docs/current/agent-loop/pilots/README.md", names)
 
     def test_history_requires_explicit_opt_in(self) -> None:
         current, _ = collect_files(include_tests=False, max_file_size=10 * 1024 * 1024)

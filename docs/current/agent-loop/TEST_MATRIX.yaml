@@ -32,7 +32,7 @@ domains:
     required_skills: ["core-environment"]
     commands:
       - id: "core-schema"
-        command: "python .agents/skills/core-environment/scripts/check_schema.py"
+        command: "python3 .agents/skills/core-environment/scripts/check_schema.py"
         cwd: "."
         evidence: "schema and ABI contract result"
       - id: "core-golden"
@@ -52,7 +52,7 @@ domains:
     required_skills: ["training-config"]
     commands:
       - id: "training-config"
-        command: "python .agents/skills/training-config/scripts/validate_training.py --all"
+        command: "python3 .agents/skills/training-config/scripts/validate_training.py --all"
         cwd: "."
         evidence: "all training config/task definitions pass"
       - id: "training-smoke"
@@ -72,7 +72,7 @@ domains:
     required_skills: ["product-integration"]
     commands:
       - id: "product-backend"
-        command: "PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests"
+        command: "PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests"
         cwd: "."
         evidence: "BFF contract and request tests"
       - id: "product-docker"
@@ -96,7 +96,7 @@ domains:
     required_skills: ["teacher-explanation"]
     commands:
       - id: "teacher-tests"
-        command: "PYTHONPATH=. pytest -q services/teacher/tests"
+        command: "PYTHONPATH=. python3 -m pytest -q services/teacher/tests"
         cwd: "."
         evidence: "evidence provenance and privacy regression tests"
     docker:

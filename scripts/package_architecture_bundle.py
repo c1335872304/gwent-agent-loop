@@ -52,6 +52,7 @@ CONTEXT_ENTRYPOINTS = (
 HISTORICAL_DOC_PREFIXES = (
     "docs/history/",
     "docs/current/agent-loop/archive/",
+    "docs/current/agent-loop/pilots/",
 )
 
 SOURCE_SUFFIXES = {".c", ".cc", ".cpp", ".h", ".hpp", ".py", ".ts", ".tsx", ".css", ".html", ".sh"}

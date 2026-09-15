@@ -1,8 +1,10 @@
 # Agent Loop 自进化阶段计划
 
-> **状态：E0–E4 已实现；E5 只读 ProposalBundle 和 E6 training-readiness 已实现；训练尚未启用**
-> **最后整理：2026-09-15**
-> **默认读取：是；历史讨论：见 [`archive/SELF_EVOLUTION_DISCUSSION_20260915.md`](archive/SELF_EVOLUTION_DISCUSSION_20260915.md)**
+> **状态：E0–E4 已验证；E5 只读 ProposalBundle 和 E6 training-readiness 代码已实现，
+> 但 E5 当前因独立 Lesson 数量不足而阻塞；训练尚未启用**
+> **最后整理：2026-09-16**
+> **读取范围：仅自进化任务默认读取；当前状态以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；
+> 历史讨论见 [`archive/SELF_EVOLUTION_DISCUSSION_20260915.md`](archive/SELF_EVOLUTION_DISCUSSION_20260915.md)**
 
 ## 1. 目标与边界
 

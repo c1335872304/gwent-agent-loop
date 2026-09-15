@@ -1,7 +1,7 @@
 # 本地 Gwent Docker 安装复盘与成功流程
 
 本文记录本次在 Windows + Docker Desktop + WSL2 环境中部署本地 CPU 单机版 Gwent 的实际过程。
-它是故障排查和复现记录；日常启动参数仍以 [LOCAL_DOCKER.md](LOCAL_DOCKER.md) 为准。
+它是故障排查和复现记录；日常启动参数仍以 [LOCAL_DOCKER.md](../../LOCAL_DOCKER.md) 为准。
 
 ## 一、最终目标
 

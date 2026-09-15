@@ -147,8 +147,8 @@ python3 scripts/check.py test
 python3 scripts/check.py full
 python3 scripts/check.py train
 
-PYTHONPATH=. pytest -q services/teacher/tests
-PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests
+PYTHONPATH=. python3 -m pytest -q services/teacher/tests
+PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests
 cd apps/web/frontend && npm ci && npm run build
 ```
 

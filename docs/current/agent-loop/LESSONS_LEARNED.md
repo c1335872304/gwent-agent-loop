@@ -7,9 +7,9 @@
 ```yaml
 id: "LL-YYYYMMDD-001"
 status: "confirmed | inferred | superseded"
-discovered_at: "YYYY-MM-DD"
-task_id: "GW-..."
-scope: "core | trainer | product | teacher | loop | environment"
+discovered_at: "YYYY-MM-DD | unknown"
+task_id: "GW-... | unknown"
+scope: "core | trainer | product | teacher | loop | protocol | environment"
 symptom: ""
 impact: ""
 root_cause: ""
@@ -29,6 +29,8 @@ trigger_terms: []
 ```yaml
 id: "LL-001"
 status: "confirmed"
+discovered_at: "unknown"
+task_id: "unknown"
 scope: "product"
 symptom: "前端或 Teacher 根据 label/source/target 文本自行推导可行动作。"
 impact: "可能与 Core 合法动作不一致，造成错误提交或解释越界。"
@@ -47,6 +49,8 @@ trigger_terms: ["legal action", "option_index", "label", "source", "target"]
 ```yaml
 id: "LL-002"
 status: "confirmed"
+discovered_at: "unknown"
+task_id: "unknown"
 scope: "teacher"
 symptom: "解释文本听起来合理，但没有 Strategy 已执行动作的结构化证据。"
 impact: "可能编造原因或泄露隐藏手牌/未公开候选动作。"
@@ -55,7 +59,7 @@ evidence:
   - ref: "AGENTS.md: Teacher Coding Agent"
 correct_practice: "只解释结构化 evidence；经过 privacy filter；不重算 legal action。"
 verification:
-  - "PYTHONPATH=. pytest -q services/teacher/tests"
+  - "PYTHONPATH=. python3 -m pytest -q services/teacher/tests"
 regression_test: "services/teacher/tests"
 trigger_terms: ["evidence", "grounding", "hidden hand", "privacy"]
 ```
@@ -65,6 +69,8 @@ trigger_terms: ["evidence", "grounding", "hidden hand", "privacy"]
 ```yaml
 id: "LL-003"
 status: "confirmed"
+discovered_at: "unknown"
+task_id: "unknown"
 scope: "environment"
 symptom: "models/v3/policy.pt 存在，但 installed.json 或 provenance 元数据缺失。"
 impact: "source check、runtime readiness 和模型来源可能被混为一谈。"
@@ -74,7 +80,7 @@ evidence:
   - ref: "scripts/check.py"
 correct_practice: "验证时分别报告 source asset、runtime metadata 和服务 readiness；不能用其中一个冒充另两个。"
 verification:
-  - "python scripts/check.py quick"
+  - "python3 scripts/check.py quick (only when the task declares Trainer/model scope)"
 regression_test: "pending: split source/runtime checks"
 trigger_terms: ["policy.pt", "installed.json", "checkpoint", "readiness"]
 ```
@@ -84,6 +90,8 @@ trigger_terms: ["policy.pt", "installed.json", "checkpoint", "readiness"]
 ```yaml
 id: "LL-004"
 status: "confirmed"
+discovered_at: "unknown"
+task_id: "unknown"
 scope: "loop"
 symptom: "Planner、Reviewer 或 Tester 继续派生新的 Agent，重复读取相同上下文。"
 impact: "token 失控、责任不清、结果无法审计。"
@@ -114,14 +122,14 @@ evidence:
   - ref: "scripts/check.py: check_local_model_slot / quick"
 correct_practice: "架构任务运行 scripts/check.py architecture、Agent Loop、文档、语法、contract 和本地确定性测试；只有 TaskPacket 明确进入 Trainer 或服务集成时，才运行全项目 quick、torch 检查或启动 Docker。"
 verification:
-  - "python scripts/agent_loop/check.py"
-  - "python -m unittest -q scripts.agent_loop.*"
-  - "python -c \"import scripts.check as check; check.check_docs()\""
+  - "python3 scripts/agent_loop/check.py"
+  - "python3 -m unittest -q scripts.agent_loop.*"
+  - "python3 -c \"import scripts.check as check; check.check_docs()\""
 regression_test: "docs/current/agent-loop/MODEL_SCOPE.md"
 trigger_terms: ["architecture", "agent loop", "quick", "torch", "docker", "test agent"]
 ```
 
-## 新增记录前的检查
+## 后续已确认经验
 
 ### LL-006: Docker cleanup must be ownership-scoped
 
@@ -249,7 +257,7 @@ evidence:
   - ref: "scripts/agent_loop/check.py Windows write preflight markers"
 correct_practice: "Promote repeated operational lessons into the repository entry instructions and a deterministic architecture check. The Agent must complete the preflight before constructing a patch, not only record the failure afterward."
 verification:
-  - "python scripts/check.py architecture"
+  - "python3 scripts/check.py architecture"
   - "read AGENTS.md before repository writes"
 regression_test: "scripts/agent_loop/check.py"
 trigger_terms: ["remembered lesson", "preflight", "repeat failure", "write gate"]

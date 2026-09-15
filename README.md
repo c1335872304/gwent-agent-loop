@@ -183,7 +183,7 @@ models/v3/          最终 V3 模型槽位
 tests/              C++ regression tests
 python/tests/       Python / RL tests
 tools/              golden trace、server adapter、profiling 等工程工具
-docs/current/       当前系统文档（不保留研发历史）
+docs/current/       当前系统文档；研发历史统一在 docs/current/archive/（早期回归夹具除外）
 ```
 
 ## 8. 验证入口

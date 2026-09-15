@@ -77,7 +77,7 @@ class BoundedLoopTests(unittest.TestCase):
                     "overall": "PASS",
                     "results": [
                         {
-                            "command": "PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests",
+                            "command": "PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests",
                             "cwd": ".",
                             "status": "PASS",
                             "exit_code": 0,

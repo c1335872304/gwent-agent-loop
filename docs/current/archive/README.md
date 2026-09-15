@@ -8,6 +8,7 @@
 
 - [`design/AI_DECISION_AND_TEACHER_TURN_PLAN.md`](design/AI_DECISION_AND_TEACHER_TURN_PLAN.md)：AI 决策与 Teacher 行动链的原始设计和实施演进；
 - [`design/LOCAL_DOCKER_PLAN.md`](design/LOCAL_DOCKER_PLAN.md)：本地 Docker 方案的设计与实施历史；
+- [`design/LOCAL_DOCKER_INSTALL_NOTES.md`](design/LOCAL_DOCKER_INSTALL_NOTES.md)：Windows/Docker Desktop 安装与故障排查复盘；
 - [`design/LOGIC_OPTIMIZATION_PLAN.md`](design/LOGIC_OPTIMIZATION_PLAN.md)：`match_id/revision`、action-chain、preview isolation 与产品验收的历史实施记录；
 - [`../agent-loop/archive/README.md`](../agent-loop/archive/README.md)：Agent Loop 阶段和 Pilot 历史归档索引。
 

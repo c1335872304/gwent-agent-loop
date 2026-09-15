@@ -204,7 +204,7 @@ Get-Content -LiteralPath "models\v3\README.md"
 
 ### 6.1 非训练 quick 子集
 
-本轮不直接执行 `python scripts/check.py quick`，因为该入口还会调用 training task validation。先执行不涉及训练的检查：
+本轮不直接执行 `python3 scripts/check.py quick`，因为该入口还会调用 training task validation。先执行不涉及训练的检查：
 
 ```powershell
 python3 tools/codegen/generate_card_data.py --check
@@ -277,7 +277,7 @@ cmake --build .build\core-test --parallel `
 ctest --test-dir .build\core-test --output-on-failure -R "gwent_core_model_tests|gwent_legal_actions_tests|gwent_c_api_smoke_tests|gwent_rl_c_api_tests|gwent_rl_collector_c_api_tests"
 ```
 
-本轮只执行 Core/C ABI/C++ tests，不执行 `scripts/check.py test`，因为该统一入口还会继续运行 Python training tests。需要覆盖：
+本轮只执行 Core/C ABI/C++ tests，不执行 `python3 scripts/check.py test`，因为该统一入口还会继续运行 Python training tests。需要覆盖：
 
 - `gwent_core_model_tests`；
 - `gwent_legal_actions_tests`；

@@ -29,7 +29,7 @@ CPU Docker 使用 `torch==2.6.0+cpu`，不会安装服务器的 CUDA 12.4 wheel�
 替换与启动的复核见安装复盘文档。
 
 本次安装中遇到的网络、基础镜像、依赖版本和权限问题，以及可复用的 PowerShell 成功流程，见
-[本地 Docker 安装复盘](LOCAL_DOCKER_INSTALL_NOTES.md)。
+[历史安装复盘](archive/design/LOCAL_DOCKER_INSTALL_NOTES.md)（只在排查安装问题时读取）。
 
 ## 结构
 

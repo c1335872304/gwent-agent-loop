@@ -9,6 +9,8 @@ Loop 执行、停止和交付只看 [`START_HERE.md`](START_HERE.md)；当前能
 项目导航：[AGENT_LOOP_NAVIGATION.md](../AGENT_LOOP_NAVIGATION.md)；三阶段路线图：[IDEAL_LOOP_3_STAGE_PLAN.md](IDEAL_LOOP_3_STAGE_PLAN.md)；模型范围：[MODEL_SCOPE.md](MODEL_SCOPE.md)；坑记录：[LESSONS_LEARNED.md](LESSONS_LEARNED.md)。领域任务卡和开场模板见 [`../agent-entry/README.md`](../agent-entry/README.md)。
 
 历史 Phase/Pilot 报告只从 [`archive/README.md`](archive/README.md) 按需追溯，不进入默认上下文。
+`pilots/` 是为早期确定性回归保留的兼容夹具，详见其
+[`README.md`](pilots/README.md)；它同样不提供当前状态。
 
 ## 模板目录
 

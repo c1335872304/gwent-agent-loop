@@ -33,7 +33,7 @@ contract 为准；方案/实施记录只用于解释为什么这样设计，不�
 - [`current/archive/design/LOGIC_OPTIMIZATION_PLAN.md`](current/archive/design/LOGIC_OPTIMIZATION_PLAN.md) — M0–M4 状态边界、revision、缓存和验收的历史记录；
 - [`current/archive/design/AI_DECISION_AND_TEACHER_TURN_PLAN.md`](current/archive/design/AI_DECISION_AND_TEACHER_TURN_PLAN.md) — AI 决策过程与教师行动链的历史设计；
 - [`current/archive/design/LOCAL_DOCKER_PLAN.md`](current/archive/design/LOCAL_DOCKER_PLAN.md) — Docker 架构与实施历史；
-- [`current/LOCAL_DOCKER_INSTALL_NOTES.md`](current/LOCAL_DOCKER_INSTALL_NOTES.md) — Windows/Docker Desktop 安装坑和复现流程。
+- [`current/archive/design/LOCAL_DOCKER_INSTALL_NOTES.md`](current/archive/design/LOCAL_DOCKER_INSTALL_NOTES.md) — Windows/Docker Desktop 安装坑和复现流程（历史复盘）。
 
 上述记录中的“建议”“规划中”只表示历史阶段；若与基线或源码不一致，以基线、
 详细 contract 和实际验证为准。更细的工程规则放在 `.agents/skills/*/`，协议级
