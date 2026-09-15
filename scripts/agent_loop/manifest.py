@@ -36,7 +36,13 @@ def validate_run_manifest(manifest: Mapping[str, Any]) -> None:
         if int(budget.get(used, -1)) < 0 or int(budget.get(limit, 0)) < 0:
             raise ValidationError(f"RunManifest budget values must be non-negative: {used}/{limit}")
         if int(budget[used]) > int(budget[limit]):
-            raise ValidationError(f"RunManifest budget exhausted: {used} > {limit}")
+            exhausted = budget.get("exhausted_limits", [])
+            if manifest["status"] not in {"blocked", "human_required"} or used not in exhausted:
+                raise ValidationError(f"RunManifest budget exhausted: {used} > {limit}")
+
+    exhausted_limits = budget.get("exhausted_limits", [])
+    if not isinstance(exhausted_limits, list) or len(set(str(item) for item in exhausted_limits)) != len(exhausted_limits):
+        raise ValidationError("RunManifest budget.exhausted_limits must be a list of unique fields")
 
     role_runs = manifest["role_runs"]
     if not isinstance(role_runs, list):

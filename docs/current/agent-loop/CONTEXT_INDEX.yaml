@@ -161,10 +161,10 @@ entries:
     confidence: "high"
     trigger_terms: ["token budget", "retry", "infinite loop", "subtask depth", "runner loss"]
     owner: "project"
-    lesson_refs: ["LL-004"]
+    lesson_refs: ["LL-004", "LL-012", "LL-013", "LL-014"]
     supersedes: []
     superseded_by: []
-    notes: "Per-agent limits are insufficient; accounting is task-wide."
+    notes: "Per-agent limits are insufficient; accounting is task-wide. A serial Owner plus verifier reserves one subtask and must derive wait/output bounds from the TaskPacket."
 
 maintenance:
   stale_after_days: 30

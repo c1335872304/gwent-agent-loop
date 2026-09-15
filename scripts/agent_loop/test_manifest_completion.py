@@ -40,6 +40,12 @@ class ManifestCompletionTests(unittest.TestCase):
         manifest["termination"] = {}
         validate_run_manifest(manifest)
 
+    def test_blocked_manifest_preserves_declared_budget_overrun(self) -> None:
+        manifest = _manifest("human_required")
+        manifest["budget"]["role_runs_used"] = 2
+        manifest["budget"]["exhausted_limits"] = ["role_runs_used"]
+        validate_run_manifest(manifest)
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

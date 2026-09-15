@@ -547,6 +547,11 @@ def _cli() -> int:
             "runner": args.canary_runner,
             "snapshot": args.canary_snapshot,
             "evidence_refs": args.canary_evidence,
+            "rollback": {
+                "status": args.rollback_status,
+                "method": args.rollback_method,
+                "evidence_refs": args.rollback_evidence,
+            },
         },
         decision={
             "status": args.decision,

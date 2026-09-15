@@ -191,6 +191,29 @@ class SingleDomainLoop:
             self.owner_execution.record.elapsed_seconds
             + self.verifier_execution.record.elapsed_seconds
         )
+        budget_limits = {
+            "role_runs_used": int(execution["max_role_runs"]),
+            "subtasks_used": int(execution["max_subtasks"]),
+            "input_tokens_used": int(execution["max_model_input_tokens"]),
+            "output_tokens_used": int(execution["max_model_output_tokens"]),
+            "model_turns_used": int(execution["max_model_turns"]),
+            "elapsed_minutes": int(execution["max_elapsed_minutes"]),
+        }
+        budget_used = {
+            "role_runs_used": 2,
+            "subtasks_used": 1,
+            "input_tokens_used": input_tokens_used,
+            "output_tokens_used": output_tokens_used,
+            "model_turns_used": self.owner_execution.record.model_turns_used
+            + self.verifier_execution.record.model_turns_used,
+            "elapsed_minutes": int(math.ceil(elapsed_seconds_used / 60.0)),
+        }
+        exhausted_limits = [
+            used
+            for used, value in budget_used.items()
+            if int(value) > int(budget_limits[used])
+        ]
+        manifest_status = "completed" if self.human_approved and not exhausted_limits else "human_required"
         artifacts = [
             self._artifact(
                 self.owner_execution.record.report_ref,
@@ -211,7 +234,7 @@ class SingleDomainLoop:
             "task_id": handoff.task_id,
             "task_revision": handoff.task_revision,
             "runner": "codex",
-            "status": "completed" if self.human_approved else "human_required",
+            "status": manifest_status,
             "created_at": "",
             "updated_at": "",
             "workspace": {
@@ -222,20 +245,15 @@ class SingleDomainLoop:
                 "write_scope_refs": list(self.owner_spec.request.write_scope),
             },
             "budget": {
-                "max_role_runs": int(execution["max_role_runs"]),
-                "max_subtasks": int(execution["max_subtasks"]),
+                "max_role_runs": budget_limits["role_runs_used"],
+                "max_subtasks": budget_limits["subtasks_used"],
                 "max_subtask_depth": int(execution["max_subtask_depth"]),
-                "max_input_tokens": int(execution["max_model_input_tokens"]),
-                "max_output_tokens": int(execution["max_model_output_tokens"]),
-                "max_model_turns": int(execution["max_model_turns"]),
-                "max_elapsed_minutes": int(execution["max_elapsed_minutes"]),
-                "role_runs_used": 2,
-                "subtasks_used": 1,
-                "input_tokens_used": input_tokens_used,
-                "output_tokens_used": output_tokens_used,
-                "model_turns_used": self.owner_execution.record.model_turns_used
-                + self.verifier_execution.record.model_turns_used,
-                "elapsed_minutes": int(math.ceil(elapsed_seconds_used / 60.0)),
+                "max_input_tokens": budget_limits["input_tokens_used"],
+                "max_output_tokens": budget_limits["output_tokens_used"],
+                "max_model_turns": budget_limits["model_turns_used"],
+                "max_elapsed_minutes": budget_limits["elapsed_minutes"],
+                **budget_used,
+                "exhausted_limits": exhausted_limits,
                 "elapsed_seconds_used": elapsed_seconds_used,
                 "exhaustion_action": "transition_to_human_required_and_stop_new_runs",
             },
@@ -249,7 +267,15 @@ class SingleDomainLoop:
             "termination": {
                 "completion_claim": "one Owner and one independent Test/Verification task passed",
                 "final_report_ref": str(self.verifier_execution.record.report_ref or ""),
-                "unresolved_blockers": [] if self.human_approved else ["human gate approval required"],
+                "unresolved_blockers": (
+                    []
+                    if self.human_approved and not exhausted_limits
+                    else (
+                        ["budget exhausted: " + ", ".join(exhausted_limits)]
+                        if exhausted_limits
+                        else ["human gate approval required"]
+                    )
+                ),
                 "recovery_point": "",
                 "cleanup": "complete",
             },

@@ -2,7 +2,7 @@
 
 > **Canonical current-state document**
 > **Last verified:** 2026-09-15
-> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；E0–E6 自进化控制面已实现到“训练前置审查”，外部 `main` 最新已知集成提交为 `289d53b`；未明确批准的父工作树变更仍保持人工 gate
+> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；E4 固定回归已生成 `ready_for_human_gate` 报告但尚未正式批准，E5/E6 仍关闭；外部 `main` 最新已知集成提交为 `289d53b`；未明确批准的父工作树变更仍保持人工 gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
 This is the only document that describes the current Agent Loop status. Phase
@@ -27,6 +27,12 @@ architecture gate was verified against that snapshot. The external worktree also
 has four pre-existing tracked ZIP deletion entries; this task did not restore,
 stage, commit or clean them.
 
+The current E4 field result is summarized in
+[`E4_REGRESSION_20260915_REPORT.md`](E4_REGRESSION_20260915_REPORT.md). The machine
+PromotionReport is `ready_for_human_gate`, but target-001 still needs a final
+RunManifest under the corrected aggregate budget before a human can safely approve
+promotion. E5 Proposal generation and E6 Trainer handoff therefore remain closed.
+
 Earlier Product, Docker, recovery, Scheduler and privacy-finding pilots explain
 how this operating profile was reached, but they are not part of the default
 context. Follow the historical-evidence map below only for audit, regression
@@ -35,12 +41,16 @@ condition.
 
 ## Verified evidence
 
-- Architecture gate: 157 deterministic Agent Loop tests passed against the E6 snapshot;
-- Documentation links: 403 local links passed against the E6 snapshot;
+- Architecture gate: 159 deterministic Agent Loop tests passed against the current local snapshot;
+- Documentation links: 405 local links passed against the current local snapshot;
 - Historical Docker canonical pytest: 145 tests passed, with 2 existing warnings;
 - Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
   elapsed `364.257s`, 4 model turns; budget gate passed;
-- Python syntax gate: 130 files passed against the E6 snapshot;
+- Python syntax gate: 130 files passed against the current local snapshot;
+- E4 fixed regression: 4 cases validated (2 target, 1 control, 1 safety); machine
+  gates passed except human approval, with target avoidable detours 2 → 0. The
+  report remains conditional because target-001 lacks a final budget-valid
+  RunManifest; see `E4_REGRESSION_20260915_REPORT.md`;
 - Live phase-two Product pilot: Owner recovered once after an injected loss;
   candidate integration and post-integration independent Test/Verification
   passed in the Codex worktree; the disjoint candidate was also applied to
@@ -89,7 +99,7 @@ condition.
 | Test / Verification role | profile and policy implemented | `TEST_AGENT.md`, `profiles/test-verification.yaml` |
 | TaskPacket / ContextBrief / Profile validation | implemented | `validate_packet.py`, `launch.py` |
 | ContextIndex and lessons navigation | implemented; entry-card, policy and snapshot consistency are gated, fact re-verification remains manual | `CONTEXT_INDEX.yaml`, `LESSONS_LEARNED.md`, `check_docs.py` |
-| Self-evolution / detour analysis | E0–E5 are implemented; E6 training-readiness gate is implemented; training and formal rule changes remain human-gated/disabled | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `experience.py`, `retrieval.py`, `injection.py`, `regression.py`, `proposal.py`, `training_readiness.py` |
+| Self-evolution / detour analysis | E0–E6 control code implemented; E4 field report is conditional and awaiting human gate; E5/E6 execution, training and formal rule changes remain closed | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `E4_REGRESSION_20260915_REPORT.md`, `regression.py`, `proposal.py`, `training_readiness.py` |
 | State, budget, lock, snapshot and persistence | implemented deterministically | `state_machine.py`, `budget.py`, `locks.py`, `persistence.py` |
 | Runner lifecycle and execution journal | implemented as model-free contracts | `runner.py`, `execution.py` |
 | Owner to Test handoff and verification plan | implemented as validators | `handoff.py`, `verification.py` |

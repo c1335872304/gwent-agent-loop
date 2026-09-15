@@ -254,6 +254,74 @@ verification:
 regression_test: "scripts/agent_loop/check.py"
 trigger_terms: ["remembered lesson", "preflight", "repeat failure", "write gate"]
 ```
+
+### LL-012: A single-domain loop reserves one subtask for the independent verifier
+
+```yaml
+id: "LL-012"
+status: "confirmed"
+discovered_at: "2026-09-15"
+task_id: "E4-TARGET-001"
+scope: "loop"
+symptom: "The Owner and independent Test Agent both closed successfully, but the RunManifest was rejected because max_subtasks was configured as 0."
+impact: "A real completed responsibility chain lost its final manifest solely because the budget omitted the required verifier subtask."
+root_cause: "max_subtasks was interpreted as Owner recursion instead of the total number of child tasks created by the loop."
+evidence:
+  - ref: ".agent-loop/tasks/E4-TARGET-001/artifacts/runner-e4-t001-baseline-test-r2.json"
+  - ref: "scripts/agent_loop/bounded_loop.py"
+    snapshot: "ea117826d569f0a5a370512e6c3adff362f746a8"
+correct_practice: "For the serial Owner -> independent Test shape, set max_subtasks=1 and max_subtask_depth=0; reserve recursion separately from the verifier count."
+verification:
+  - "TaskPacket validation passed with max_subtasks=1"
+  - "Independent Docker Test closed with 198 passed tests"
+regression_test: "scripts/agent_loop/test_bounded_loop.py"
+trigger_terms: ["max_subtasks", "independent verifier", "RunManifest budget", "serial loop"]
+```
+
+### LL-013: The bounded wait must derive from the declared task time budget
+
+```yaml
+id: "LL-013"
+status: "confirmed"
+discovered_at: "2026-09-15"
+task_id: "E4-TARGET-001"
+scope: "loop | environment"
+symptom: "The Owner returned a valid ChangeReport, but the runner timed out at its fixed 180-second wait before the close phase completed."
+impact: "The loop could waste a real model run and leave no final handoff even though the child task had already finished its work."
+root_cause: "The orchestration wait bound was shorter than the TaskPacket max_elapsed_minutes and was not derived from the declared budget."
+evidence:
+  - ref: ".agent-loop/tasks/E4-TARGET-001/artifacts/runner-e4-t001-baseline-owner.json"
+  - ref: "scripts/agent_loop/run_bounded_loop.py"
+    snapshot: "ea117826d569f0a5a370512e6c3adff362f746a8"
+correct_practice: "Default max_wait_seconds to TaskPacket execution.max_elapsed_minutes*60; use an explicit smaller bound only for a deliberate canary."
+verification:
+  - "The rerun closed Owner and independent Test and recorded final snapshots"
+  - "Unit test for the derived wait bound passed"
+regression_test: "scripts/agent_loop/test_bounded_loop.py"
+trigger_terms: ["max_wait_seconds", "bounded wait", "runner timeout", "TaskPacket elapsed budget"]
+```
+
+### LL-014: A serial task budget must cover both role outputs
+
+```yaml
+id: "LL-014"
+status: "confirmed"
+discovered_at: "2026-09-15"
+task_id: "E4-TARGET-002"
+scope: "loop"
+symptom: "Owner and independent Test both closed, but the task-level RunManifest exceeded max_model_output_tokens=8000 even though neither role exceeded its own profile limit."
+impact: "A valid independent Docker Test result was incorrectly left at human_required because the aggregate budget did not cover the serial Owner plus verifier outputs."
+root_cause: "The TaskPacket output limit was treated as a per-role allowance while RunManifest accounts for the whole serial responsibility chain."
+evidence:
+  - ref: ".agent-loop/tasks/E4-TARGET-002/run-manifest-baseline.json"
+  - ref: ".agent-loop/tasks/E4-TARGET-002/run-manifest-baseline-r2.json"
+    snapshot: "d39cf8f066591f44bc4dc9405fd7b0a9a1234037"
+correct_practice: "Set the task-level output budget to cover the declared serial role chain, keep each profile limit intact, and record exhausted_limits when a run still exceeds the aggregate budget."
+verification:
+  - "The corrected 32000-token packet completed Baseline and Evolved RunManifest validation"
+  - "scripts/agent_loop/test_manifest_completion.py passed"
+regression_test: "scripts/agent_loop/test_manifest_completion.py"
+trigger_terms: ["max_model_output_tokens", "aggregate budget", "serial Owner Test", "exhausted_limits"]
 ```
 
 1. 先确认它不是已有 Skill、contract 或导航条目的重复内容；
