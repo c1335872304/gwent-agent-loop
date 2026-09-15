@@ -1,5 +1,5 @@
 index_version: 1
-workspace_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-report ready_for_human_gate"
+workspace_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
 generated_at: "2026-09-15"
 entry_cards:
   core:
@@ -73,7 +73,7 @@ entries:
       - {path: "AGENTS.md", locator: "路由 and Agent sections", source_kind: "rule"}
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "角色与职责", source_kind: "architecture"}
     verified_at: "2026-09-15"
-    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-report ready_for_human_gate"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["agent routing", "domain owner", "manager agent", "handoff"]
@@ -91,7 +91,7 @@ entries:
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "记录格式 and confirmed lessons", source_kind: "lesson_policy"}
       - {path: "AGENTS.md", locator: "Agent Loop boundaries and no Manager Agent", source_kind: "rule"}
     verified_at: "2026-09-15"
-    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-report ready_for_human_gate"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["self-evolution", "detour", "path analysis", "avoidance rule", "experience layer", "shadow retrieval", "promotion"]
@@ -108,7 +108,7 @@ entries:
       - {path: ".agents/skills/core-environment/references/ACTION_CONTRACT.md", locator: "action contract", source_kind: "contract"}
       - {path: ".agents/skills/product-integration/SKILL.md", locator: "legal action", source_kind: "skill"}
     verified_at: "2026-09-15"
-    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-report ready_for_human_gate"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["legal action", "option_index", "action grammar", "frontend action"]
@@ -124,7 +124,7 @@ entries:
       - {path: "AGENTS.md", locator: "Teacher Coding Agent", source_kind: "rule"}
       - {path: ".agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md", locator: "privacy boundary", source_kind: "contract"}
     verified_at: "2026-09-15"
-    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-report ready_for_human_gate"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["Teacher", "explanation", "hidden information", "privacy", "evidence"]
@@ -141,7 +141,7 @@ entries:
       - {path: ".agents/skills/training-config/SKILL.md", locator: "warm-start/resume/model promotion", source_kind: "skill"}
       - {path: "artifacts/checkpoints/registry.yaml", locator: "registry", source_kind: "contract"}
     verified_at: "2026-09-15"
-    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-report ready_for_human_gate"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["checkpoint", "warm-start", "resume", "model promotion", "policy.pt"]
@@ -156,7 +156,7 @@ entries:
     source_refs:
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "预算、熔断与退出", source_kind: "architecture"}
     verified_at: "2026-09-15"
-    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-report ready_for_human_gate"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["token budget", "retry", "infinite loop", "subtask depth", "runner loss"]
@@ -165,6 +165,23 @@ entries:
     supersedes: []
     superseded_by: []
     notes: "Per-agent limits are insufficient; accounting is task-wide. A serial Owner plus verifier reserves one subtask and must derive wait/output bounds from the TaskPacket."
+  - id: "agent-loop-report-contract"
+    domain: "project"
+    claim: "TestReport result statuses are a strict protocol enum; a Docker PASS with a non-canonical status must be rejected and corrected at the Host prompt."
+    source_refs:
+      - {path: "scripts/agent_loop/report_validation.py", locator: "_RESULT_STATUS", source_kind: "validator"}
+      - {path: "scripts/agent_loop/codex_bridge.py", locator: "TestReport exact status instruction", source_kind: "host_protocol"}
+      - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "LL-015", source_kind: "lesson"}
+    verified_at: "2026-09-15"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["TestReport status", "PASS enum", "protocol drift", "Docker evidence"]
+    owner: "project"
+    lesson_refs: ["LL-015"]
+    supersedes: []
+    superseded_by: []
+    notes: "Keep report validation strict; repair the producer instruction or rerun the Test Agent instead of normalizing unknown statuses."
 
 maintenance:
   stale_after_days: 30

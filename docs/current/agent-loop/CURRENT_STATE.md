@@ -2,7 +2,7 @@
 
 > **Canonical current-state document**
 > **Last verified:** 2026-09-15
-> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；E4 固定回归已生成 `ready_for_human_gate` 报告但尚未正式批准，E5/E6 仍关闭；外部 `main` 最新已知集成提交为 `289d53b`；未明确批准的父工作树变更仍保持人工 gate
+> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；E4 固定回归已获人工批准，E5 因缺少至少两个独立结构化 Lesson 暂时阻塞，E6 仍关闭；外部 `main` 最新已知集成提交为 `289d53b`；未明确批准的父工作树变更仍保持人工 gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
 This is the only document that describes the current Agent Loop status. Phase
@@ -28,10 +28,11 @@ has four pre-existing tracked ZIP deletion entries; this task did not restore,
 stage, commit or clean them.
 
 The current E4 field result is summarized in
-[`E4_REGRESSION_20260915_REPORT.md`](E4_REGRESSION_20260915_REPORT.md). The machine
-PromotionReport is `ready_for_human_gate`; target-001's corrected revision-3
-Baseline/Evolved RunManifests are complete and budget-valid. E4 still needs an
-explicit human decision before E5 Proposal generation and E6 Trainer handoff.
+[`E4_REGRESSION_20260915_REPORT.md`](E4_REGRESSION_20260915_REPORT.md). The
+PromotionReport is `approved`; target-001's corrected revision-3 Baseline/Evolved
+RunManifests are complete and budget-valid. E5 is currently blocked because the
+repository has only one Lesson covered by the approved report, while E5 requires
+at least two independent structured Lessons. E6 remains closed.
 
 Earlier Product, Docker, recovery, Scheduler and privacy-finding pilots explain
 how this operating profile was reached, but they are not part of the default
@@ -47,10 +48,10 @@ condition.
 - Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
   elapsed `364.257s`, 4 model turns; budget gate passed;
 - Python syntax gate: 130 files passed against the current local snapshot;
-- E4 fixed regression: 4 cases validated (2 target, 1 control, 1 safety); machine
-  gates passed except human approval, with target avoidable detours 2 → 0. T001
-  revision-3 Baseline/Evolved RunManifests are budget-valid and Docker-backed;
-  see `E4_REGRESSION_20260915_REPORT.md`;
+- E4 fixed regression: 4 cases validated (2 target, 1 control, 1 safety); all
+  machine gates passed and explicit human approval is recorded, with target
+  avoidable detours 2 → 0. T001 revision-3 Baseline/Evolved RunManifests are
+  budget-valid and Docker-backed; see `E4_REGRESSION_20260915_REPORT.md`;
 - Live phase-two Product pilot: Owner recovered once after an injected loss;
   candidate integration and post-integration independent Test/Verification
   passed in the Codex worktree; the disjoint candidate was also applied to
@@ -99,7 +100,7 @@ condition.
 | Test / Verification role | profile and policy implemented | `TEST_AGENT.md`, `profiles/test-verification.yaml` |
 | TaskPacket / ContextBrief / Profile validation | implemented | `validate_packet.py`, `launch.py` |
 | ContextIndex and lessons navigation | implemented; entry-card, policy and snapshot consistency are gated, fact re-verification remains manual | `CONTEXT_INDEX.yaml`, `LESSONS_LEARNED.md`, `check_docs.py` |
-| Self-evolution / detour analysis | E0–E6 control code implemented; E4 field report is conditional and awaiting human gate; E5/E6 execution, training and formal rule changes remain closed | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `E4_REGRESSION_20260915_REPORT.md`, `regression.py`, `proposal.py`, `training_readiness.py` |
+| Self-evolution / detour analysis | E0–E6 control code implemented; E4 approved; E5 proposal generation is blocked until two independent structured Lessons are available; E6 execution, training and formal rule changes remain closed | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `E4_REGRESSION_20260915_REPORT.md`, `regression.py`, `proposal.py`, `training_readiness.py` |
 | State, budget, lock, snapshot and persistence | implemented deterministically | `state_machine.py`, `budget.py`, `locks.py`, `persistence.py` |
 | Runner lifecycle and execution journal | implemented as model-free contracts | `runner.py`, `execution.py` |
 | Owner to Test handoff and verification plan | implemented as validators | `handoff.py`, `verification.py` |

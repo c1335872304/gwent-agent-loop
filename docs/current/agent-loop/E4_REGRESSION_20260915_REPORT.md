@@ -1,8 +1,8 @@
 # E4：固定回归与 PromotionReport 现场报告
 
 > **日期：** 2026-09-15  
-> **机器报告：** `ready_for_human_gate`  
-> **正式晋级：** 未发生；未执行 E5 Proposal 应用或模型训练
+> **机器报告：** `approved`
+> **正式规则变更：** 未发生；E5 Proposal 尚未生成，模型训练未执行
 
 ## 执行范围
 
@@ -48,9 +48,11 @@ cleanup complete。
 
 ## Gate 结论
 
-机器 PromotionReport 的 11 个 gate 中，除 `human_approval` 外均通过；报告状态为
-`ready_for_human_gate`。T001 的证据缺口已补齐，但 E4 仍未正式完成，因为人工
-批准尚未记录；当前不能直接生成 approved PromotionReport。
+机器 PromotionReport 的 11 个 gate 全部通过，且人工批准已记录；报告状态为
+`approved`。这只批准 E4 证据进入 E5，不代表 Skill、Routing、Validator 或模型
+已经自动改变。
 
-下一步是由人工审阅并批准或拒绝 E4 PromotionReport；批准后再生成只读 E5
-Proposal。E6 Trainer 校验和 smoke training 目前保持关闭。
+E5 当前仍需至少两个独立结构化 Lesson；本仓库目前只有 approved report 覆盖的
+`LL-009`，E5 命令已按协议 fail-closed。补齐第二条具有不同 `detour_id`、来源和
+snapshot 的 confirmed/promoted Lesson，并将其纳入新的 E4 回归证据后，才能重新
+生成只读 E5 Proposal。E6 Trainer 校验和 smoke training 目前保持关闭。

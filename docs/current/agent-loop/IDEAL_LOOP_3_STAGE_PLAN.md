@@ -186,7 +186,8 @@ Runner backend，补齐 snapshot restore/rebind、跨角色 contract handoff，�
 `archive/pilots/PILOT_010_REPORT.md` 和 `PILOT_018_REPORT.md` 分别记录模型无关 canary 与真实
 Product → Teacher → Test canary。最终候选已在明确授权后合入外部 `main`；四个
 历史 ZIP 仍保留为未提交、不可读取的用户改动。自进化 E4 已生成机器回归报告，
-但 E4 仍等待人工 PromotionReport 决策，尚未进入 E5。后续只处理 E5 只读提案、
+E4 已获人工 PromotionReport 批准，但 E5 仍因缺少至少两个独立结构化 Lesson
+而阻塞。后续先补齐第二个独立 Detour 的回归证据，再生成 E5 只读提案、进行
 Trainer 资格校验和可选 Host 适配，不改变当前串行安全边界。
 
 ## 维护规则
