@@ -2,6 +2,7 @@
 
 ## Agent entry
 
+- 一屏任务入口（evidence、privacy、验证、handoff）：[`agent-entry/TEACHER.md`](agent-entry/TEACHER.md)；
 - 路由、handoff 与验证选择：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
 - Teacher evidence/privacy：[`teacher-explanation`](../../.agents/skills/teacher-explanation/SKILL.md)、[`EVIDENCE_CONTRACT.md`](../../.agents/skills/teacher-explanation/references/EVIDENCE_CONTRACT.md)、[`PRIVACY_BOUNDARY.md`](../../.agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md)；
 - React/BFF/Core HTTP：[`product-integration`](../../.agents/skills/product-integration/SKILL.md)、[`CORE_API_CONTRACT.md`](../../apps/web/docs/CORE_API_CONTRACT.md)；

@@ -1,6 +1,14 @@
 # 训练 Docker 规划
 
-> 状态：Docker 文件已落地。本机 CPU 镜像、任务 `plan` 和 16 局 smoke 已验证；GPU 与 512 并行只能在训练服务器完成。
+> **用途：** 训练容器的操作与边界说明；当前训练能力和单次运行结果以 Training Task、RunManifest / runs 证据和 [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md) 为准。
+> **历史快照：** Docker 文件已落地。本机 CPU 镜像、任务 `plan` 和 16 局 smoke 曾验证；GPU 与 512 并行只能在训练服务器完成。
+
+## Agent entry
+
+- Trainer 任务一屏入口（task、资产、验证、handoff）：[`agent-entry/TRAINER.md`](agent-entry/TRAINER.md)；
+- 唯一训练 workflow：[`training-config`](../../.agents/skills/training-config/SKILL.md)；
+- 训练、checkpoint 与 promotion 边界：[`TRAINING_AND_MODEL.md`](TRAINING_AND_MODEL.md)；
+- 产品 Docker 与服务验证不在本文范围，见 [`LOCAL_DOCKER.md`](LOCAL_DOCKER.md) 和 [`TEST_AGENT.md`](agent-loop/TEST_AGENT.md)。
 
 本文描述如何把当前服务器训练环境容器化，并同时支持本地 CPU 小规模验证。它不改变本地人机对战 Docker 的职责，也不把训练容器加入正常的对战 Compose。
 

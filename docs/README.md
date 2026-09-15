@@ -9,6 +9,7 @@ contract 为准；方案/实施记录只用于解释为什么这样设计，不�
 2. [`current/AGENT_ONBOARDING_INDEX.md`](current/AGENT_ONBOARDING_INDEX.md) — 按任务定位 Owner、Skill、contract、目录和验证；
 3. [`current/agent-loop/START_HERE.md`](current/agent-loop/START_HERE.md) — 受限串行任务的最小读取顺序和生命周期；
 4. [`current/agent-loop/CURRENT_STATE.md`](current/agent-loop/CURRENT_STATE.md) — 唯一实时运行状态。
+5. 已确定领域的实施任务再读 [`current/agent-entry/README.md`](current/agent-entry/README.md) — 只打开对应任务卡、Skill 和最小事实集。
 
 ## 当前事实来源
 

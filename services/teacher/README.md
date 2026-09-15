@@ -4,6 +4,7 @@
 
 ## Agent entry
 
+- 一屏任务入口（evidence、privacy、验证、handoff）：[`TEACHER.md`](../../docs/current/agent-entry/TEACHER.md)；
 - 全仓库路由与 handoff：[`AGENT_ONBOARDING_INDEX.md`](../../docs/current/AGENT_ONBOARDING_INDEX.md)；
 - 必读 Skill：[`teacher-explanation`](../../.agents/skills/teacher-explanation/SKILL.md)；
 - evidence 结构：[`EVIDENCE_CONTRACT.md`](../../.agents/skills/teacher-explanation/references/EVIDENCE_CONTRACT.md)；

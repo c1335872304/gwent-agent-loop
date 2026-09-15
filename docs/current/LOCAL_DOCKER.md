@@ -2,6 +2,7 @@
 
 ## Agent entry
 
+- Product 任务一屏入口（HTTP、合法动作、验证、handoff）：[`agent-entry/PRODUCT.md`](agent-entry/PRODUCT.md)；
 - 路由与运行时边界：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
 - Product 任务 Skill：[`product-integration`](../../.agents/skills/product-integration/SKILL.md)；
 - Docker 测试角色与 cleanup：[`TEST_AGENT.md`](agent-loop/TEST_AGENT.md)；
