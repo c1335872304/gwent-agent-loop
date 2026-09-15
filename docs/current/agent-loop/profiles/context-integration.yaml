@@ -7,7 +7,7 @@ role_type: "context_integration"
 authority:
   boundary: "Project navigation, ContextBrief, TaskPacket, handoff, Agent Loop documents and structured task artifacts"
   required_skills: []
-  source_of_truth_refs: ["AGENTS.md", "docs/current/AGENT_LOOP_NAVIGATION.md", "docs/current/AGENT_LOOP_PLAN.md"]
+  source_of_truth_refs: ["AGENTS.md", "docs/current/AGENT_ONBOARDING_INDEX.md", "docs/current/agent-loop/CONTEXT_INDEX.yaml", "docs/current/agent-loop/START_HERE.md"]
   handoff_recipients: ["core", "trainer", "product", "teacher", "test-verification", "main"]
 capabilities:
   read_roots: ["AGENTS.md", "docs/current", ".agents/skills", ".agents/evals"]

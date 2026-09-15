@@ -37,6 +37,56 @@ EXPECTED_ENTRY_CARDS = {
     },
 }
 
+EXPECTED_CONTEXT_POLICY = {
+    "read_order": (
+        "user_request_and_safety",
+        "AGENTS.md",
+        "docs/current/AGENT_ONBOARDING_INDEX.md",
+        "docs/current/agent-loop/CONTEXT_INDEX.yaml#context_policy",
+        "docs/current/agent-loop/START_HERE.md",
+        "docs/current/agent-loop/CURRENT_STATE.md",
+        "domain_entry_card_then_skill_contract",
+        "task_specific_code_test_and_lessons",
+    ),
+    "authority_order": (
+        "user_request_and_safety",
+        "AGENTS.md",
+        "domain_skill_and_contract",
+        "current_code_and_snapshot",
+        "task_packet_and_reports",
+        "archive",
+    ),
+    "required_floor": (
+        "AGENTS.md",
+        "docs/current/AGENT_ONBOARDING_INDEX.md",
+        "docs/current/agent-loop/CONTEXT_INDEX.yaml",
+        "docs/current/agent-loop/START_HERE.md",
+        "docs/current/agent-loop/CURRENT_STATE.md",
+    ),
+    "domain_route": "docs/current/agent-entry/<DOMAIN>.md -> Skill -> contract -> nearest code/test",
+    "default_exclusions": (
+        "raw conversation",
+        "full repository scan",
+        "historical archive",
+        "models/v3/policy.pt unless Trainer task",
+        "external ZIPs",
+    ),
+    "handoff_payload": (
+        "TaskPacket",
+        "ContextBrief",
+        "ChangeReport",
+        "final_snapshot",
+        "contract_diff",
+    ),
+    "stop_on": (
+        "missing_authority",
+        "conflicting_contract",
+        "snapshot_drift",
+        "privacy_uncertainty",
+        "budget_or_permission_uncertainty",
+    ),
+}
+
 STALE_CURRENT_MARKERS = (
     "initial-baseline-pending",
     "Proposed（地基文档，尚未启用自动执行）",
@@ -96,6 +146,144 @@ def validate_entry_cards(index: Mapping[str, Any], *, root: str | Path = ROOT) -
             )
 
 
+def validate_context_policy(index: Mapping[str, Any], *, root: str | Path = ROOT) -> None:
+    """Require one machine-readable context assembly and stop policy."""
+    root_path = Path(root).resolve()
+    policy = _mapping(index.get("context_policy"), "ContextIndex.context_policy")
+    if policy.get("version") != 1:
+        raise ValidationError("ContextIndex.context_policy.version must be 1")
+
+    for key, expected in EXPECTED_CONTEXT_POLICY.items():
+        actual = policy.get(key)
+        if key == "domain_route":
+            if actual != expected:
+                raise ValidationError(
+                    "ContextIndex.context_policy.domain_route must be the shared domain route"
+                )
+            continue
+        if not isinstance(actual, list) or tuple(actual) != expected:
+            raise ValidationError(
+                f"ContextIndex.context_policy.{key} must match the shared context contract"
+            )
+
+    for relative_path in EXPECTED_CONTEXT_POLICY["required_floor"]:
+        if not (root_path / relative_path).is_file():
+            raise ValidationError(f"context policy floor file missing: {relative_path}")
+
+
+def validate_context_index_freshness(index: Mapping[str, Any]) -> None:
+    """Keep current fact entries bound to the same declared index snapshot."""
+    snapshot = index.get("workspace_snapshot")
+    generated_at = index.get("generated_at")
+    if not isinstance(snapshot, str) or not snapshot.strip() or "<" in snapshot:
+        raise ValidationError("ContextIndex.workspace_snapshot must identify a real snapshot")
+    if not isinstance(generated_at, str) or not generated_at.strip() or "YYYY" in generated_at:
+        raise ValidationError("ContextIndex.generated_at must identify the verification time")
+
+    entries = index.get("entries")
+    if not isinstance(entries, list):
+        raise ValidationError("ContextIndex.entries must be a list")
+    for entry in entries:
+        item = _mapping(entry, "ContextIndex.entries[]")
+        if item.get("status") == "confirmed":
+            if item.get("verified_snapshot") != snapshot:
+                raise ValidationError(
+                    f"confirmed fact {item.get('id', '<unknown>')} has a different verified_snapshot"
+                )
+            if item.get("verified_at") != generated_at:
+                raise ValidationError(
+                    f"confirmed fact {item.get('id', '<unknown>')} has a different verified_at"
+                )
+
+
+def validate_authority_delegation(*, root: str | Path = ROOT) -> None:
+    """Prevent the human-facing entry documents from becoming duplicates."""
+    root_path = Path(root).resolve()
+    required_markers = {
+        root_path / "docs/current/AGENT_ONBOARDING_INDEX.md": (
+            "文档职责（单向引用）",
+            "首次读取顺序、责任域路由、事实来源和验证等级",
+        ),
+        root_path / "docs/current/agent-loop/START_HERE.md": (
+            "本页不复制这些表",
+            "context_policy",
+            "必须停止",
+        ),
+        root_path / "docs/current/AGENT_LOOP_NAVIGATION.md": (
+            "维护附录",
+            "不再复制入口表、领域路由或当前状态",
+            "当前能力、现场证据、关闭的能力和路线阶段只读取",
+        ),
+        root_path / "docs/current/agent-loop/README.md": (
+            "本页只做模板目录",
+            "不复制上述协议",
+        ),
+    }
+    for path, markers in required_markers.items():
+        if not path.is_file():
+            raise ValidationError(f"authority document missing: {path.relative_to(root_path)}")
+        text = path.read_text(encoding="utf-8")
+        missing = [marker for marker in markers if marker not in text]
+        if missing:
+            raise ValidationError(
+                f"{path.relative_to(root_path)} missing delegation markers: {', '.join(missing)}"
+            )
+
+    forbidden_duplicates = {
+        root_path / "docs/current/agent-loop/START_HERE.md": (
+            "## 先判断任务类型",
+            "| 问题涉及 | Owner | 必读 Skill | 事实来源 |",
+        ),
+        root_path / "docs/current/AGENT_LOOP_NAVIGATION.md": (
+            "## 首次进入项目的读取顺序",
+            "## 按问题路由",
+            "当前推进到三阶段路线图的阶段三",
+        ),
+        root_path / "docs/current/agent-loop/README.md": (
+            "## 当前默认上下文",
+            "PILOT_018_REPORT.md 是当前现场证据",
+        ),
+    }
+    for path, markers in forbidden_duplicates.items():
+        text = path.read_text(encoding="utf-8")
+        hits = [marker for marker in markers if marker in text]
+        if hits:
+            raise ValidationError(
+                f"{path.relative_to(root_path)} repeats delegated content: {', '.join(hits)}"
+            )
+
+
+def validate_context_templates(*, root: str | Path = ROOT) -> None:
+    """Keep task artifacts linked to the shared policy instead of copying it."""
+    root_path = Path(root).resolve()
+    required_refs = {
+        root_path / "docs/current/agent-loop/TASK_PACKET_TEMPLATE.yaml": (
+            "context_policy_ref: \"docs/current/agent-loop/CONTEXT_INDEX.yaml#context_policy\"",
+        ),
+        root_path / "docs/current/agent-loop/CONTEXT_BRIEF_TEMPLATE.yaml": (
+            "context_policy_ref: \"docs/current/agent-loop/CONTEXT_INDEX.yaml#context_policy\"",
+            "included_refs: []",
+            "excluded_refs: []",
+            "authority_conflicts: []",
+        ),
+        root_path / "docs/current/agent-loop/CONTEXT_INDEX_TEMPLATE.yaml": (
+            "context_policy:",
+            "default_exclusions:",
+            "handoff_payload:",
+            "stop_on:",
+        ),
+    }
+    for path, markers in required_refs.items():
+        if not path.is_file():
+            raise ValidationError(f"context template missing: {path.relative_to(root_path)}")
+        text = path.read_text(encoding="utf-8")
+        missing = [marker for marker in markers if marker not in text]
+        if missing:
+            raise ValidationError(
+                f"{path.relative_to(root_path)} missing context markers: {', '.join(missing)}"
+            )
+
+
 def validate_current_doc_semantics(*, root: str | Path = ROOT) -> None:
     """Reject known stale current-state claims and require current anchors."""
     root_path = Path(root).resolve()
@@ -144,6 +332,10 @@ def validate_documentation(*, root: str | Path = ROOT) -> None:
     index_path = root_path / "docs/current/agent-loop/CONTEXT_INDEX.yaml"
     index = _mapping(load_yaml(index_path), str(index_path))
     validate_entry_cards(index, root=root_path)
+    validate_context_policy(index, root=root_path)
+    validate_context_index_freshness(index)
+    validate_authority_delegation(root=root_path)
+    validate_context_templates(root=root_path)
     validate_current_doc_semantics(root=root_path)
 
 

@@ -3,6 +3,13 @@ task_id: ""
 packet_revision: 1
 context_snapshot: ""
 prepared_by: "planner | owner"
+context_policy_ref: "docs/current/agent-loop/CONTEXT_INDEX.yaml#context_policy"
+
+assembly:
+  # 只记录本任务实际装入、排除和未决的上下文；不要复制共享策略。
+  included_refs: []
+  excluded_refs: []
+  authority_conflicts: []
 
 problem_model:
   current_behavior: ""

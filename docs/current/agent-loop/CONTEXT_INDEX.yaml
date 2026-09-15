@@ -22,6 +22,49 @@ entry_cards:
     owner: "teacher"
     skill: ".agents/skills/teacher-explanation/SKILL.md"
     required_markers: ["Teacher", "check_teacher.py", "handoff"]
+context_policy:
+  version: 1
+  read_order:
+    - "user_request_and_safety"
+    - "AGENTS.md"
+    - "docs/current/AGENT_ONBOARDING_INDEX.md"
+    - "docs/current/agent-loop/CONTEXT_INDEX.yaml#context_policy"
+    - "docs/current/agent-loop/START_HERE.md"
+    - "docs/current/agent-loop/CURRENT_STATE.md"
+    - "domain_entry_card_then_skill_contract"
+    - "task_specific_code_test_and_lessons"
+  authority_order:
+    - "user_request_and_safety"
+    - "AGENTS.md"
+    - "domain_skill_and_contract"
+    - "current_code_and_snapshot"
+    - "task_packet_and_reports"
+    - "archive"
+  required_floor:
+    - "AGENTS.md"
+    - "docs/current/AGENT_ONBOARDING_INDEX.md"
+    - "docs/current/agent-loop/CONTEXT_INDEX.yaml"
+    - "docs/current/agent-loop/START_HERE.md"
+    - "docs/current/agent-loop/CURRENT_STATE.md"
+  domain_route: "docs/current/agent-entry/<DOMAIN>.md -> Skill -> contract -> nearest code/test"
+  default_exclusions:
+    - "raw conversation"
+    - "full repository scan"
+    - "historical archive"
+    - "models/v3/policy.pt unless Trainer task"
+    - "external ZIPs"
+  handoff_payload:
+    - "TaskPacket"
+    - "ContextBrief"
+    - "ChangeReport"
+    - "final_snapshot"
+    - "contract_diff"
+  stop_on:
+    - "missing_authority"
+    - "conflicting_contract"
+    - "snapshot_drift"
+    - "privacy_uncertainty"
+    - "budget_or_permission_uncertainty"
 entries:
   - id: "project-routing"
     domain: "project"

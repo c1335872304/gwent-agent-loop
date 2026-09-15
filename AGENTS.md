@@ -24,7 +24,9 @@ $core-environment      $training-config     $product-integration
 
 处理 Agent Loop 或仓库研发任务时，先读取
 [`docs/current/AGENT_ONBOARDING_INDEX.md`](docs/current/AGENT_ONBOARDING_INDEX.md)
-定位责任域和最小事实集，再读取
+定位责任域和最小事实集；按该页读取
+[`docs/current/agent-loop/CONTEXT_INDEX.yaml`](docs/current/agent-loop/CONTEXT_INDEX.yaml)
+的 `context_policy`，再读取
 [`docs/current/agent-loop/START_HERE.md`](docs/current/agent-loop/START_HERE.md)
 确认任务生命周期和当前状态；已确定为 Core、Trainer、Product 或 Teacher 的实施任务，
 才只读取对应的 [`docs/current/agent-entry/`](docs/current/agent-entry/README.md) 任务卡、

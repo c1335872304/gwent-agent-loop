@@ -32,6 +32,7 @@ workspace:
 inputs:
   # 非琐碎任务的 ContextBrief；其引用在 token 紧张时不可省略。
   context_brief_ref: ""
+  context_policy_ref: "docs/current/agent-loop/CONTEXT_INDEX.yaml#context_policy"
   context_floor_refs: []
   canonical_files:
     - path: ""

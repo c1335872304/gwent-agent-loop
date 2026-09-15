@@ -27,40 +27,23 @@
 新会话应读取仓库中的结构化上下文；原任务恢复则通过持久化的 task identity
 和 `runner_ref` 执行 lookup/rebind。
 
-## 1. 新对话首次读取顺序
+## 1. 上下文装配
 
-只读必要内容，不要一开始扫描整个仓库、完整聊天记录或模型文件。
+首次读取顺序、责任域路由、事实来源选择和状态语义的唯一入口是
+[`../AGENT_ONBOARDING_INDEX.md`](../AGENT_ONBOARDING_INDEX.md)。本页不复制这些表，
+只规定执行时必须带入的最小上下文：
 
-1. 用户当前请求，以及权限、数据保留和外部写入边界；
-2. 根目录 [`AGENTS.md`](../../../AGENTS.md)；
-3. [`../AGENT_ONBOARDING_INDEX.md`](../AGENT_ONBOARDING_INDEX.md)；
-4. 本页；
-5. [`CURRENT_STATE.md`](CURRENT_STATE.md)；
-6. 根据责任域读取对应 Skill；
-7. 只读取该 Skill 指向的 contract、实现和测试；
-8. 查找相关的 [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) 条目；
-9. 最后读取当前 TaskPacket、ContextBrief 和 snapshot；历史报告只在任务明确
-   需要复核证据时，从 [`archive/README.md`](archive/README.md) 按需打开。
+- `TaskPacket`：范围、Owner、snapshot、预算、验收和写入边界；
+- `ContextBrief`：`fact_source_graph`、事实账本、假设、未知项和相关 Lessons；
+- 当前 snapshot：代码/配置事实必须绑定到可复现的 commit 或工作树清单；
+- 对应领域任务卡 → Skill → contract → 最近实现/测试；
+- 子任务只接收以上结构化工件，不接收父对话全文、全仓库扫描结果或历史归档。
 
-出现冲突时，优先级是：用户当前明确请求与安全约束、`AGENTS.md`、领域
-Skill/contract、本页 Loop 协议、TaskPacket/报告、代码注释或日志。归档 Pilot
-只能提供证据，不能覆盖 `CURRENT_STATE.md`。
+共享策略见 [`CONTEXT_INDEX.yaml`](CONTEXT_INDEX.yaml) 的 `context_policy`；ContextBrief
+只记录本任务实际装入、排除和冲突的引用，不复制共享策略。出现冲突时按
+`context_policy.authority_order` 处理，未解决冲突必须停止为 `HUMAN_REQUIRED`。
 
-## 2. 先判断任务类型
-
-| 问题涉及 | Owner | 必读 Skill | 事实来源 |
-|---|---|---|---|
-| 规则、卡牌、legal action、C ABI、observation/action schema | Core | `.agents/skills/core-environment/SKILL.md` | `src/`, `include/`, `config/rl_contract.json`, golden/trace |
-| PPO、collector、reward、training task、checkpoint、resume | Trainer | `.agents/skills/training-config/SKILL.md` | `configs/`, `training/`, `python/`, `artifacts/` |
-| React、FastAPI BFF、Core HTTP、UX | Product | `.agents/skills/product-integration/SKILL.md` | `apps/web/`, `docs/current/TEACHER_AND_WEB.md` |
-| evidence、解释、privacy、provider、Teacher API/UI | Teacher | `.agents/skills/teacher-explanation/SKILL.md` | `services/teacher/`, Teacher contract |
-| 测试、复现、diff/contract 审查、Docker 证据 | Test / Verification | `docs/current/agent-loop/TEST_AGENT.md` | TaskPacket 的 TestMatrix 和最终 snapshot |
-| 资料组织、交接、状态沉淀、跨域事实整理 | Context / Integration | 本页、导航、Loop contract | `ContextBrief`, `HandoffReport`, `CURRENT_STATE.md` |
-
-不要按“Python / C++ / TypeScript”机械路由。先找拥有事实来源的领域 Owner；
-跨域改动通过 contract handoff 串行交接，不新增 Manager Agent。
-
-## 3. 默认执行模式
+## 2. 默认执行模式
 
 除非用户明确改变边界，否则保持以下设置：
 
@@ -76,9 +59,9 @@ Skill/contract、本页 Loop 协议、TaskPacket/报告、代码注释或日志�
 
 “串行”是本项目的设计目标，不是临时退化方案；不需要为了看起来更智能而增加并行。
 
-## 4. 修改任务的标准流程
+## 3. 修改任务的标准流程
 
-### 4.1 创建最小任务上下文
+### 3.1 创建最小任务上下文
 
 非琐碎任务先创建不可变 TaskPacket，至少明确：
 
@@ -92,7 +75,7 @@ Skill/contract、本页 Loop 协议、TaskPacket/报告、代码注释或日志�
 需要探索事实时再创建 ContextBrief，列出来源、已知事实、假设、未知项和
 触发的 Lessons；不要用一个新 Agent 代替上下文整理。
 
-### 4.2 Owner 只做声明范围内的工作
+### 3.2 Owner 只做声明范围内的工作
 
 Owner 必须：
 
@@ -104,7 +87,7 @@ Owner 必须：
 
 Owner 不得把“测试绿了”当成独立验证，也不得修改 Test 标准来制造 PASS。
 
-### 4.3 独立 Test / Verification
+### 3.3 独立 Test / Verification
 
 Test Agent 只从 Owner 最终 commit/snapshot 出发，独立检查：
 
@@ -117,7 +100,7 @@ Test Agent 只从 Owner 最终 commit/snapshot 出发，独立检查：
 没有独立证据，不得写 PASS；不能运行时写清楚 `ENVIRONMENT_FAILURE` 或
 `HUMAN_REQUIRED`，不要把主机上的半成功当作最终结论。
 
-### 4.4 集成和关闭
+### 3.4 集成和关闭
 
 只有最终 snapshot、changed paths、contract、TestReport 和预算都通过后，才生成
 IntegrationManifest。脏 parent 的 disjoint candidate 可以自动产出隔离分支或
@@ -126,7 +109,7 @@ worktree，但直接修改 parent/main、解决冲突、删除用户改动仍需
 关闭前必须保留：TaskPacket、ContextBrief、ChangeReport、Handoff、TestReport、
 RunManifest、IntegrationManifest 和 rollback 证据。关闭会话不能删除这些工件。
 
-## 5. 本地 Codex CLI 用法
+## 4. 本地 Codex CLI 用法
 
 本地 CLI 是当前已现场验证的 Host；Desktop/MCP 是可选的另一层适配，不要混用
 两者的能力假设。
@@ -149,7 +132,7 @@ RunManifest、IntegrationManifest 和 rollback 证据。关闭会话不能删除
 python3 scripts/agent_loop/run_stage3_live.py --help
 ```
 
-## 6. 验证命令速查
+## 5. 验证命令速查
 
 ```bash
 # Agent Loop / 架构任务的默认门禁，不加载 Trainer 模型
@@ -168,7 +151,7 @@ cd apps/web/frontend && npm run build
 主机 pytest 只能用于诊断环境差异。架构任务不要默认运行 `scripts/check.py quick`，
 因为它会进入 Trainer/torch 检查。
 
-## 7. 必须停止的情况
+## 6. 必须停止的情况
 
 遇到下列任一情况，先持久化状态和原因，再停止；不要猜测、无限重试或自动修复：
 
@@ -185,7 +168,7 @@ cd apps/web/frontend && npm run build
 `ENVIRONMENT_FAILURE`、`DOCKER_FAILURE`、`PERMISSION_REQUIRED`、`PROTOCOL_ERROR`、
 `BUDGET_EXHAUSTED` 和 `HUMAN_REQUIRED` 不得互相伪装。
 
-## 8. 本仓库的特殊文件边界
+## 7. 本仓库的特殊文件边界
 
 外部 `/mnt/c/codes/gwent_v4/main` 中的以下两个历史 ZIP 是不可读取的用户改动：
 
@@ -198,14 +181,16 @@ packages/gwent_architecture_20260910_181503.zip
 覆盖它们为代价。当前外部 `main` 若只显示这两个路径为 modified，应保留并报告，
 不要用 reset、clean 或 stash 处理。
 
-## 9. 新对话可直接使用的启动模板
+## 8. 新对话可直接使用的启动模板
 
 新对话不需要依赖旧聊天。把下面信息写入任务上下文，或让 Agent 从仓库读取：
 
 ```text
-请先读取 AGENTS.md、docs/current/agent-loop/START_HERE.md 和
-docs/current/agent-loop/CURRENT_STATE.md，再读取本任务对应的 Skill、contract
-和相关 Lessons。不要扫描全仓库，不要读取模型或两个历史 ZIP。
+请先读取 AGENTS.md、docs/current/AGENT_ONBOARDING_INDEX.md、
+docs/current/agent-loop/CONTEXT_INDEX.yaml、docs/current/agent-loop/START_HERE.md
+和 docs/current/agent-loop/CURRENT_STATE.md；
+然后只读本任务对应的领域任务卡、Skill、contract、实现、测试与 Lessons。
+不要扫描全仓库，不要读取模型或两个历史 ZIP。
 
 目标：<一句话目标>
 责任域：<core | trainer | product | teacher | loop>
@@ -220,7 +205,7 @@ docs/current/agent-loop/CURRENT_STATE.md，再读取本任务对应的 Skill、c
 RunManifest、失败分类、实际命令和是否需要人工集成。
 ```
 
-## 10. 文档维护
+## 9. 文档维护
 
 每次有实质性 Loop 变化时，先更新 `CURRENT_STATE.md`；入口、命令、路由或边界
 变化时更新本页和导航。可复现且已验证的新坑写入 `LESSONS_LEARNED.md`；未经验证

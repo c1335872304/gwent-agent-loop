@@ -21,8 +21,11 @@ rebound from a new Scheduler process, handed to an independent Teacher review,
 verified by two independent Docker Test runs, integrated in an isolated
 branch/worktree, rolled back in isolation, and closed with a completed
 RunManifest. Direct mutations outside an explicitly approved path remain
-`HUMAN_REQUIRED`; after explicit approval, the verified candidate is now in the
-external `main` at `eec999c`; only the two historical ZIP changes remain untouched.
+`HUMAN_REQUIRED`. The externally saved `main` currently resolves to `406e170`; the
+previously recorded candidate commit `eec999c` is not the current `main` tip, so this
+document makes no claim that it is currently integrated. The external worktree also
+has four pre-existing tracked ZIP deletion entries; this task did not restore, stage,
+commit or clean them.
 
 Earlier Product, Docker, recovery, Scheduler and privacy-finding pilots explain
 how this operating profile was reached, but they are not part of the default
@@ -32,9 +35,9 @@ condition.
 
 ## Verified evidence
 
-- Architecture gate: 105 deterministic Agent Loop tests passed;
+- Architecture gate: 112 deterministic Agent Loop tests passed;
 - Docker canonical pytest: 145 tests passed, with 2 existing warnings;
-- Documentation links: 166 local links passed;
+- Documentation links: 395 local links passed;
 - Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
   elapsed `364.257s`, 4 model turns; budget gate passed;
 - Python syntax gate: 115 files passed;
@@ -83,7 +86,7 @@ condition.
 | Windows write preflight | enforced by repo instructions and architecture markers | `AGENTS.md`, `AGENT_LOOP_NAVIGATION.md`, `scripts/agent_loop/check.py` |
 | Test / Verification role | profile and policy implemented | `TEST_AGENT.md`, `profiles/test-verification.yaml` |
 | TaskPacket / ContextBrief / Profile validation | implemented | `validate_packet.py`, `launch.py` |
-| ContextIndex and lessons navigation | implemented, freshness is still partly manual | `CONTEXT_INDEX.yaml`, `LESSONS_LEARNED.md` |
+| ContextIndex and lessons navigation | implemented; entry-card, policy and snapshot consistency are gated, fact re-verification remains manual | `CONTEXT_INDEX.yaml`, `LESSONS_LEARNED.md`, `check_docs.py` |
 | State, budget, lock, snapshot and persistence | implemented deterministically | `state_machine.py`, `budget.py`, `locks.py`, `persistence.py` |
 | Runner lifecycle and execution journal | implemented as model-free contracts | `runner.py`, `execution.py` |
 | Owner to Test handoff and verification plan | implemented as validators | `handoff.py`, `verification.py` |
@@ -189,9 +192,9 @@ change is allowed in this experiment.
 - optionally wire an external Desktop/MCP Codex Host factory to the same durable
   lookup/hydration path; the local CLI reference implementation and its
   separate-process regression are complete;
-- direct integration into `/mnt/c/codes/gwent_v4` `main` was completed after
-  explicit approval; the final candidate is present at `eec999c`, while the two
-  historical ZIP changes remain uncommitted and untouched;
+- the external `/mnt/c/codes/gwent_v4` `main` currently points to `406e170`, not
+  the earlier candidate `eec999c`; no integration was performed by this documentation
+  audit. Its four tracked ZIP deletion entries remain outside this task's scope;
 - preserve the fail-closed decision when any role or platform rebind is absent;
 - keep cross-domain parallelism, automatic repair, deployment, promotion, and
   model changes disabled until they receive separate bounded canaries.

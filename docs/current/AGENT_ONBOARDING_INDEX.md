@@ -4,6 +4,18 @@
 > 修改边界和验证命令。它是**索引**，不是第二份协议或项目百科；实时结论始终以
 > [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md) 和最终 snapshot 为准。
 
+## 0. 文档职责（单向引用）
+
+| 文档 | 唯一职责 | 不负责什么 |
+|---|---|---|
+| 本页 | 首次读取顺序、责任域路由、事实来源和验证等级 | 不重复 Loop 生命周期细节 |
+| [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md) | 串行 Loop 的执行、停止和交付协议 | 不重新定义路由或首次读取顺序 |
+| [`AGENT_LOOP_NAVIGATION.md`](AGENT_LOOP_NAVIGATION.md) | Context / handoff / Lessons 的维护附录 | 不作为默认入口，不重复领域路由 |
+| [`agent-loop/CONTEXT_INDEX.yaml`](agent-loop/CONTEXT_INDEX.yaml) | 机器可检查的入口卡、权威顺序、排除项和停止条件 | 不承载聊天摘要或单次任务结论 |
+| 领域任务卡 → Skill → contract | 领域事实、invariant 和最小验证 | 不由导航文档复制业务规则 |
+
+如果多个文档同时描述同一事实，保留上表中职责更靠前的来源；其他文档只保留链接和用途说明。
+
 ## 1. 先选入口，不要全仓库扫描
 
 | 你现在要做什么 | 第一入口 | 然后读取 |
@@ -22,14 +34,15 @@
 
 1. 用户目标、权限、允许写入路径和外部影响边界；
 2. [`../../AGENTS.md`](../../AGENTS.md)；
-3. [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md)；
-4. [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)；
-5. 已确定领域时，先打开对应任务卡，再读该卡指定的 Skill 和 contract；
-6. 仅打开本任务相关实现、测试、Lessons 和当前工件。
+3. [`agent-loop/CONTEXT_INDEX.yaml`](agent-loop/CONTEXT_INDEX.yaml) 的 `context_policy`；
+4. [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md)；
+5. [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)；
+6. 已确定领域时，先打开对应任务卡，再读该卡指定的 Skill 和 contract；
+7. 仅打开本任务相关实现、测试、Lessons 和当前工件。
 
 不要把历史报告、整个 Git 日志、模型文件或旧对话当作默认上下文。发生事实冲突时，
-优先级为：用户的明确安全边界 → `AGENTS.md` → Skill/正式 contract → 当前代码和
-snapshot → 当前 TaskPacket/报告 → 归档材料。
+按 [`CONTEXT_INDEX.yaml`](agent-loop/CONTEXT_INDEX.yaml) 的 `context_policy.authority_order`
+裁决；本页只解释入口和用途，不复制第二份优先级列表。
 
 ### 文档状态与命令语义
 
@@ -52,7 +65,7 @@ snapshot → 当前 TaskPacket/报告 → 归档材料。
 | React、FastAPI BFF、Core HTTP、UX、动态合法动作 | Product；[`PRODUCT.md`](agent-entry/PRODUCT.md) → [`product-integration`](../../.agents/skills/product-integration/SKILL.md) | 卡片列出的 HTTP contract、`apps/web/` | 卡片选择 BFF、frontend、Docker 验证 | HTTP contract 变更或 Teacher evidence/隐私受影响 |
 | Teacher explanation、evidence、privacy、provider、TeacherPanel | Teacher；[`TEACHER.md`](agent-entry/TEACHER.md) → [`teacher-explanation`](../../.agents/skills/teacher-explanation/SKILL.md) | 卡片列出的 evidence / privacy / Product contract | 卡片选择 Teacher、BFF、frontend、Docker 验证 | 缺少 authoritative evidence 时交给 Core；纯 UI 交给 Product |
 | 测试、复现、diff/contract 审查、Docker health、证据报告 | Test / Verification；[`TEST_AGENT.md`](agent-loop/TEST_AGENT.md) | 当前 TaskPacket、TestMatrix、最终 snapshot、diff | 声明的命令、日志、health、cleanup、TestReport | 发现生产缺陷或 contract gap 时退回对应 Owner |
-| 资料定位、交接、状态沉淀、工件组织 | Context / Integration；[`AGENT_LOOP_NAVIGATION.md`](AGENT_LOOP_NAVIGATION.md) | ContextBrief、HandoffReport、当前状态、Lessons | 引用可解析、snapshot 一致、交接范围完整 | 不替代任何领域 Owner 定义业务 contract |
+| 资料定位、交接、状态沉淀、工件组织 | Context / Integration；本页 → [`AGENT_LOOP_NAVIGATION.md`](AGENT_LOOP_NAVIGATION.md) | ContextBrief、HandoffReport、当前状态、Lessons | 引用可解析、snapshot 一致、交接范围完整 | 不替代任何领域 Owner 定义业务 contract |
 
 Owner 不能因为文件扩展名跨越边界：Core 的 Python golden/trace 仍归 Core；
 `tools/server/` 的训练/评估通常归 Trainer；Product 只消费 Core HTTP，不加载 RL 或
@@ -165,7 +178,8 @@ ownership 不清、Host 无法 rebind 或任一预算耗尽时，停止为 `HUMA
 
 ```text
 先读 AGENTS.md、docs/current/AGENT_ONBOARDING_INDEX.md、
-docs/current/agent-loop/START_HERE.md 和 CURRENT_STATE.md；然后只读本任务对应的
+docs/current/agent-loop/CONTEXT_INDEX.yaml、docs/current/agent-loop/START_HERE.md
+和 CURRENT_STATE.md；然后只读本任务对应的
 Skill、contract、实现、测试与 Lessons。不要扫描全仓库、读取模型或历史归档。
 
 目标：<一句话>
