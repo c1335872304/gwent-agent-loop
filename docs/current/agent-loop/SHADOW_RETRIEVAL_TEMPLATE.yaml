@@ -1,0 +1,22 @@
+# E2 Shadow Retrieval v1：报告 selected/excluded，不改变当前 ContextBrief
+schema: "agent-loop.shadow-retrieval.v1"
+status: "completed | unavailable"
+query: {}
+selected: []
+excluded: []
+cost:
+  input_lessons: 0
+  invalid_lessons: 0
+  eligible_matches: 0
+  selected_count: 0
+  excluded_count: 0
+  selected_estimated_tokens: 0
+  candidate_hit_rate: 0.0
+  input_match_rate: 0.0
+  model_calls: 0
+  context_injection: false
+baseline:
+  unchanged: true
+  injection_enabled: false
+  fallback: "use_current_context_baseline"
+unavailable_reason: ""

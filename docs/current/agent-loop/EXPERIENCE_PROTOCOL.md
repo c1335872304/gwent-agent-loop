@@ -1,7 +1,7 @@
 # Experience Layer Protocol
 
-> **当前实现：E0–E1 candidate-only**
-> **当前状态：** 只分析已结束任务的执行路径并保存候选经验；E2 检索、E3 注入、E4 Promotion 均未启用。
+> **当前实现：E0–E1 candidate-only、E2 shadow-only**
+> **当前状态：** 分析已结束任务的执行路径并保存候选经验；E2 只做旁路检索和报告，E3 注入、E4 Promotion 均未启用。
 
 本协议是 [`SELF_EVOLUTION_PLAN.md`](SELF_EVOLUTION_PLAN.md) 的运行时补充。它不新增 Agent，
 不改变当前串行 Scheduler，不读取原始对话，也不让经验覆盖 AGENTS、Skill、contract、
@@ -23,6 +23,7 @@ PathAnalysis
   -> DetourRecord（所有失败：avoidable / necessary / unclassified）
   -> Candidate Lesson（仅 verified fallback 的 avoidable detour）
   -> ExperienceManifest（candidate_only，injection=false）
+  -> E2 Shadow Retrieval（selected/excluded report，仍不注入）
 ```
 
 未被明确证明可避免的失败不会自动生成 Avoidance Rule。
@@ -103,6 +104,20 @@ experience/
 当前 `ExperienceManifest` 强制 `injection.enabled=false`，Candidate 不会自动进入任何新的
 ContextBrief。提取失败不改变主任务状态；报告中应保留失败原因。
 
+E2 Shadow Retrieval 使用 `SHADOW_QUERY_TEMPLATE.yaml` 和 `retrieval.py`：
+
+```bash
+python3 scripts/agent_loop/retrieval.py \
+  --lesson .agent-loop/experience/candidate/LESSON-<digest>.yaml \
+  --query .agent-loop/tasks/<task>/ShadowQuery.yaml \
+  --output .agent-loop/tasks/<task>/ShadowRetrieval.yaml
+```
+
+有多个 Lesson 时重复传入 `--lesson`；不要让 shell 通配符展开成未绑定参数。
+
+报告只用于观察命中和排除，不会修改当前 ContextBrief；检索异常时记录 `unavailable` 并
+继续使用基线上下文。
+
 ## 5. 安全和证据要求
 
 - 所有输入先拒绝 `conversation`、`chat_history`、`raw_transcript`、`full_transcript`、
@@ -114,8 +129,20 @@ ContextBrief。提取失败不改变主任务状态；报告中应保留失败�
 - 当前阶段不修改 Skill、Routing、Scheduler、contract、权限、预算或模型；
 - 测试失败、Docker 失败、权限失败和预算耗尽必须保留原分类，不能改写成“弯路”以外的成功。
 
-## 6. 后续阶段边界
+## 6. E2 Shadow Retrieval
 
-E2 才允许 Shadow Retrieval；E3 才允许已确认经验以 advisory 形式进入 ContextBrief；
+E2 的输入是显式 `ShadowQuery` 和候选/已确认 Lesson 文件。只有 `confirmed` 或 `promoted`
+记录可以进入匹配池；`candidate`、rejected、deprecated、过期、冲突、contract 不兼容、快照
+不兼容或缺少验证日期的记录必须进入 `excluded` 并带原因。检索使用 domain、task_type、
+changed paths、failure class、preconditions、contract versions 和 snapshot policy 做确定性
+匹配，默认最多 selected 3 条、1500 estimated tokens。
+
+输出为 `SHADOW_RETRIEVAL_TEMPLATE.yaml` 形状的报告，必须记录匹配字段、排除原因、输入数量、
+命中率、估算 Token 和 `model_calls=0`。检索不可用时输出 `status=unavailable`，并声明
+`baseline.unchanged=true`；它不能阻断当前任务，也不能改变 ContextBrief。
+
+## 7. 后续阶段边界
+
+E3 才允许已确认经验以 advisory 形式进入 ContextBrief；
 E4 才允许与 Baseline 做固定回归并提交 Promotion Proposal。任何影响 Harness Policy 的规则
 仍然需要人工 Gate。

@@ -1,6 +1,6 @@
 # Agent Loop 自进化阶段计划
 
-> **状态：E0–E1 candidate-only 已实现；E2–E6 尚未启用**
+> **状态：E0–E1 candidate-only、E2 shadow-only 已实现；E3–E6 尚未启用**
 > **最后整理：2026-09-15**
 > **默认读取：是；历史讨论：见 [`archive/SELF_EVOLUTION_DISCUSSION_20260915.md`](archive/SELF_EVOLUTION_DISCUSSION_20260915.md)**
 
@@ -375,28 +375,28 @@ Rollback Success Rate
 
 > 在相同前置条件下，不重复已经被证据证明可以避免的失败；在不同条件下，不误用旧规则。
 
-## 8. E0–E1 实施边界与下一步
+## 8. E0–E2 实施边界与下一步
 
 E0–E1 已实现为 `scripts/agent_loop/experience.py`：它只接收结构化 Trace 和可选的
 RunManifest/TestReport/ChangeReport，生成 PathAnalysis、DetourRecord、Candidate Lesson
-和 candidate-only ExperienceManifest。当前实现不读取原始对话、不调用模型、不检索经验、不
-注入 ContextBrief，也不修改 Skill、Routing、Scheduler、contract、生产代码或模型。
+和 candidate-only ExperienceManifest。E2 已实现为 `scripts/agent_loop/retrieval.py`：它只对
+显式字段做 Shadow Retrieval，记录 selected/excluded、排除原因和成本。当前实现不读取原始
+对话、不调用模型、不注入 ContextBrief，也不修改 Skill、Routing、Scheduler、contract、
+生产代码或模型。
 
-## 9. 下一项实施任务：E2 Shadow Retrieval
+## 9. 下一项实施任务：E3 Advisory Injection
 
-E0–E1 的确定性路径分析已经完成。下一项 TaskPacket 应限定为：
+E0–E2 的确定性分析和旁路检索已经完成。下一项 TaskPacket 应限定为：
 
-> 读取 `candidate` 和已确认经验，按显式 domain、task_type、changed paths、contract
-> version、snapshot 和触发条件做 Shadow Retrieval；只记录 selected/excluded 及原因，禁止
-> 注入 ContextBrief，禁止修改 Skill、Scheduler、Routing、contract、生产代码和模型。
+> 仅将已确认的 Shadow Retrieval 结果以有限 advisory 形式加入 ContextBrief；candidate 不得
+> 被注入，经验不能覆盖当前 authority、权限、预算、并发和停止条件。
 
 必须交付：
 
-- 显式字段匹配器和过期/冲突/版本不兼容过滤；
-- selected、excluded、排除原因和检索成本报告；
-- 检索不可用时继续使用基线 ContextBrief；
-- 独立回归：相关命中、无关排除、过期排除、冲突排除、candidate 不可检索；
+- advisory 专用 ContextBrief 区域和严格数量/Token 上限；
+- 只允许 `confirmed` 经验进入 advisory，candidate、过期、冲突和不兼容记录必须排除；
+- 记录经验是否被采用，但不改变 authority、权限、预算、并发和停止条件；
+- 独立回归：相关命中、无关排除、过期排除、冲突排除、candidate 不可注入；
 - 不新增 Agent、不引入并行、不改变当前串行安全边界。
 
-E2 完成前，`candidate` 仍不能影响 Agent 行为；E3 才允许将已确认经验以有限 advisory 形式
-加入 ContextBrief。
+E3 完成前，Shadow Retrieval 仍只生成报告，不影响 Agent 行为。

@@ -439,6 +439,7 @@ def build_candidate_lessons(
             "compatibility": {
                 "contract_versions": contract_versions,
                 "changed_paths": [str(path) for path in changed_paths],
+                "snapshot_policy": "contract_bound",
                 "invalidated_by": ["contract_version_changes", "path_scope_rewrite"],
             },
             "privacy": {

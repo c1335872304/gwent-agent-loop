@@ -1,0 +1,18 @@
+# E2 ShadowQuery v1：只用于旁路检索，不会注入 ContextBrief
+schema: "agent-loop.shadow-query.v1"
+query_id: "<task-id>-shadow-<revision>"
+domain: "product"
+task_type: "api_contract_change"
+changed_paths:
+  - "apps/web"
+failure_class: ""
+failed_action: ""
+preconditions: []
+contract_versions:
+  product-http: "v1"
+current_snapshot: "git:<current-snapshot>"
+as_of: "YYYY-MM-DD"
+max_age_days: 180
+max_results: 3
+max_tokens: 1500
+conflicting_lesson_ids: []

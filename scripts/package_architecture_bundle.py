@@ -87,6 +87,8 @@ EXACT_FILES = {
     "contracts/README.md",
     "docs/current/agent-loop/CONTEXT_INDEX.yaml",
     "docs/current/agent-loop/EXPERIENCE_MANIFEST_TEMPLATE.yaml",
+    "docs/current/agent-loop/SHADOW_QUERY_TEMPLATE.yaml",
+    "docs/current/agent-loop/SHADOW_RETRIEVAL_TEMPLATE.yaml",
     "python/pyproject.toml",
     "apps/web/backend/requirements.txt",
     "apps/web/backend/requirements-dev.txt",
