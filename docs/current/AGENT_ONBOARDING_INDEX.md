@@ -156,7 +156,7 @@ ownership 不清、Host 无法 rebind 或任一预算耗尽时，停止为 `HUMA
 - 直接改脏 parent/main、解决冲突、删除用户改动或扩大 Docker/外部权限，都不是默认动作；
   先按 [`GIT_MANAGEMENT.md`](GIT_MANAGEMENT.md) 和 TaskPacket 停在人工闸门。
 - `models/v3/policy.pt` 在当前架构阶段冻结；非 Trainer 任务不读取、不哈希、不替换它。
-- 外部 `/mnt/c/codes/gwent_v4` 的两个历史 ZIP 是不可读取的用户改动；不得读取、哈希、
+- 外部 `/mnt/c/codes/gwent_v4` 的四个历史 ZIP 是不可读取的用户改动；不得读取、哈希、
   暂存、合并、删除或以它们为代价执行 reset/clean/stash。完整边界见
   [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md)。
 

@@ -170,15 +170,17 @@ cd apps/web/frontend && npm run build
 
 ## 7. 本仓库的特殊文件边界
 
-外部 `/mnt/c/codes/gwent_v4/main` 中的以下两个历史 ZIP 是不可读取的用户改动：
+外部 `/mnt/c/codes/gwent_v4/main` 中的以下四个历史 ZIP 是不可读取的用户改动：
 
 ```text
 packages/gwent_architecture_20260910_173340.zip
 packages/gwent_architecture_20260910_181503.zip
+release_assets/gwent-v3-models-update20.zip
+release_assets/gwent-v3-update20-model.zip
 ```
 
 不要读取、哈希、暂存、合并、删除或改变它们的内容；其他文件的合并也不能以
-覆盖它们为代价。当前外部 `main` 若只显示这两个路径为 modified，应保留并报告，
+覆盖它们为代价。当前外部 `main` 若只显示这四个路径为 modified，应保留并报告，
 不要用 reset、clean 或 stash 处理。
 
 ## 8. 新对话可直接使用的启动模板
@@ -190,7 +192,7 @@ packages/gwent_architecture_20260910_181503.zip
 docs/current/agent-loop/CONTEXT_INDEX.yaml、docs/current/agent-loop/START_HERE.md
 和 docs/current/agent-loop/CURRENT_STATE.md；
 然后只读本任务对应的领域任务卡、Skill、contract、实现、测试与 Lessons。
-不要扫描全仓库，不要读取模型或两个历史 ZIP。
+不要扫描全仓库，不要读取模型或四个历史 ZIP。
 
 目标：<一句话目标>
 责任域：<core | trainer | product | teacher | loop>

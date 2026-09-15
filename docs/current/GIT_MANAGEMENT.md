@@ -23,8 +23,9 @@ Codex 任务：默认使用 codex/<topic> 隔离分支或 worktree
 Git LFS：未配置；大二进制的长期远程策略仍需人工决定
 ```
 
-外部 `main` 中两个 `packages/gwent_architecture_*.zip` 是不可读取的用户改动；它们
-不属于当前任务 scope，禁止读取、哈希、暂存、覆盖、删除或通过 reset/clean/stash 处理。
+外部 `main` 中四个历史 ZIP 是不可读取的用户改动；它们不属于当前任务 scope，禁止
+读取、哈希、暂存、覆盖、删除或通过 reset/clean/stash 处理。具体路径由
+[`START_HERE.md`](agent-loop/START_HERE.md) 维护，避免在多个文档重复列举。
 `.gitignore` 默认排除缓存、`node_modules/`、`.agent-loop/`、训练运行输出和 checkpoint。
 `models/v3/policy.pt` 与发布资产是否适合未来远程存储，仍需在配置 remote 前单独决定。
 
@@ -295,7 +296,7 @@ git status --short --ignored
 
 - [x] Git 基线和后续提交存在；
 - [x] `.gitignore`、目录契约和 Agent Loop 本机状态边界已定义；
-- [x] 外部 `main` 的两个不可读取 ZIP 已被记录为保留项；
+- [x] 外部 `main` 的四个不可读取 ZIP 已被记录为保留项；
 - [ ] remote / LFS / 发布二进制的长期存储策略尚未授权，不由 Agent 自动配置；
 - [ ] 每次开始仍必须用实时 Git 命令确认 branch、HEAD、dirty paths 和用户改动。
 

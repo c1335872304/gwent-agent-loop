@@ -2,7 +2,7 @@
 
 > **Canonical current-state document**
 > **Last verified:** 2026-09-15
-> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；本次上下文治理变更已按批准路径同步外部 `main`（`7f91f06` + 状态修正提交）；未明确批准的父工作树变更仍保持人工 gate
+> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；E0–E6 自进化控制面已实现到“训练前置审查”，外部 `main` 最新已知集成提交为 `289d53b`；未明确批准的父工作树变更仍保持人工 gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
 This is the only document that describes the current Agent Loop status. Phase
@@ -22,11 +22,10 @@ verified by two independent Docker Test runs, integrated in an isolated
 branch/worktree, rolled back in isolation, and closed with a completed
 RunManifest. Direct mutations outside an explicitly approved path remain
 `HUMAN_REQUIRED`. The externally saved `main` contains this
-documentation/context-governance audit as the path-scoped commits `7f91f06` and its
-follow-up state correction; the final verification was run against the latter. The
-previously recorded candidate commit `eec999c` is not part of this integration. The
-external worktree also has four pre-existing tracked ZIP deletion entries; this task
-did not restore, stage, commit or clean them.
+documentation/context-governance and E6 readiness work through `289d53b`; the
+architecture gate was verified against that snapshot. The external worktree also
+has four pre-existing tracked ZIP deletion entries; this task did not restore,
+stage, commit or clean them.
 
 Earlier Product, Docker, recovery, Scheduler and privacy-finding pilots explain
 how this operating profile was reached, but they are not part of the default
@@ -36,21 +35,21 @@ condition.
 
 ## Verified evidence
 
-- Architecture gate: 112 deterministic Agent Loop tests passed;
-- Docker canonical pytest: 145 tests passed, with 2 existing warnings;
-- Documentation links: 395 local links passed;
+- Architecture gate: 157 deterministic Agent Loop tests passed against the E6 snapshot;
+- Documentation links: 403 local links passed against the E6 snapshot;
+- Historical Docker canonical pytest: 145 tests passed, with 2 existing warnings;
 - Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
   elapsed `364.257s`, 4 model turns; budget gate passed;
-- Python syntax gate: 115 files passed;
+- Python syntax gate: 130 files passed against the E6 snapshot;
 - Live phase-two Product pilot: Owner recovered once after an injected loss;
   candidate integration and post-integration independent Test/Verification
   passed in the Codex worktree; the disjoint candidate was also applied to
   isolated branch `agent-loop/GW-REAL-PRODUCT-001/integration-2` at snapshot
   `227d71ed978aca33e37ee1ddee270fec11391fa8`; the explicitly authorized
   path-scoped external-main commit is
-  `481f3b1937895826bd2e8eaf4290babcf0dad11b`; this documentation/context-governance
-  audit was subsequently integrated to the external `main` as `7f91f06`, followed by
-  its state correction, using the same explicit path-scoped procedure;
+  `481f3b1937895826bd2e8eaf4290babcf0dad11b`; later E0–E6 implementation and
+  context-governance changes were integrated through external `main` commit
+  `289d53b` using the same explicit path-scoped procedure;
 - Service-backed Product verification: Core/BFF/Web healthy, Product HTTP smoke
   passed, missing-Core injection produced BFF `unhealthy` with classified
   `DOCKER_FAILURE`, and isolated containers/network cleanup completed;
@@ -128,8 +127,8 @@ controlled loss, resume on the same responsibility chain, and hand its final
 commit to one independent Test/Verification child. Pilot 006 then applied the
 disjoint candidate in the Codex worktree and ran a second independent
 verification on the applied snapshot. The separate external `main` checkout
-received only the explicitly approved path-scoped commits; its two historical
-architecture ZIP modifications remain untouched. The disjoint candidate was
+received only the explicitly approved path-scoped commits; its four historical ZIP
+deletion entries remain untouched. The disjoint candidate was
 automatically applied to a new branch/worktree and verified without changing
 unrelated paths. The repository still does not call the Codex Desktop MCP API
 directly; that host-specific bridge remains injectable.
@@ -196,11 +195,10 @@ change is allowed in this experiment.
 - optionally wire an external Desktop/MCP Codex Host factory to the same durable
   lookup/hydration path; the local CLI reference implementation and its
   separate-process regression are complete;
-- the external `/mnt/c/codes/gwent_v4` `main` contains the context-governance audit
-  (`7f91f06` plus its state correction), and the final architecture gate passed against
-  that state. The earlier candidate `eec999c` is not part of this integration. Its four
-  tracked ZIP deletion entries remain outside this task's scope and were left
-  untouched;
+- the external `/mnt/c/codes/gwent_v4` `main` contains the E0–E6 implementation and
+  context-governance audit through `289d53b`; the final architecture gate passed
+  against that state. Its four tracked ZIP deletion entries remain outside this
+  task's scope and were left untouched;
 - preserve the fail-closed decision when any role or platform rebind is absent;
 - keep cross-domain parallelism, automatic repair, deployment, promotion, and
   model changes disabled until they receive separate bounded canaries.

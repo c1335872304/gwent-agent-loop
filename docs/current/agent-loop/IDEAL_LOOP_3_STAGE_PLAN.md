@@ -185,7 +185,7 @@ cleanup 证据和 changed-path/contract gate 均已收口；经明确授权的�
 Runner backend，补齐 snapshot restore/rebind、跨角色 contract handoff，并由
 `archive/pilots/PILOT_010_REPORT.md` 和 `PILOT_018_REPORT.md` 分别记录模型无关 canary 与真实
 Product → Teacher → Test canary。最终候选已在明确授权后合入外部 `main`；两个
-历史 ZIP 仍保留为未提交、不可读取的用户改动。后续只处理可选 Host 适配和单独
+四个历史 ZIP 仍保留为未提交、不可读取的用户改动。后续只处理可选 Host 适配和单独
 门禁，不改变当前串行安全边界。
 
 ## 维护规则
