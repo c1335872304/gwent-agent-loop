@@ -8,11 +8,19 @@
 - `python3 scripts/check.py architecture` 是索引/控制面默认门禁，`python3 scripts/check.py docker-test` 是 Product、Teacher 与 Loop Python pytest 的最终环境；
 - 本文记录完整测试分层、手工验收和暂缓项，不能替代领域 Skill 或最终 TestReport。
 
+命令约定：标记为 `bash` 的宿主命令在 WSL/Linux 执行，Python 入口统一为 `python3`；
+标记为 `powershell` 的宿主命令使用 Windows PowerShell，Python 入口使用 `py -3`。
+Docker 容器内部统一使用镜像提供的 `python3`。不要把宿主 shell 的环境变量语法混用。
+
 ## 状态语义
 
-第 1 节和 M4 的通过数是 **2026-09-11 的产品验收快照**，用于解释测试矩阵和保留的浏览器验收项；它们不是仓库、Docker 镜像或 Agent Loop 的实时状态。新任务应先读取 [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md)、对应领域 Skill、TaskPacket 和 [`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)，再从本文选择分层测试。一次 Loop 的最终 PASS/FAIL 只能来自该次的最终 snapshot 与 TestReport。
+本文是**稳定测试计划和验收清单**，不承载某次运行的通过数。历史产品验收快照已移至
+[`archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md`](archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md)，
+只在复核当时结论时读取。新任务应先读取 [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md)、对应领域 Skill、
+TaskPacket 和 [`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)，再从本文选择与变更范围匹配的测试。
+一次 Loop 的最终 PASS/FAIL 只能来自该次的最终 snapshot 与 TestReport。
 
-## 1. 目标与 2026-09-11 验收快照
+## 1. 目标与测试范围
 
 本计划用于验收以下完整链路：
 
@@ -38,32 +46,15 @@ CPU Docker Compose runtime
 4. Teacher 只解释已执行的真实动作或 Core clone 中已执行的单个根行动及其必要选择，不泄露 AI 隐藏手牌，也不阻断游戏；
 5. Docker 中的 Core → BFF → Web → 浏览器访问链路可以稳定工作。
 
-2026-09-11 的验收快照为“非训练产品链路基本通过，浏览器手动验收待执行”：
-
-- Core 非训练 CTest：**36/36 通过**；另行执行了小规模训练 smoke；
-- Core card data/schema 检查：通过；Teacher 静态检查：通过；
-- Docker 内 BFF 测试：**17 passed**；Core HTTP adapter 测试：**12 passed**；Teacher 测试：**7 passed**；
-- 前端 `npm run build`：通过；
-- 当前源码重建的 Core/BFF/Web Compose：healthy；CPU `human_vs_ai` 推理、BFF HTTP、`ability_text`、隐藏手牌边界、版本化预演和 `409 stale_state`：通过；
-- Teacher profile health 和 `/api/teacher/explain`：通过；
-- 本地训练 smoke：collector 使用 1 个环境、2 个回合通过；PPO/replay smoke 使用 4 个环境、1 次 update 通过，`illegal=0`、`mismatches=0`；
-- 浏览器实际点击验收尚未执行；正式训练和训练全量测试按要求暂缓。
-
-M4 自动验收记录（2026-09-11，历史快照）：
-
-- 连续 Teacher 预演、真实《盖尔》及其排/位置/牌选择、领袖目标选择均通过；
-- 旧 revision 返回 `409 stale_state`，新局返回新 `match_id/revision=0`；
-- 停止 Teacher 后真实 `/step` 仍成功；
-- human-vs-AI 隐藏手牌边界和卡牌 `ability_text` 通过；
-- 仅剩浏览器手工点击与视觉确认，不能由 API smoke 代替。
-
 测试环境已固定为按需构建的 Docker `test` profile：依赖写入
 `deploy/docker/requirements.test.txt`，镜像由 `deploy/docker/Dockerfile.test` 构建，测试时挂载当前工作树。
 生产镜像仍刻意不包含 pytest；测试容器退出后可以删除，但测试依赖镜像会保留并由 Docker layer cache 复用。
 
-本轮范围明确排除正式训练：不执行 `python/tests` 全量、训练任务验证、长时间 PPO 训练和服务器训练。只执行本地 1 环境 collector smoke 及 4 环境/1 次 update 的最小 PPO/replay smoke；其余训练相关项目统一标记为“暂缓”。
+默认产品验收不执行正式训练：不执行 `python/tests` 全量、训练任务验证、长时间 PPO 训练和服务器训练。
+如需训练层证据，必须由 TaskPacket 明确声明 Trainer scope、模型范围、预算和验证命令；否则只执行与当前变更相关的最小 smoke，
+其余训练相关项目标记为 `not_run`，不能从历史快照继承 PASS。
 
-本计划遵循四个边界：Core 是规则和合法动作事实来源，Trainer 只负责训练/模型兼容，Product 只负责转发和展示，Teacher 只解释结构化 evidence。
+本计划遵循四个边界：Core 是规则和合法动作事实来源，Trainer 负责训练/模型兼容，Product 负责转发和展示，Teacher 只解释结构化 evidence。
 
 ## 2. 测试原则
 
@@ -76,7 +67,7 @@ T1 静态、schema、配置和 contract 检查
     ↓
 T2 Core / C ABI / golden 回归
     ↓
-T3 Python RL / Collector / 模型推理（本轮暂缓）
+T3 Python RL / Collector / 模型推理（按 TaskPacket 决定）
     ↓
 T4 Teacher 与 BFF 单元测试
     ↓
@@ -91,13 +82,13 @@ T7 浏览器功能验收
 
 ### 2.2 不重新训练作为默认策略
 
-本次单机产品验收只使用：
+默认单机产品验收只使用：
 
 ```text
 models/v3/policy.pt
 ```
 
-不要求下载历史 checkpoint、`runs/` 或 `artifacts/`。训练层 smoke、训练任务和 checkpoint compatibility 本轮暂缓；只有用户明确要求时才恢复训练测试或启动正式训练。
+不要求下载历史 checkpoint、`runs/` 或 `artifacts/`。训练层 smoke、训练任务和 checkpoint compatibility 不属于默认产品验收；只有 TaskPacket 明确要求时才恢复训练测试或启动正式训练。
 
 ### 2.3 不接管桌面也能完成大部分测试
 
@@ -204,9 +195,9 @@ Get-Content -LiteralPath "models\v3\README.md"
 
 ### 6.1 非训练 quick 子集
 
-本轮不直接执行 `python3 scripts/check.py quick`，因为该入口还会调用 training task validation。先执行不涉及训练的检查：
+默认不直接执行 `python3 scripts/check.py quick`，因为该入口还会调用 training task validation。先执行不涉及训练的检查：
 
-```powershell
+```bash
 python3 tools/codegen/generate_card_data.py --check
 python3 tools/codegen/validate_card_data.py
 python3 .agents/skills/core-environment/scripts/check_schema.py
@@ -224,7 +215,7 @@ python3 .agents/skills/teacher-explanation/scripts/check_teacher.py
   sh -c "python3 tools/codegen/generate_card_data.py --check && python3 tools/codegen/validate_card_data.py && python3 .agents/skills/core-environment/scripts/check_schema.py && python3 .agents/skills/teacher-explanation/scripts/check_teacher.py"
 ```
 
-本轮非训练检查必须覆盖并通过：
+声明为非训练验收时，必须覆盖并通过：
 
 - Agent/Skill 包完整性；
 - Markdown 本地链接；
@@ -236,13 +227,13 @@ python3 .agents/skills/teacher-explanation/scripts/check_teacher.py
 - RL schema 校验；
 - Teacher runtime/product integration 文件检查。
 
-以下项目本轮不执行，留到训练测试恢复时：
+以下项目不属于默认非训练验收，只有恢复训练测试时才执行：
 
 - `validate_training.py --all`；
 - training task YAML 完整校验；
 - checkpoint warm-start/resume/migration 验证。
 
-### 6.2 本次卡牌能力字段的专门检查
+### 6.2 卡牌能力字段的专门检查
 
 检查以下链路不能断：
 
@@ -277,7 +268,7 @@ cmake --build .build\core-test --parallel `
 ctest --test-dir .build\core-test --output-on-failure -R "gwent_core_model_tests|gwent_legal_actions_tests|gwent_c_api_smoke_tests|gwent_rl_c_api_tests|gwent_rl_collector_c_api_tests"
 ```
 
-本轮只执行 Core/C ABI/C++ tests，不执行 `python3 scripts/check.py test`，因为该统一入口还会继续运行 Python training tests。需要覆盖：
+Core/C ABI/C++ 验收不执行 `python3 scripts/check.py test`，因为该统一入口还会继续运行 Python training tests。需要覆盖：
 
 - `gwent_core_model_tests`；
 - `gwent_legal_actions_tests`；
@@ -302,7 +293,7 @@ cmake --build .build\core-full --parallel
 ctest --test-dir .build\core-full --output-on-failure
 ```
 
-通过标准：Core CMake 构建和 CTest 全部退出码为 0。`python/tests`、PPO、Collector 和训练初始化不在本轮执行。
+通过标准：Core CMake 构建和 CTest 全部退出码为 0。`python/tests`、PPO、Collector 和训练初始化不在此 Core 验收层执行。
 
 ### 7.3 C API 信息边界
 
@@ -350,7 +341,7 @@ cmake --build .build\golden --parallel
 
 ## 8. T3：训练层、checkpoint 和训练 smoke
 
-本轮只执行本地最小 smoke，不启动 512 环境并行、不执行正式训练、不修改产品模型槽。训练服务器和长时间训练仍然暂缓。
+训练层默认只执行本地最小 smoke，不启动 512 环境并行、不执行正式训练、不修改产品模型槽。训练服务器和长时间训练必须由单独的 Trainer TaskPacket 明确授权。
 
 ### 8.1 本地最小 smoke
 
@@ -379,7 +370,7 @@ docker run --rm `
 
 ### 8.2 后续恢复正式训练时执行
 
-```powershell
+```bash
 python3 scripts/check.py train
 ```
 
@@ -395,9 +386,9 @@ python3 scripts/check.py train
 
 正式训练测试恢复后，再做 checkpoint compatibility/inference 验证。当前 Docker 产品测试仍然可以验证 CPU 推理，但不代表训练已完成。
 
-## 8.4 本轮保留的产品推理检查
+## 8.4 产品推理检查（非训练）
 
-本轮仍需使用已下载的最优模型验证产品是否能够启动并推理；这不是训练测试。使用 `models/v3/policy.pt` 启动 Docker Core，确认：
+产品验收若声明模型推理范围，使用已安装的产品模型验证启动和推理；这不是训练测试。使用 `models/v3/policy.pt` 启动 Docker Core，确认：
 
 - `/health` 返回 `ok=true`；
 - `checkpoint` 指向 `/app/models/v3/policy.pt`；
@@ -412,7 +403,7 @@ python3 scripts/check.py train
 
 ### 9.1 Teacher 静态和单元测试
 
-```powershell
+```bash
 python3 .agents/skills/teacher-explanation/scripts/check_teacher.py
 PYTHONPATH=. python3 -m pytest -q services/teacher/tests
 PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests/test_teacher_api.py
@@ -610,11 +601,11 @@ Teacher 集成单独验证：
 | 页面白屏 | `npm run build`、静态资源、浏览器 console | 不直接修改 API contract |
 | Docker 健康失败 | Compose 依赖顺序、healthcheck、服务日志 | 不删除模型或盲目重装 Docker |
 
-## 14. 本轮非训练验收命令顺序
+## 14. 推荐的非训练验收命令顺序
 
 ### 14.1 不启动 Docker 的 Core/Product/Teacher 验收
 
-```powershell
+```bash
 python3 tools/codegen/generate_card_data.py --check
 python3 tools/codegen/validate_card_data.py
 python3 .agents/skills/core-environment/scripts/check_schema.py
@@ -642,14 +633,14 @@ Invoke-RestMethod http://127.0.0.1:8080/api/game/state
 
 最后再执行第 10、11、12 节的 API、Docker 和浏览器清单。
 
-## 15. 本轮完成定义和交付证据
+## 15. 一次非训练产品验收的完成定义和交付证据
 
 只有同时满足以下条件，才可以写“非训练项目链路验收通过”：
 
 - [ ] T0 环境和模型资产通过；
 - [ ] T1 非训练静态/schema/card/Product 检查通过；
 - [ ] T2 C++/C ABI/CTest/golden 通过；
-- [ ] T3 训练相关项目已明确标记为暂缓，不作为本轮通过条件；
+- [ ] T3 训练相关项目已明确标记为 `not_run` 或按 TaskPacket 完成，不把历史结果当作本次通过条件；
 - [ ] 产品 Docker CPU 推理通过；
 - [ ] T4 Teacher、BFF、隐私测试通过；
 - [ ] T5 前端构建和 HTTP contract smoke 通过；
@@ -677,4 +668,4 @@ test-evidence/
 └── golden/
 ```
 
-测试完成后，在此文档顶部更新当前状态，并注明：执行日期、Docker 镜像版本、模型 hash、通过/失败数量，以及尚未覆盖的浏览器或性能项目。
+测试完成后，把执行日期、Docker 镜像版本、模型 hash、通过/失败数量和未覆盖项目写入本次 TestReport/RunManifest；只有能力或稳定 contract 发生变化时，才更新 `PROJECT_BASELINE.md` 或 `CURRENT_STATE.md`，不要把单次结果回写成长期状态。

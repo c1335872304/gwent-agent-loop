@@ -51,6 +51,7 @@ context_policy:
     - "raw conversation"
     - "full repository scan"
     - "historical archive"
+    - "docs/current/agent-loop/pilots/ compatibility fixtures"
     - "models/v3/policy.pt unless Trainer task"
     - "external ZIPs"
   handoff_payload:

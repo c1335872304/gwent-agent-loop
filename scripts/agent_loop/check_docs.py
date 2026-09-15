@@ -68,6 +68,7 @@ EXPECTED_CONTEXT_POLICY = {
         "raw conversation",
         "full repository scan",
         "historical archive",
+        "docs/current/agent-loop/pilots/ compatibility fixtures",
         "models/v3/policy.pt unless Trainer task",
         "external ZIPs",
     ),
@@ -93,6 +94,11 @@ STALE_CURRENT_MARKERS = (
     "真实 Host-backed rebind 与独立进程恢复仍待现场试点",
     "当前阶段三继续验证多角色 Scheduler",
     "当前状态是“非训练产品链路基本通过",
+    "## 1. 目标与 2026-09-11 验收快照",
+    "2026-09-11 的验收快照为“非训练产品链路基本通过",
+    "当前 M0、M1、M2 已在本机完成",
+    "当前本机 CPU Trainer 已完成 8 个环境",
+    "16 局 CPU smoke",
 )
 
 
@@ -307,7 +313,12 @@ def validate_current_doc_semantics(*, root: str | Path = ROOT) -> None:
     required_markers = {
         current_state: ("Canonical current-state document", "PILOT_018_REPORT.md"),
         plan: ("稳定协议", "CURRENT_STATE.md", "IDEAL_LOOP_3_STAGE_PLAN.md"),
-        test_plan: ("历史快照", "snapshot", "TestReport"),
+        test_plan: (
+            "稳定测试计划和验收清单",
+            "archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md",
+            "snapshot",
+            "TestReport",
+        ),
     }
     for path, markers in required_markers.items():
         if not path.is_file():
@@ -318,6 +329,15 @@ def validate_current_doc_semantics(*, root: str | Path = ROOT) -> None:
             raise ValidationError(
                 f"{path.relative_to(root_path)} missing current-doc markers: {', '.join(missing)}"
             )
+
+    historical_test_snapshot = (
+        root_path / "docs/current/archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md"
+    )
+    if not historical_test_snapshot.is_file():
+        raise ValidationError(
+            "historical project test snapshot missing: "
+            "docs/current/archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md"
+        )
 
     old_plan = root_path / "docs/current/LOGIC_OPTIMIZATION_PLAN.md"
     if old_plan.exists():

@@ -41,7 +41,8 @@
 6. 已确定领域时，先打开对应任务卡，再读该卡指定的 Skill 和 contract；
 7. 仅打开本任务相关实现、测试、Lessons 和当前工件。
 
-不要把历史报告、整个 Git 日志、模型文件或旧对话当作默认上下文。发生事实冲突时，
+不要把历史报告、`docs/current/agent-loop/pilots/` 兼容夹具、整个 Git 日志、模型文件或旧对话当作默认上下文。
+发生事实冲突时，
 按 [`CONTEXT_INDEX.yaml`](agent-loop/CONTEXT_INDEX.yaml) 的 `context_policy.authority_order`
 裁决；本页只解释入口和用途，不复制第二份优先级列表。
 

@@ -1,7 +1,7 @@
-# 训练 Docker 规划
+# 训练 Docker 操作与边界
 
 > **用途：** 训练容器的操作与边界说明；当前训练能力和单次运行结果以 Training Task、RunManifest / runs 证据和 [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md) 为准。
-> **历史快照：** Docker 文件已落地。本机 CPU 镜像、任务 `plan` 和 16 局 smoke 曾验证；GPU 与 512 并行只能在训练服务器完成。
+> **状态说明：** 本文是稳定操作说明，不承载某次运行的通过数。每次训练的当前结果必须来自 Training Task、RunManifest / `runs` 证据和最终 snapshot；GPU 与 512 并行只能在训练服务器按任务单独验证。
 
 ## Agent entry
 
@@ -52,7 +52,7 @@ docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.trai
 docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.train.yml -f deploy/docker/compose.train.cpu.yml run --rm trainer
 ```
 
-实际运行 16 局 CPU smoke 的命令见第 10.2 节。该任务的 `resume: never` 会拒绝覆盖已有 checkpoint；需要重复实验时应创建新的 task/run_dir，而不是删除已有结果。
+实际运行 CPU smoke 的命令见第 10.2 节。该任务的 `resume: never` 会拒绝覆盖已有 checkpoint；需要重复实验时应创建新的 task/run_dir，而不是删除已有结果。
 
 ## 2. 当前项目事实
 
@@ -256,7 +256,7 @@ docker compose ... run --rm trainer ...
 
 ## 8. 路径和配置改造要求
 
-当前部分任务文件仍包含服务器绝对路径，例如 `/home/...`。这些路径进入容器后会失效，必须在训练 Docker 实施前处理。
+执行前必须检查任务文件是否包含服务器绝对路径，例如 `/home/...`；这类路径进入容器后会失效，任务应在 `plan` 阶段拒绝，而不是带入运行。
 
 统一规则：
 
@@ -364,7 +364,7 @@ runtime:
   device: cpu
 ```
 
-当前已有的 `training/tasks/smoke.yaml` 使用 8 个环境、2 个 collector 线程和 CPU，适合作为第一条 Docker 训练验收链。
+仓库提供的 `training/tasks/smoke.yaml` 是低成本 Docker 训练验收入口；实际环境规模、镜像和结果以本次 Task/RunManifest 为准。
 
 按此前 Docker Desktop 约 12 个 CPU、7.44GB 容器内存的资源配置，本地可以做：
 
@@ -397,45 +397,18 @@ models/v3/policy.pt
 
 它不能自动等价于 resume，因为 resume 还需要同一运行的 optimizer、计数器和训练状态。使用外部 checkpoint 前，应先运行项目已有的 warm-start 校验工具，并确认 source schema/action grammar。
 
-## 13. 分阶段实施
+## 13. 当前验证门槛
 
-### M0：训练 Docker contract
+本文不把历史 M0–M4 结果复制为当前 PASS。原始实施路线仅供追溯，见
+[`archive/design/TRAINING_DOCKER_IMPLEMENTATION_ROADMAP.md`](archive/design/TRAINING_DOCKER_IMPLEMENTATION_ROADMAP.md)。
 
-- 确认 CPU/GPU 镜像版本；
-- 确认 Core builder 工具链；
-- 确认容器内项目根目录、动态库路径和输出目录；
-- 确认历史 retired task 的宿主机绝对路径不作为 Docker 任务运行；
-- 确认不加入 SSH。
+当前每次训练至少要有：
 
-### M1：训练镜像
-
-- 编写 `Dockerfile.train`；
-- 编译并复制 `libgwent_core.so`；
-- 安装锁定的 Python、PyTorch 和训练依赖；
-- 设置非 root、工作目录和 `PYTHONPATH`。
-
-### M2：CPU Compose 与 smoke
-
-- 编写 CPU Compose；
-- 用 `training/tasks/smoke.yaml` 执行 `plan`；
-- 执行小规模 smoke；
-- 检查 checkpoint、日志、评估和 `runs/` 输出。
-
-当前 M0、M1、M2 已在本机完成。`training/tasks/smoke.yaml` 已经通过 task 校验、容器 `plan` 和 16 局 CPU smoke；输出位于 `runs/tasks/trainer_smoke/`，没有写入 `models/v3/`。
-
-### M3：GPU Compose 与服务器验证
-
-- 编写 GPU Compose；
-- 验证 `torch.cuda.is_available()`；
-- 验证 C++ Core 动态库和 Collector；
-- 先用小规模任务验证，再切换正式任务。
-
-### M4：正式训练操作
-
-- 服务器上执行正式 task；
-- 512 并行只在服务器资源确认后启用；
-- 记录镜像 tag、源码版本、Core ABI、schema、grammar 和 task；
-- 训练结果经过 evaluation/promotion 后再安装到 `models/v3/`。
+1. 声明 Training Task、源码 snapshot、镜像 tag、Core ABI、schema/grammar 和 device；
+2. 先执行 `plan`，再执行符合预算的 smoke 或正式 run；
+3. 将实际环境、输出路径、checkpoint metadata 和失败分类写入 RunManifest；
+4. 未经 evaluation/promotion，不得把训练输出安装为产品 `models/v3/policy.pt`；
+5. GPU/512 只有在服务器现场证据存在时，才可声明已验证。
 
 ## 14. 验收标准
 

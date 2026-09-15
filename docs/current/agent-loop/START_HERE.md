@@ -37,7 +37,8 @@
 - `ContextBrief`：`fact_source_graph`、事实账本、假设、未知项和相关 Lessons；
 - 当前 snapshot：代码/配置事实必须绑定到可复现的 commit 或工作树清单；
 - 对应领域任务卡 → Skill → contract → 最近实现/测试；
-- 子任务只接收以上结构化工件，不接收父对话全文、全仓库扫描结果或历史归档。
+- 子任务只接收以上结构化工件，不接收父对话全文、全仓库扫描结果、历史归档或
+  `docs/current/agent-loop/pilots/` 兼容夹具。
 
 共享策略见 [`CONTEXT_INDEX.yaml`](CONTEXT_INDEX.yaml) 的 `context_policy`；ContextBrief
 只记录本任务实际装入、排除和冲突的引用，不复制共享策略。出现冲突时按

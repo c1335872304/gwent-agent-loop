@@ -24,7 +24,7 @@ contract 为准；方案/实施记录只用于解释为什么这样设计，不�
 
 - [`current/LOCAL_DOCKER.md`](current/LOCAL_DOCKER.md) — 本地 Docker 启动、停止、配置和浏览器入口；
 - [`current/DEVELOPMENT.md`](current/DEVELOPMENT.md) — C++、Python、Web、Teacher 的开发命令；
-- [`current/PROJECT_TEST_PLAN.md`](current/PROJECT_TEST_PLAN.md) — 测试分层、当前结果和未覆盖项目；
+- [`current/PROJECT_TEST_PLAN.md`](current/PROJECT_TEST_PLAN.md) — 稳定测试分层、验收清单和未覆盖项目；单次结果以 TestReport 为准；
 - [`../apps/web/README.md`](../apps/web/README.md) — Web 产品边界和模块入口。
 
 ## 设计与实施记录
@@ -34,6 +34,8 @@ contract 为准；方案/实施记录只用于解释为什么这样设计，不�
 - [`current/archive/design/AI_DECISION_AND_TEACHER_TURN_PLAN.md`](current/archive/design/AI_DECISION_AND_TEACHER_TURN_PLAN.md) — AI 决策过程与教师行动链的历史设计；
 - [`current/archive/design/LOCAL_DOCKER_PLAN.md`](current/archive/design/LOCAL_DOCKER_PLAN.md) — Docker 架构与实施历史；
 - [`current/archive/design/LOCAL_DOCKER_INSTALL_NOTES.md`](current/archive/design/LOCAL_DOCKER_INSTALL_NOTES.md) — Windows/Docker Desktop 安装坑和复现流程（历史复盘）。
+- [`current/archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md`](current/archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md) — 2026-09-11 产品验收快照（仅追溯）。
+- [`current/archive/design/TRAINING_DOCKER_IMPLEMENTATION_ROADMAP.md`](current/archive/design/TRAINING_DOCKER_IMPLEMENTATION_ROADMAP.md) — 训练 Docker M0–M4 实施历史（仅追溯）。
 
 上述记录中的“建议”“规划中”只表示历史阶段；若与基线或源码不一致，以基线、
 详细 contract 和实际验证为准。更细的工程规则放在 `.agents/skills/*/`，协议级

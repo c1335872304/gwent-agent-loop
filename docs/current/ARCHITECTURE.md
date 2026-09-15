@@ -300,7 +300,8 @@ Teacher Runtime 的处理顺序是：
 服务器 GPU：正式任务、长预算、512 并行、完整评估
 ```
 
-本地不使用 512 并行做正式验收。当前本机 CPU Trainer 已完成 8 环境、2 collector 线程、16 局 smoke；服务器 GPU runtime 和正式 512 训练仍需在服务器上单独验收。
+本地不使用 512 并行做正式验收。历史记录曾完成小规模 CPU smoke；
+这不是当前实例的自动 PASS。服务器 GPU runtime 和正式 512 训练仍需在服务器上按独立 Training Task/RunManifest 验收。
 
 训练容器不安装 SSH。SSH 只登录服务器主机，然后由主机启动 Docker。未来多机训练若需要 rendezvous 或调度器，再单独设计分布式边界。
 
@@ -363,7 +364,7 @@ Product integration
 
 不要因为 Observation 变化就顺手修改 Product API；不要因为 Task YAML 变化就修改 RL schema；不要在 Python、BFF 或 React 复制 C++ 规则。
 
-## 13. 当前已验证与未完成项
+## 13. 能力边界与需单独现场验证项
 
 已验证：
 
@@ -372,8 +373,8 @@ Product integration
 - `match_id/revision` stale-state 保护；
 - AI 实际动作与 AI 教师数据流分离；
 - 本地产品 Docker 的 Core/BFF/Teacher/Web 链；
-- 本地 CPU Trainer 镜像、task 校验、8 环境 16 局 smoke；
-- smoke 训练 `illegal=0`，checkpoint 和 task state 正常生成。
+- 本地 CPU Trainer 镜像、task 校验和 smoke 入口已实现；具体通过结果必须绑定本次 RunManifest；
+- smoke 训练可以产生 checkpoint 和 task state，但合法动作、数量和性能结论不能从历史运行继承。
 
 仍需在后续服务器阶段完成：
 

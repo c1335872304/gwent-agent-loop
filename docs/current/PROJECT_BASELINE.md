@@ -93,7 +93,10 @@ React 丢弃不匹配当前版本的教师响应。
 | Local Python base | `python:3.10-slim-bookworm` | Dockerfiles |
 | Local inference | Torch `2.6.0+cpu` | `Dockerfile.core` / Compose |
 
-2026-09-11 的运行态审计确认：四个 Compose 服务 healthy；Core 实际运行 Python 3.10.21、Torch 2.6.0+cpu；已加载模型 contract metadata 与 manifest 一致，模型 Update 为 20。模型 loader 会 fail-closed 校验 schema、grammar 和 prefix semantics，因此不兼容 checkpoint 不会静默进入推理。
+历史运行态审计的版本、health 和模型结果已归档在
+[`archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md`](archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md)，不代表当前运行实例健康。
+当前实例必须按 [`LOCAL_DOCKER.md`](LOCAL_DOCKER.md) 和本次 TestReport 重新检查；模型 loader 仍会 fail-closed 校验 schema、grammar
+和 prefix semantics，不兼容 checkpoint 不得静默进入推理。
 
 Python 3.10 的补丁版本与服务器环境可以不同；本地是 CPU 推理，服务器可使用 CUDA。二者只有在 checkpoint contract、模型结构或模型语义不一致时才构成产品兼容性问题。
 
@@ -114,19 +117,20 @@ Training server
 - `installed.json` 缺失不阻止推理，但会失去来源文件名、hash 和 metadata 的本地审计记录；
 - 历史 task 可以保留旧 schema/grammar 以支持迁移研究，但不得直接在当前 runtime 上启动。`rulefix_v7_250k` 就是此类历史任务，验证器会显式警告。
 
-## 7. 已验证的关键链路
+## 7. 已验证的关键能力（不等于当前实例健康）
 
-| 验证 | 当前证据 |
+| 能力 | 能力级依据 |
 |---|---|
-| Core clone 隔离 | `gwent_rl_c_api_tests` 通过；连续 10 次分支预演后，真实 pending choice 仍可完成 |
+| Core clone 隔离 | `gwent_rl_c_api_tests` 覆盖可变 pending choice 与真实状态隔离 |
 | Contract 镜像 | schema 检查通过：manifest、C header、Python mirror 与维度一致 |
-| Training 定义 | 23 个 config/task 通过校验；仅历史 `rulefix_v7_250k` 发出预期 warning |
-| 模型兼容 | Core 成功加载 Update 20，metadata 与当前 schema/grammar/reward 一致 |
+| Training 定义 | config/task 有独立校验入口；历史 `rulefix_v7_250k` 被明确标记为迁移用途 |
+| 模型兼容 | loader 对 metadata 与当前 schema/grammar/reward 做 fail-closed 校验 |
 | 产品链路 | BFF → Core → Teacher 的只读预演返回成功；结果携带匹配的 match/revision，预演前后真实状态不变 |
 | 过期保护 | 重用旧 revision 返回结构化 409 `stale_state`；前端刷新合法动作而非报 Core 崩溃 |
-| 服务状态 | Web、BFF、Core、Teacher health check 全部正常 |
+| 服务状态 | Web、BFF、Core、Teacher 均定义了 health check；实例健康必须现场重跑 |
 
-这些证据不等于完成正式训练评估，也不替代浏览器手工交互、长期性能或全量 CTest。
+这些是能力级依据，不是某个当前运行实例的 health 或本次任务 PASS。它们不等于完成正式训练评估，
+也不替代浏览器手工交互、长期性能或全量 CTest；当前实例结论必须绑定本次 snapshot、TestReport 和 RunManifest。
 
 ## 8. 文档与维护入口
 
@@ -138,12 +142,15 @@ Training server
 | 训练 Docker、CPU smoke、服务器 GPU 训练 | `TRAINING_DOCKER.md` |
 | AI 决策过程与教师设计历程 | `archive/design/AI_DECISION_AND_TEACHER_TURN_PLAN.md` |
 | 运行时状态、教师推演与故障逻辑优化（历史实施记录） | `archive/design/LOGIC_OPTIMIZATION_PLAN.md` |
-| 测试矩阵与未执行项 | `PROJECT_TEST_PLAN.md` |
+| 稳定测试矩阵、验收清单与未覆盖项 | `PROJECT_TEST_PLAN.md`；一次性历史验收快照见 `archive/design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md` |
 | 训练、warm-start、promotion | `TRAINING_AND_MODEL.md`、`$training-config` |
 
 计划完成后必须把最终事实回填到本文或对应 contract，而不是让“建议”“规划中”文档继续充当当前说明。
 
-## 9. 已知维护事项
+## 9. 非阻塞维护 backlog（不影响当前基线）
+
+下列事项是可单独排期的维护工作，不表示当前产品故障、Loop 阻塞或验收失败。
+除非对应任务明确进入范围，否则新 Agent 不应为它们扩大读取、模型、Docker 或训练范围。
 
 1. 为当前 `policy.pt` 补充 `installed.json`，记录来源和 hash；
 2. 将旧 contract training task 明确标为历史/迁移用途，避免误启动；

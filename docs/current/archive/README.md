@@ -10,6 +10,9 @@
 - [`design/LOCAL_DOCKER_PLAN.md`](design/LOCAL_DOCKER_PLAN.md)：本地 Docker 方案的设计与实施历史；
 - [`design/LOCAL_DOCKER_INSTALL_NOTES.md`](design/LOCAL_DOCKER_INSTALL_NOTES.md)：Windows/Docker Desktop 安装与故障排查复盘；
 - [`design/LOGIC_OPTIMIZATION_PLAN.md`](design/LOGIC_OPTIMIZATION_PLAN.md)：`match_id/revision`、action-chain、preview isolation 与产品验收的历史实施记录；
+- [`design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md`](design/PROJECT_TEST_PLAN_20260911_SNAPSHOT.md)：2026-09-11 产品验收快照和 M4 自动验收记录；
+- [`design/AGENT_LOOP_PLAN_ORIGINAL_ROADMAP.md`](design/AGENT_LOOP_PLAN_ORIGINAL_ROADMAP.md)：Agent Loop 原始 Phase 0–4 推演、评估清单和最初落地清单；
+- [`design/TRAINING_DOCKER_IMPLEMENTATION_ROADMAP.md`](design/TRAINING_DOCKER_IMPLEMENTATION_ROADMAP.md)：训练 Docker M0–M4 原始实施路线和历史 smoke 记录；
 - [`../agent-loop/archive/README.md`](../agent-loop/archive/README.md)：Agent Loop 阶段和 Pilot 历史归档索引。
 
 ## 使用规则
