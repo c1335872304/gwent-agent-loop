@@ -1,7 +1,11 @@
-# 昆特牌 AI 本地产品：逻辑可靠性优化方案
+# 昆特牌 AI 本地产品：逻辑可靠性优化方案（历史实施记录）
 
-**状态：M0–M3 已实施；M4 自动验收已通过，浏览器手工验收待执行。**  
-**依据：** [项目当前基线](PROJECT_BASELINE.md)、当前 Core/BFF/Teacher 实现与已存在的 `PREFIX_OVERFLOW` clone 回归。  
+> **归档状态：** M0–M4 的原始实施与验收记录；不作为新任务的当前状态或操作指南。
+> **当前事实：** 先读 [`PROJECT_BASELINE.md`](../../PROJECT_BASELINE.md)、[`TEACHER_AND_WEB.md`](../../TEACHER_AND_WEB.md)、[`PROJECT_TEST_PLAN.md`](../../PROJECT_TEST_PLAN.md) 和 [`apps/web/docs/CORE_API_CONTRACT.md`](../../../../apps/web/docs/CORE_API_CONTRACT.md)。
+> **用途：** 仅在追查 `match_id/revision`、action-chain v2、preview isolation、缓存或 2026-09-11 产品验收时回看。
+
+**历史快照：** M0–M3 已实施；M4 自动验收已通过，浏览器手工验收待执行。
+**当时依据：** 当前 Core/BFF/Teacher 实现与已存在的 `PREFIX_OVERFLOW` clone 回归。
 **目标：** 不增加卡牌、训练能力或玩法功能；将“真实对局、AI 实际决策、AI 教师反事实推演”之间的状态边界、动作语义与故障行为变成可证明的 contract。
 
 ## 1. 结论与优先级
@@ -139,7 +143,7 @@ revision 相同且 option 合法       → 执行，revision + 1，返回新 Gam
 revision 相同但 option 非法       → HTTP 422 invalid_action
 ```
 
-先以可选字段兼容旧调用方，待 BFF、前端和测试全部迁移后再设为必填；该时点按 [CORE_API_CONTRACT.md](../../apps/web/docs/CORE_API_CONTRACT.md) 判断是否升级 Product `api_version`。
+先以可选字段兼容旧调用方，待 BFF、前端和测试全部迁移后再设为必填；该时点按 [CORE_API_CONTRACT.md](../../../../apps/web/docs/CORE_API_CONTRACT.md) 判断是否升级 Product `api_version`。
 
 ### B3. 预演与 Teacher 的时序
 

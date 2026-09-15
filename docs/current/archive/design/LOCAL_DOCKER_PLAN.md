@@ -4,7 +4,7 @@
 > [`LOCAL_DOCKER.md`](../../LOCAL_DOCKER.md) 与 [`PROJECT_BASELINE.md`](../../PROJECT_BASELINE.md) 为准。
 > 本文保留部署设计和实施历史；后文“建议新增”“尚未执行”等措辞描述的是实施前状态。
 
-> M4 自动验收已补充到 [`LOGIC_OPTIMIZATION_PLAN.md`](../../LOGIC_OPTIMIZATION_PLAN.md) 和
+> M4 自动验收已补充到 [`LOGIC_OPTIMIZATION_PLAN.md`](LOGIC_OPTIMIZATION_PLAN.md) 和
 > [`PROJECT_TEST_PLAN.md`](../../PROJECT_TEST_PLAN.md)。本文件不再作为 Docker 启动命令的
 > 唯一入口；日常操作请直接阅读 `LOCAL_DOCKER.md`。
 

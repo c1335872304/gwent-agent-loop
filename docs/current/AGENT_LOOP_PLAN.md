@@ -1,11 +1,13 @@
-# Gwent Agent Loop 基础规范与实施计划
+# Gwent Agent Loop 基础协议
 
-> **状态：Proposed（地基文档，尚未启用自动执行）**  
-> **版本：0.1**  
+> **状态：稳定协议；受限串行 Loop 已实现并有现场证据。**
+> **版本：0.2**
 > **适用范围：本仓库内由人或 AI 协作完成的研发任务**  
 > **规范词汇：MUST / MUST NOT / SHOULD / MAY 分别表示必须、禁止、应当、可以。**
 >
-> **当前实现状态：** 请以 [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md) 为唯一现状入口；本文件只定义稳定协议。
+> **当前实现状态：** 只读 [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)。
+> **当前路线与停止条件：** 只读 [`agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md`](agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md)。
+> **阅读边界：** 本文定义可复用的协议，不是运行状态、待办列表或一次任务的操作手册；第 13–16 节保留最初的实施推演，仅供追溯，不能作为当前下一步。
 
 ## 0. 为什么要有这份文档
 
@@ -814,7 +816,9 @@ while task.state not in TERMINAL:
 
 ---
 
-## 13. 实施路线图与退出标准
+## 13. 原始实施路线图与退出标准（历史推演）
+
+> 本节记录协议制定时的 Phase 0–4 推演。实际实现已超出该序列；不要据此判断当前能力或重启已完成阶段。当前状态见 [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)，当前路线见 [`agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md`](agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md)。
 
 ### Phase 0 — 文档与基线（本规范阶段）
 
@@ -887,7 +891,9 @@ while task.state not in TERMINAL:
 
 ---
 
-## 15. 当前待决问题（必须在自动化前决定）
+## 15. 原始待决问题（历史）
+
+> 这些是协议编写时的开放问题，不是当前阻塞项。仍有价值的限制已经沉淀到 `CURRENT_STATE.md`、`RECOVERY_POLICY.md` 和对应的 TaskPacket / Host contract。
 
 1. 本仓库是否采用 Git worktree 作为未来并行写入的唯一隔离机制；若当前环境无 Git，Phase 3 如何显式降级？
 2. `.agent-loop/` 是否完全忽略，还是保留脱敏的可提交 run summary？
@@ -902,7 +908,9 @@ while task.state not in TERMINAL:
 
 ---
 
-## 16. 首次落地清单
+## 16. 最初落地清单（历史）
+
+> 下列清单已完成或被后续实现取代；新的任务从 `AGENT_ONBOARDING_INDEX.md`、`START_HERE.md` 和当前 TaskPacket 开始，而不是重做本节步骤。
 
 在开始编写任何 Agent Loop 代码前，按顺序完成：
 

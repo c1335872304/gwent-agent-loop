@@ -8,7 +8,11 @@
 - `python3 scripts/check.py architecture` 是索引/控制面默认门禁，`python3 scripts/check.py docker-test` 是 Product、Teacher 与 Loop Python pytest 的最终环境；
 - 本文记录完整测试分层、手工验收和暂缓项，不能替代领域 Skill 或最终 TestReport。
 
-## 1. 目标与当前结论
+## 状态语义
+
+第 1 节和 M4 的通过数是 **2026-09-11 的产品验收快照**，用于解释测试矩阵和保留的浏览器验收项；它们不是仓库、Docker 镜像或 Agent Loop 的实时状态。新任务应先读取 [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md)、对应领域 Skill、TaskPacket 和 [`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)，再从本文选择分层测试。一次 Loop 的最终 PASS/FAIL 只能来自该次的最终 snapshot 与 TestReport。
+
+## 1. 目标与 2026-09-11 验收快照
 
 本计划用于验收以下完整链路：
 
@@ -34,7 +38,7 @@ CPU Docker Compose runtime
 4. Teacher 只解释已执行的真实动作或 Core clone 中已执行的单个根行动及其必要选择，不泄露 AI 隐藏手牌，也不阻断游戏；
 5. Docker 中的 Core → BFF → Web → 浏览器访问链路可以稳定工作。
 
-当前状态是“非训练产品链路基本通过，浏览器手动验收待执行”：
+2026-09-11 的验收快照为“非训练产品链路基本通过，浏览器手动验收待执行”：
 
 - Core 非训练 CTest：**36/36 通过**；另行执行了小规模训练 smoke；
 - Core card data/schema 检查：通过；Teacher 静态检查：通过；
@@ -45,7 +49,7 @@ CPU Docker Compose runtime
 - 本地训练 smoke：collector 使用 1 个环境、2 个回合通过；PPO/replay smoke 使用 4 个环境、1 次 update 通过，`illegal=0`、`mismatches=0`；
 - 浏览器实际点击验收尚未执行；正式训练和训练全量测试按要求暂缓。
 
-M4 自动验收记录（2026-09-11）：
+M4 自动验收记录（2026-09-11，历史快照）：
 
 - 连续 Teacher 预演、真实《盖尔》及其排/位置/牌选择、领袖目标选择均通过；
 - 旧 revision 返回 `409 stale_state`，新局返回新 `match_id/revision=0`；

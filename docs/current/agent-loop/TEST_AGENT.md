@@ -1,8 +1,10 @@
 # Test / Verification Agent
 
+> **当前边界：** 本文只定义独立 Test / Verification 的稳定职责、Docker 规则和报告格式；现场能力与限制只以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准。Pilot 报告是历史证据，不能替代 TaskPacket、最终 snapshot 或 TestReport。
+
 ## Docker readiness note
 
-The repository has a working Docker foundation, but it is not yet a complete all-tests runner. The current test image passed 121 Agent Loop/Python/API/Teacher tests, and the CPU trainer image provides `torch=2.6.0+cpu`. Core C++ tests, frontend builds, and full Trainer validation do not yet share one container command.
+The repository has a working Docker foundation, but it is not a universal all-tests runner. The canonical image covers the declared Python pytest scope, while Core C++ tests, frontend builds, and full Trainer validation retain their own commands. Current evidence and pinned-image results belong in [`CURRENT_STATE.md`](CURRENT_STATE.md) and the relevant TestReport rather than this stable role contract.
 
 The agent must never run a global `docker compose down` on a shared project. It must record pre-existing containers, use `run --rm` or an isolated project name, and clean only resources created by the current attempt. Unknown ownership means `HUMAN_REQUIRED`.
 
@@ -24,11 +26,10 @@ the TestReport must use `environment.runner: docker` exactly, with plural
 `compose_files`, `health: passed`, `cleanup: complete`, and non-empty
 `evidence_refs`; `host-docker` is not a valid report runner value.
 
-状态：Agent 配置和本地 Codex CLI Runner 已实现；Pilot 005 已完成一次真实
-Runner 丢失后的同一责任链有界恢复，并由独立 Test Agent 在 Owner 最终
-snapshot 上验证通过。Pilot 006 还完成了父工作树集成后的第二轮独立验证，
-并通过了 canonical Docker test；Pilot 008 已由声明服务依赖的 TaskPacket
-补齐 service-backed Docker health/failure/cleanup 证据。
+本地 Codex CLI Host 的独立 Test 任务、Docker capability handoff、有限恢复、
+service-backed health/failure/cleanup，以及隔离集成后的第二轮 Docker 验证均已有
+现场证据。最新完整串行多角色证据是 [`PILOT_018_REPORT.md`](PILOT_018_REPORT.md)；
+Docker 的使用仍必须由当前 TaskPacket 声明，不能因历史 Pilot 自动扩大权限。
 
 ## 角色定位
 
@@ -99,4 +100,4 @@ Owner ChangeReport
       └─ 权限、预算、范围或 cleanup 问题 → HUMAN_REQUIRED
 ```
 
-当前阶段三继续验证多角色 Scheduler 与跨会话 Runner 的边界；模型无关的角色路由、snapshot restore/rebind 和跨域 contract handoff 已由 Pilot 010 覆盖，但真实 Host-backed rebind 与独立进程恢复仍待现场试点。任何恢复失败、预算耗尽或权限不确定都必须进入 `HUMAN_REQUIRED`，不能通过新增 Agent 绕过。当前单领域 CLI 闭环、受控恢复、service-backed Docker、串行 Scheduler 和多角色控制面 canary 的已完成证据以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准。
+本地 CLI 的真实 Host-backed rebind、独立进程恢复、串行多角色 handoff 和 Docker Test 已由 Pilot 018 验证。Desktop/MCP Host 是可选的后续适配器，不影响本地 CLI 受限串行路径。任何恢复失败、预算耗尽或权限不确定都必须进入 `HUMAN_REQUIRED`，不能通过新增 Agent 绕过；当前已完成能力和仍关闭的自动修复、并行、部署与模型变更以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准。

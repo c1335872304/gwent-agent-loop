@@ -24,45 +24,11 @@ RunManifest. Direct mutations outside an explicitly approved path remain
 `HUMAN_REQUIRED`; after explicit approval, the verified candidate is now in the
 external `main` at `eec999c`; only the two historical ZIP changes remain untouched.
 
-Historical live pilot `GW-REAL-PRODUCT-001` completed one Product Owner with a
-controlled Runner loss and same-runner bounded resume, followed by one
-independent Test/Verification run. The candidate was integrated into the
-phase-two Codex worktree after the explicit human decision and passed a second
-independent Test/Verification run there. The separate external `main` checkout
-now contains the approved path-scoped Product, line-ending, Agent Loop
-documentation, and final Product candidate commits `481f3b1`, `eecd26f`,
-`49d18de`, `94ff768`, and `eec999c`; two historical architecture ZIP
-modifications remain intentionally untouched. The new
-isolated branch/worktree path also automatically applied the disjoint candidate
-and passed changed-path and clean-worktree checks. Direct mutations outside an
-explicitly approved path remain `HUMAN_REQUIRED`. An initial metric audit stopped at
-`BUDGET_EXHAUSTED`; after the explicit 1,000,000
-input-token policy change, the existing closed Owner/Test evidence was revalidated
-under the new 32,000 output cap and passed the budget gate.
-Pilot 008 then proved the declared service-backed Product path: isolated Core,
-BFF, and Web health, HTTP smoke, controlled missing-Core `DOCKER_FAILURE`, and
-ownership-scoped cleanup all passed.
-Pilot 009 then proved the Phase 3 P0 serial Scheduler canary: TaskPacket owner
-routing, FIFO queueing, pause/resume/end, `max_concurrency=1`, hard budget
-limits, and append-only scheduler evidence all passed without model or Docker
-side effects.
-The `RunnerExecutionBackend` now binds that Scheduler contract to the existing
-Runner/Host transport lifecycle, including cumulative-metric deltas, model-turn
-accounting, explicit close after a completed report, and persisted-artifact
-requirements for resume; its lifecycle regression tests pass. Pilot 010 then
-proved explicit product/core role routing, fail-closed Scheduler restore/rebind,
-serial completion, and a cross-domain contract handoff. The canary was
-model-free and did not start Docker. The Host now persists session identity,
-PID, worktree and output logs and supports lookup/rebind from a new bridge
-process; the code-level independent-process regression passes. Pilot 011 then
-ran a real Product task through a separate Scheduler process, closed Product,
-and created the Product → Teacher handoff. Teacher stopped fail-closed after
-finding that advanced preview responses still serialize `prompt` into the
-browser response, and its real input usage exceeded the 64k Teacher packet
-budget; independent Test was not started. The field result is
-`HUMAN_REQUIRED`, not PASS. Pilot 011 remains historical; Pilot 018 supersedes
-its blocked field condition after the privacy filter was fixed, the Teacher
-input budget was aligned to 1,000,000, and the review scope was bounded.
+Earlier Product, Docker, recovery, Scheduler and privacy-finding pilots explain
+how this operating profile was reached, but they are not part of the default
+context. Follow the historical-evidence map below only for audit, regression
+triage or a cited decision; Pilot 018 supersedes the earlier blocked field
+condition.
 
 ## Verified evidence
 
@@ -132,7 +98,7 @@ input budget was aligned to 1,000,000, and the review scope was bounded.
 | Main scheduler calling the real platform | real Product create, separate-process rebind, Teacher review, two independent Docker Test runs, isolated integration and rollback passed; direct parent mutation remains human-owned | `scheduler_backend.py`, `codex_cli_bridge.py`, `PILOT_018_REPORT.md` |
 | Worktree integration planning, conflict/scope detection and rollback rehearsal | implemented; disjoint isolated auto-integration and isolated rollback passed, direct parent mutation remains human-owned | `integration.py`, `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `archive/pilots/PILOT_006_REPORT.md`, `archive/pilots/PILOT_007_REPORT.md` |
 | Real Owner and independent Test child tasks | revision-5 Product, Teacher, Test 1 and Test 2 all closed and passed in Pilot 018; Test runs were Docker-backed and independent | `PILOT_018_REPORT.md`, local RunManifest |
-| Cross-domain parallel orchestration | intentionally deferred | Phase 6 |
+| Cross-domain parallel orchestration | intentionally outside the serial operating profile | `IDEAL_LOOP_3_STAGE_PLAN.md` |
 
 ## Actual execution boundary
 
@@ -239,8 +205,9 @@ change is allowed in this experiment.
 - Do not pass the parent conversation as child context;
 - Do not delete child-task history after completion; preserve reports and close
   or archive the session according to the host policy;
-- Do not start live cross-domain orchestration before the remaining Host-backed
-  role factory, process-rebind, and independent verification gates pass.
+- Do not enable cross-domain parallel orchestration, even though the local CLI
+  Host-backed serial role factory, process rebind and independent verification
+  gates have passed.
 
 ## Document maintenance rule
 

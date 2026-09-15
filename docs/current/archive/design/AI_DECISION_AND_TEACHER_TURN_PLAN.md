@@ -7,7 +7,7 @@
 > **当前使用方式：** 阅读当前字段和请求方式时，以
 > [`apps/web/docs/CORE_API_CONTRACT.md`](../../../../apps/web/docs/CORE_API_CONTRACT.md)、
 > [`TEACHER_AND_WEB.md`](../../TEACHER_AND_WEB.md) 和
-> [`LOGIC_OPTIMIZATION_PLAN.md`](../../LOGIC_OPTIMIZATION_PLAN.md) 为准。当前教师边界是
+> [`LOGIC_OPTIMIZATION_PLAN.md`](LOGIC_OPTIMIZATION_PLAN.md) 为准。当前教师边界是
 > “一个根行动及其 Core-required choices”，不是完整对局、下一回合或整场比赛。
 
 ## 1. 文档目的

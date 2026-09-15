@@ -137,7 +137,7 @@ Training server
 | 本地产品 Docker 操作 | `LOCAL_DOCKER.md` |
 | 训练 Docker、CPU smoke、服务器 GPU 训练 | `TRAINING_DOCKER.md` |
 | AI 决策过程与教师设计历程 | `archive/design/AI_DECISION_AND_TEACHER_TURN_PLAN.md` |
-| 运行时状态、教师推演与故障逻辑优化 | `LOGIC_OPTIMIZATION_PLAN.md` |
+| 运行时状态、教师推演与故障逻辑优化（历史实施记录） | `archive/design/LOGIC_OPTIMIZATION_PLAN.md` |
 | 测试矩阵与未执行项 | `PROJECT_TEST_PLAN.md` |
 | 训练、warm-start、promotion | `TRAINING_AND_MODEL.md`、`$training-config` |
 
