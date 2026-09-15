@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import shutil
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -28,6 +29,30 @@ from typing import Iterable
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE_ROOT = "gwent_v3_architecture"
 DEFAULT_MAX_FILE_SIZE = 5 * 1024 * 1024
+
+# These are the files a new Agent must be able to read before it touches the
+# rest of the bundle.  Keep this list explicit so a refactor cannot silently
+# produce an architecture package without the current context contract.
+CONTEXT_ENTRYPOINTS = (
+    "AGENTS.md",
+    "docs/current/AGENT_ONBOARDING_INDEX.md",
+    "docs/current/agent-loop/CONTEXT_INDEX.yaml",
+    "docs/current/agent-loop/START_HERE.md",
+    "docs/current/agent-loop/CURRENT_STATE.md",
+    "docs/current/agent-entry/README.md",
+    "docs/current/agent-entry/CORE.md",
+    "docs/current/agent-entry/TRAINER.md",
+    "docs/current/agent-entry/PRODUCT.md",
+    "docs/current/agent-entry/TEACHER.md",
+    "docs/current/agent-entry/TASK_TEMPLATES.md",
+)
+
+# Historical reports remain useful for audits, but they must not be part of a
+# cold-start context by accident.  --include-history is an explicit opt-in.
+HISTORICAL_DOC_PREFIXES = (
+    "docs/history/",
+    "docs/current/agent-loop/archive/",
+)
 
 SOURCE_SUFFIXES = {".c", ".cc", ".cpp", ".h", ".hpp", ".py", ".ts", ".tsx", ".css", ".html", ".sh"}
 DOCUMENT_SUFFIXES = {".md"}
@@ -48,7 +73,7 @@ TREE_RULES: dict[str, set[str]] = {
     "apps/web/backend/tests": {".py"},
     "apps/web/frontend/src": {".ts", ".tsx", ".css"},
     "services/teacher": {".py", ".md", ".txt"},
-    "docs": {".md"},
+    "docs/current": {".md"},
     ".agents/skills": {".md", ".py"},
     "configs": {".yaml", ".yml", ".json", ".md"},
     "training": {".yaml", ".yml", ".json", ".md"},
@@ -60,6 +85,7 @@ EXACT_FILES = {
     "CMakeLists.txt",
     "config/rl_contract.json",
     "contracts/README.md",
+    "docs/current/agent-loop/CONTEXT_INDEX.yaml",
     "python/pyproject.toml",
     "apps/web/backend/requirements.txt",
     "apps/web/backend/requirements-dev.txt",
@@ -138,6 +164,11 @@ def relative(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
+def is_historical_doc(path: Path) -> bool:
+    name = relative(path)
+    return any(name.startswith(prefix) for prefix in HISTORICAL_DOC_PREFIXES)
+
+
 def is_forbidden(path: Path) -> bool:
     rel = path.relative_to(ROOT)
     if any(part in FORBIDDEN_PARTS for part in rel.parts):
@@ -151,12 +182,17 @@ def has_allowed_suffix(path: Path, suffixes: set[str]) -> bool:
     return path.suffix.lower() in suffixes
 
 
-def iter_tree(rule_root: str, suffixes: set[str]) -> Iterable[Path]:
+def iter_tree(rule_root: str, suffixes: set[str], *, include_history: bool = False) -> Iterable[Path]:
     directory = ROOT / rule_root
     if not directory.exists():
         return
     for path in sorted(directory.rglob("*")):
-        if path.is_file() and not is_forbidden(path) and has_allowed_suffix(path, suffixes):
+        if (
+            path.is_file()
+            and not is_forbidden(path)
+            and has_allowed_suffix(path, suffixes)
+            and (include_history or not is_historical_doc(path))
+        ):
             yield path
 
 
@@ -169,7 +205,12 @@ def iter_exact_prefix(prefix: str) -> Iterable[Path]:
             yield path
 
 
-def collect_files(include_tests: bool, max_file_size: int) -> tuple[list[Path], list[str]]:
+def collect_files(
+    include_tests: bool,
+    max_file_size: int,
+    *,
+    include_history: bool = False,
+) -> tuple[list[Path], list[str]]:
     selected: set[Path] = set()
     skipped: list[str] = []
 
@@ -185,7 +226,10 @@ def collect_files(include_tests: bool, max_file_size: int) -> tuple[list[Path], 
     for rule_root, suffixes in TREE_RULES.items():
         if not include_tests and rule_root in {"python/tests", "tests", "apps/web/backend/tests"}:
             continue
-        selected.update(iter_tree(rule_root, suffixes))
+        selected.update(iter_tree(rule_root, suffixes, include_history=include_history))
+
+    if include_history:
+        selected.update(iter_tree("docs/history", DOCUMENT_SUFFIXES, include_history=True))
 
     if include_tests:
         for prefix in EXACT_PREFIXES:
@@ -209,6 +253,41 @@ def collect_files(include_tests: bool, max_file_size: int) -> tuple[list[Path], 
     return files, skipped
 
 
+def git_snapshot() -> dict[str, str]:
+    """Return provenance without making Git metadata part of the archive."""
+
+    def run_git(*args: str) -> str | None:
+        try:
+            result = subprocess.run(
+                ["git", *args],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+        except OSError:
+            return None
+        if result.returncode != 0:
+            return None
+        return result.stdout.strip()
+
+    head = run_git("rev-parse", "--verify", "HEAD")
+    branch = run_git("branch", "--show-current")
+    status = run_git("status", "--short", "--untracked-files=all")
+    if status is None:
+        worktree = "unavailable"
+        changed_paths = "unknown"
+    else:
+        worktree = "clean" if not status else "dirty"
+        changed_paths = str(len(status.splitlines()))
+    return {
+        "head": head or "unavailable",
+        "branch": branch or "detached-or-unavailable",
+        "worktree": worktree,
+        "changed_paths": changed_paths,
+    }
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -226,14 +305,36 @@ def human_size(size: int) -> str:
     return f"{value:.2f} TB"
 
 
-def manifest(files: list[Path], skipped: list[str], max_file_size: int) -> str:
+def manifest(
+    files: list[Path],
+    skipped: list[str],
+    max_file_size: int,
+    *,
+    include_history: bool,
+    include_tests: bool,
+    snapshot: dict[str, str],
+) -> str:
     created = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    history_mode = "current + history" if include_history else "current context only"
+    test_mode = "included" if include_tests else "omitted"
     lines = [
         "# Gwent AI 架构包",
         "",
         f"生成时间（UTC）：{created}",
+        f"Git HEAD：{snapshot['head']}",
+        f"Git branch：{snapshot['branch']}",
+        f"Git worktree：{snapshot['worktree']} ({snapshot['changed_paths']} changed path(s))",
+        f"文档模式：{history_mode}",
+        f"测试源码：{test_mode}",
         "",
         "这是用于架构审阅的小型源码包，不是可直接运行的发布包。",
+        "",
+        "## 新 Agent 速读入口",
+        "",
+        "按以下顺序读取：`AGENTS.md` → `docs/current/AGENT_ONBOARDING_INDEX.md` → "
+        "`docs/current/agent-loop/CONTEXT_INDEX.yaml` → `docs/current/agent-loop/START_HERE.md`，",
+        "再按任务路由读取对应的 `docs/current/agent-entry/*.md`、Skill、contract 和验证命令。",
+        "当前上下文是默认入口；历史 Pilot/归档只有在审计或回归时才读取。",
         "",
         "## 已包含",
         "",
@@ -247,7 +348,8 @@ def manifest(files: list[Path], skipped: list[str], max_file_size: int) -> str:
         "- policy/checkpoint、embeddings、训练 runs、artifacts、构建产物、node_modules；",
         "- `.env`、本地密钥、缓存、日志、压缩包和超过",
         f"  {human_size(max_file_size)} 的文件；",
-        "- 完整卡牌参考导出及不属于当前本地产品架构的评测产物。",
+        "- 完整卡牌参考导出及不属于当前本地产品架构的评测产物；",
+        "- 历史文档默认不纳入；需要审计历史时使用 `--include-history`。",
         "",
         "## 使用方式",
         "",
@@ -294,6 +396,16 @@ def parse_args() -> argparse.Namespace:
         help="ZIP output path; default: packages/gwent_architecture_<timestamp>.zip",
     )
     parser.add_argument("--without-tests", action="store_true", help="omit test source files")
+    parser.add_argument(
+        "--include-history",
+        action="store_true",
+        help="include historical docs and Agent Loop archive reports (default: current context only)",
+    )
+    parser.add_argument(
+        "--require-clean",
+        action="store_true",
+        help="fail unless the source Git worktree is clean before packaging",
+    )
     parser.add_argument("--dry-run", action="store_true", help="print the selected files without creating a ZIP")
     parser.add_argument("--quiet", action="store_true", help="do not print each selected file")
     parser.add_argument("--overwrite", action="store_true", help="allow replacing an existing --output ZIP")
@@ -314,7 +426,7 @@ def output_path(args: argparse.Namespace) -> Path:
     return candidate.resolve()
 
 
-def write_archive(destination: Path, files: list[Path], skipped: list[str], max_file_size: int) -> None:
+def write_archive(destination: Path, files: list[Path], manifest_text: str) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(prefix="gwent_architecture_", suffix=".zip", dir=destination.parent, delete=False) as handle:
         temporary = Path(handle.name)
@@ -322,7 +434,7 @@ def write_archive(destination: Path, files: list[Path], skipped: list[str], max_
         with zipfile.ZipFile(temporary, mode="w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
             for path in files:
                 archive.write(path, archive_name(relative(path)))
-            archive.writestr(archive_name("ARCHITECTURE_PACKAGE.md"), manifest(files, skipped, max_file_size))
+            archive.writestr(archive_name("ARCHITECTURE_PACKAGE.md"), manifest_text)
             archive.writestr(archive_name("SHA256SUMS"), checksum_manifest(files))
 
         with zipfile.ZipFile(temporary, "r") as archive:
@@ -347,10 +459,26 @@ def main() -> int:
     args = parse_args()
     if args.max_file_size_mb <= 0:
         raise ValueError("--max-file-size-mb must be positive")
+    snapshot = git_snapshot()
+    if args.require_clean and snapshot["worktree"] != "clean":
+        raise RuntimeError(
+            "--require-clean requested, but Git worktree is "
+            f"{snapshot['worktree']} ({snapshot['changed_paths']} changed path(s))"
+        )
     max_file_size = int(args.max_file_size_mb * 1024 * 1024)
-    files, skipped = collect_files(include_tests=not args.without_tests, max_file_size=max_file_size)
+    include_tests = not args.without_tests
+    files, skipped = collect_files(
+        include_tests=include_tests,
+        max_file_size=max_file_size,
+        include_history=args.include_history,
+    )
     if not files:
         raise RuntimeError("architecture allowlist selected no files")
+
+    selected_names = {relative(path) for path in files}
+    missing_context = [path for path in CONTEXT_ENTRYPOINTS if path not in selected_names]
+    if missing_context:
+        raise RuntimeError("context entrypoints missing from architecture bundle: " + ", ".join(missing_context))
 
     destination = output_path(args)
     if destination.exists() and not args.overwrite:
@@ -358,6 +486,8 @@ def main() -> int:
 
     print(f"Project : {ROOT}")
     print(f"Mode    : {'dry run' if args.dry_run else 'create ZIP'}")
+    print(f"Docs    : {'current + history' if args.include_history else 'current context only'}")
+    print(f"Git     : {snapshot['head']} ({snapshot['worktree']})")
     print(f"Files   : {len(files)}")
     print(f"Source  : {human_size(sum(path.stat().st_size for path in files))}")
     if skipped:
@@ -371,7 +501,18 @@ def main() -> int:
     if args.dry_run:
         return 0
 
-    write_archive(destination, files, skipped, max_file_size)
+    write_archive(
+        destination,
+        files,
+        manifest(
+            files,
+            skipped,
+            max_file_size,
+            include_history=args.include_history,
+            include_tests=include_tests,
+            snapshot=snapshot,
+        ),
+    )
     print(f"ZIP     : {destination}")
     print(f"Size    : {human_size(destination.stat().st_size)}")
     print("[PASS] allowlist and archive safety verification")
