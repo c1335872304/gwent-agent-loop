@@ -3,10 +3,7 @@
 ## Agent entry
 
 - 一屏任务入口（evidence、privacy、验证、handoff）：[`agent-entry/TEACHER.md`](agent-entry/TEACHER.md)；
-- 路由、handoff 与验证选择：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
-- Teacher evidence/privacy：[`teacher-explanation`](../../.agents/skills/teacher-explanation/SKILL.md)、[`EVIDENCE_CONTRACT.md`](../../.agents/skills/teacher-explanation/references/EVIDENCE_CONTRACT.md)、[`PRIVACY_BOUNDARY.md`](../../.agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md)；
-- React/BFF/Core HTTP：[`product-integration`](../../.agents/skills/product-integration/SKILL.md)、[`CORE_API_CONTRACT.md`](../../apps/web/docs/CORE_API_CONTRACT.md)；
-- 局部实现入口：[`apps/web/README.md`](../../apps/web/README.md)、[`services/teacher/README.md`](../../services/teacher/README.md)。
+- 本文只保留 Teacher / Web 的详细 evidence、privacy 与降级事实；任务路由、Skill、reference 和验证选择统一由入口卡提供。
 
 先区分真实 AI 已执行动作、Core clone 已执行的反事实根行动链和纯 UI 展示。缺少
 authoritative evidence 时向 Core/Strategy 请求结构化字段；不要让 Teacher 决策、重算

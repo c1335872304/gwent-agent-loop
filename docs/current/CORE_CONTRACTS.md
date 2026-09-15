@@ -3,11 +3,7 @@
 ## Agent entry
 
 - 一屏任务入口（触发、边界、验证、handoff）：[`agent-entry/CORE.md`](agent-entry/CORE.md)；
-- 路由、目录、handoff 和验证选择：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
-- 必读 Skill：[`core-environment`](../../.agents/skills/core-environment/SKILL.md)；
-- action/pending-choice 语义：[`ACTION_CONTRACT.md`](../../.agents/skills/core-environment/references/ACTION_CONTRACT.md)；
-- schema/version 规则：[`SCHEMA_CONTRACT.md`](../../.agents/skills/core-environment/references/SCHEMA_CONTRACT.md)；
-- card/runtime catalog 任务：[`CARD_EXTENSION.md`](../../.agents/skills/core-environment/references/CARD_EXTENSION.md) 与 [`RUNTIME_CARD_CATALOG.md`](../../.agents/skills/core-environment/references/RUNTIME_CARD_CATALOG.md)。
+- 本文只保留 Core 与跨层 contract 的详细事实；任务路由、Skill 和 reference 选择统一由入口卡提供。
 
 Core 是规则、legal action、C ABI 与环境 contract 的 authoritative Owner。变更前先判断是
 规则、Action Grammar、Observation Schema 还是 Reward ABI；消费者只能通过明确 handoff

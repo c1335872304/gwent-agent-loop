@@ -5,11 +5,7 @@
 ## Agent entry
 
 - 一屏任务入口（HTTP、合法动作、验证、handoff）：[`PRODUCT.md`](../../docs/current/agent-entry/PRODUCT.md)；
-- 全仓库路由与最小事实集：[`AGENT_ONBOARDING_INDEX.md`](../../docs/current/AGENT_ONBOARDING_INDEX.md)；
-- 必读 Skill：[`product-integration`](../../.agents/skills/product-integration/SKILL.md)；
-- 权威 HTTP contract：[`CORE_API_CONTRACT.md`](docs/CORE_API_CONTRACT.md)；
-- 产品/Teacher 边界：[`TEACHER_AND_WEB.md`](../../docs/current/TEACHER_AND_WEB.md)；
-- 验证矩阵与 Docker 证据规则：[`PROJECT_TEST_PLAN.md`](../../docs/current/PROJECT_TEST_PLAN.md)。
+- 本文只保留 Web 产品拓扑与实现边界；HTTP contract、Teacher 交接和验证选择统一由入口卡提供。
 
 修改前先确定是否只涉及 UI/BFF，还是会改变 Core HTTP contract 或 Teacher evidence。
 前者由 Product Owner 完成；后两者必须通过 Core 或 Teacher 的显式 contract handoff，

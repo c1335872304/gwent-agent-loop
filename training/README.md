@@ -5,11 +5,7 @@
 ## Agent entry
 
 - 一屏任务入口（任务类型、资产边界、验证、handoff）：[`TRAINER.md`](../docs/current/agent-entry/TRAINER.md)；
-- 全仓库路由与验证等级：[`AGENT_ONBOARDING_INDEX.md`](../docs/current/AGENT_ONBOARDING_INDEX.md)；
-- 必读 Skill：[`training-config`](../.agents/skills/training-config/SKILL.md)；
-- 训练、checkpoint、promotion 边界：[`TRAINING_AND_MODEL.md`](../docs/current/TRAINING_AND_MODEL.md)；
-- Core schema/action contract：[`CORE_CONTRACTS.md`](../docs/current/CORE_CONTRACTS.md) 与 [`rl_contract.json`](../config/rl_contract.json)；
-- 运行输出与长期资产：[`runs/README.md`](../runs/README.md)、[`artifacts/README.md`](../artifacts/README.md)。
+- 本文只保留 Training Task 的生命周期和运行接口事实；任务分类、Skill、资产和验证选择统一由入口卡提供。
 
 先判断任务是算法 config、正式 Training Task、resume、warm-start、evaluation 还是
 promotion。环境 schema/action grammar 由 Core 定义；Trainer 只判断兼容性与迁移策略，

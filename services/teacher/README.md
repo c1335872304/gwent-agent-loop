@@ -5,11 +5,7 @@
 ## Agent entry
 
 - 一屏任务入口（evidence、privacy、验证、handoff）：[`TEACHER.md`](../../docs/current/agent-entry/TEACHER.md)；
-- 全仓库路由与 handoff：[`AGENT_ONBOARDING_INDEX.md`](../../docs/current/AGENT_ONBOARDING_INDEX.md)；
-- 必读 Skill：[`teacher-explanation`](../../.agents/skills/teacher-explanation/SKILL.md)；
-- evidence 结构：[`EVIDENCE_CONTRACT.md`](../../.agents/skills/teacher-explanation/references/EVIDENCE_CONTRACT.md)；
-- 隐私边界：[`PRIVACY_BOUNDARY.md`](../../.agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md)；
-- 产品集成和降级行为：[`TEACHER_AND_WEB.md`](../../docs/current/TEACHER_AND_WEB.md)。
+- 本文只保留 Teacher Runtime 的组件和接口事实；evidence、privacy、验证与跨域 handoff 统一由入口卡提供。
 
 缺少结构化事实时，先交给 Core/Strategy 扩展 contract；纯展示、loading 或 error UX
 交给 Product。不要让 Teacher 通过重算动作、解析 label 或读取隐藏信息补齐 evidence。
