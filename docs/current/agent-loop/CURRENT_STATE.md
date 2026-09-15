@@ -29,9 +29,9 @@ stage, commit or clean them.
 
 The current E4 field result is summarized in
 [`E4_REGRESSION_20260915_REPORT.md`](E4_REGRESSION_20260915_REPORT.md). The machine
-PromotionReport is `ready_for_human_gate`, but target-001 still needs a final
-RunManifest under the corrected aggregate budget before a human can safely approve
-promotion. E5 Proposal generation and E6 Trainer handoff therefore remain closed.
+PromotionReport is `ready_for_human_gate`; target-001's corrected revision-3
+Baseline/Evolved RunManifests are complete and budget-valid. E4 still needs an
+explicit human decision before E5 Proposal generation and E6 Trainer handoff.
 
 Earlier Product, Docker, recovery, Scheduler and privacy-finding pilots explain
 how this operating profile was reached, but they are not part of the default
@@ -48,9 +48,9 @@ condition.
   elapsed `364.257s`, 4 model turns; budget gate passed;
 - Python syntax gate: 130 files passed against the current local snapshot;
 - E4 fixed regression: 4 cases validated (2 target, 1 control, 1 safety); machine
-  gates passed except human approval, with target avoidable detours 2 → 0. The
-  report remains conditional because target-001 lacks a final budget-valid
-  RunManifest; see `E4_REGRESSION_20260915_REPORT.md`;
+  gates passed except human approval, with target avoidable detours 2 → 0. T001
+  revision-3 Baseline/Evolved RunManifests are budget-valid and Docker-backed;
+  see `E4_REGRESSION_20260915_REPORT.md`;
 - Live phase-two Product pilot: Owner recovered once after an injected loss;
   candidate integration and post-integration independent Test/Verification
   passed in the Codex worktree; the disjoint candidate was also applied to

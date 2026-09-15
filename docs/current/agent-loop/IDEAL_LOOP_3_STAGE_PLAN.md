@@ -186,8 +186,8 @@ Runner backend，补齐 snapshot restore/rebind、跨角色 contract handoff，�
 `archive/pilots/PILOT_010_REPORT.md` 和 `PILOT_018_REPORT.md` 分别记录模型无关 canary 与真实
 Product → Teacher → Test canary。最终候选已在明确授权后合入外部 `main`；四个
 历史 ZIP 仍保留为未提交、不可读取的用户改动。自进化 E4 已生成机器回归报告，
-但 target-001 的最终 RunManifest 仍需补齐，尚未进入 E5。后续只处理可选 Host 适配和单独
-门禁，不改变当前串行安全边界。
+但 E4 仍等待人工 PromotionReport 决策，尚未进入 E5。后续只处理 E5 只读提案、
+Trainer 资格校验和可选 Host 适配，不改变当前串行安全边界。
 
 ## 维护规则
 

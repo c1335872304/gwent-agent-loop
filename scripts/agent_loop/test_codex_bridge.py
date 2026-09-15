@@ -42,6 +42,7 @@ class CodexBridgeTests(unittest.TestCase):
         )
         self.assertIn("tested_snapshot", launch.prompt)
         self.assertIn("exact full command string", launch.prompt)
+        self.assertIn("status exactly to one of PASS, FAIL, NOT_RUN, or INCONCLUSIVE", launch.prompt)
 
     def test_requires_git_project_and_git_snapshot(self):
         with self.assertRaisesRegex(CodexBridgeError, "Git project"):

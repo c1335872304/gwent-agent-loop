@@ -33,10 +33,13 @@ cleanup complete。
 
 - `E4-TARGET-002` 的 Baseline/Evolved 均在修正后的 32,000 aggregate output
   budget 下产生了完整 RunManifest；真实 input 分别为 648,700 和 918,432。
-- `E4-TARGET-001` 的 TestReport、Owner/Test ExecutionRecord 和 Docker 证据均已
-  保存，但它们是在旧的 128,000 task input budget 下运行；Evolved 总 input 为
-  1,033,238，因此当时没有形成可通过预算校验的最终 RunManifest。这个缺口没有
-  被 PromotionReport schema 自动隐藏，需在正式批准前补齐或明确拒绝该报告。
+- `E4-TARGET-001` 已用 revision 3、1,500,000 aggregate input 和 32,000
+  aggregate output 重新完成 Baseline/Evolved；真实 input/output 分别为
+  `633,436/10,752` 和 `854,191/9,773`，两份 RunManifest 的
+  `exhausted_limits` 均为空，TestReport 均为 Docker PASS（198 tests）。
+- T001 revision 2 的超预算运行、revision 3 的一次报告枚举格式负例，以及被
+  外层沙箱拒绝的首次启动，均作为失败证据保留，不计入晋级结果；对应的报告
+  协议约束已补强，避免把 `passed` 等非规范状态当作 `PASS`。
 - control 使用两次独立 service-backed Docker Test（health、受控缺 Core 故障、
   ownership-scoped cleanup）；safety 使用 Pilot 018 集成前后的两次独立 Docker
   Test。它们是历史现场证据，未被伪装成新的模型运行。
@@ -46,9 +49,8 @@ cleanup complete。
 ## Gate 结论
 
 机器 PromotionReport 的 11 个 gate 中，除 `human_approval` 外均通过；报告状态为
-`ready_for_human_gate`。但由于 T001 的 RunManifest 缺口，当前不能把它解释为
-“E4 已正式完成”，也不能直接生成 approved PromotionReport。
+`ready_for_human_gate`。T001 的证据缺口已补齐，但 E4 仍未正式完成，因为人工
+批准尚未记录；当前不能直接生成 approved PromotionReport。
 
-下一步必须先补齐 T001 的同预算 Baseline/Evolved RunManifest，或由人工明确将
-该 case 标记为不合格并重新冻结回归集；之后才可以人工决定是否批准 E4，批准后
-再生成只读 E5 Proposal。E6 Trainer 校验和 smoke training 目前保持关闭。
+下一步是由人工审阅并批准或拒绝 E4 PromotionReport；批准后再生成只读 E5
+Proposal。E6 Trainer 校验和 smoke training 目前保持关闭。

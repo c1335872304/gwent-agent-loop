@@ -324,6 +324,29 @@ regression_test: "scripts/agent_loop/test_manifest_completion.py"
 trigger_terms: ["max_model_output_tokens", "aggregate budget", "serial Owner Test", "exhausted_limits"]
 ```
 
+### LL-015: TestReport 枚举值必须在 Host 提示中逐字固定
+
+```yaml
+id: "LL-015"
+status: "confirmed"
+discovered_at: "2026-09-15"
+task_id: "E4-TARGET-001"
+scope: "loop | protocol"
+symptom: "A Docker run passed 198 tests and returned overall=PASS, but the Test Agent used results[].status=passed, so the strict report validator rejected the otherwise valid evidence."
+impact: "The loop stopped before producing a final RunManifest and the successful Docker evidence could not enter the fixed regression set."
+root_cause: "The Host prompt described the TestReport shape but did not enumerate the exact uppercase result-status values accepted by the validator."
+evidence:
+  - ref: ".agent-loop/host-artifacts/E4-TARGET-001/e4-t001-baseline-r4-test.json"
+  - ref: "scripts/agent_loop/report_validation.py"
+  - ref: "scripts/agent_loop/codex_bridge.py"
+correct_practice: "State the exact enum values in the Host prompt and keep the validator strict; never silently normalize an unrecognized report status into PASS."
+verification:
+  - "scripts/agent_loop/test_codex_bridge.py passed the exact status instruction assertion"
+  - "T001 revision-3 Baseline/Evolved TestReports used results[].status=PASS"
+regression_test: "scripts/agent_loop/test_codex_bridge.py"
+trigger_terms: ["TestReport status", "passed vs PASS", "report enum", "protocol drift"]
+```
+
 1. 先确认它不是已有 Skill、contract 或导航条目的重复内容；
 2. 保存最小可验证症状，不复制整段聊天或敏感日志；
 3. 记录来源和 snapshot；
