@@ -2,7 +2,7 @@
 
 > **Canonical current-state document**
 > **Last verified:** 2026-09-15
-> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；直接父工作树集成仍保持人工 gate
+> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；本次上下文治理变更已按批准路径同步外部 `main`；未明确批准的父工作树变更仍保持人工 gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
 This is the only document that describes the current Agent Loop status. Phase
@@ -21,11 +21,12 @@ rebound from a new Scheduler process, handed to an independent Teacher review,
 verified by two independent Docker Test runs, integrated in an isolated
 branch/worktree, rolled back in isolation, and closed with a completed
 RunManifest. Direct mutations outside an explicitly approved path remain
-`HUMAN_REQUIRED`. The externally saved `main` currently resolves to `406e170`; the
-previously recorded candidate commit `eec999c` is not the current `main` tip, so this
-document makes no claim that it is currently integrated. The external worktree also
-has four pre-existing tracked ZIP deletion entries; this task did not restore, stage,
-commit or clean them.
+`HUMAN_REQUIRED`. The externally saved `main` currently resolves to `7f91f06`; this
+documentation/context-governance audit is integrated there as the path-scoped commit
+`docs: consolidate context authority`. The previously recorded candidate commit
+`eec999c` is not the current `main` tip. The external worktree also has four
+pre-existing tracked ZIP deletion entries; this task did not restore, stage, commit or
+clean them.
 
 Earlier Product, Docker, recovery, Scheduler and privacy-finding pilots explain
 how this operating profile was reached, but they are not part of the default
@@ -47,7 +48,9 @@ condition.
   isolated branch `agent-loop/GW-REAL-PRODUCT-001/integration-2` at snapshot
   `227d71ed978aca33e37ee1ddee270fec11391fa8`; the explicitly authorized
   path-scoped external-main commit is
-  `481f3b1937895826bd2e8eaf4290babcf0dad11b`;
+  `481f3b1937895826bd2e8eaf4290babcf0dad11b`; this documentation/context-governance
+  audit was subsequently integrated to the external `main` as `7f91f06` using the
+  same explicit path-scoped procedure;
 - Service-backed Product verification: Core/BFF/Web healthy, Product HTTP smoke
   passed, missing-Core injection produced BFF `unhealthy` with classified
   `DOCKER_FAILURE`, and isolated containers/network cleanup completed;
@@ -192,9 +195,10 @@ change is allowed in this experiment.
 - optionally wire an external Desktop/MCP Codex Host factory to the same durable
   lookup/hydration path; the local CLI reference implementation and its
   separate-process regression are complete;
-- the external `/mnt/c/codes/gwent_v4` `main` currently points to `406e170`, not
-  the earlier candidate `eec999c`; no integration was performed by this documentation
-  audit. Its four tracked ZIP deletion entries remain outside this task's scope;
+- the external `/mnt/c/codes/gwent_v4` `main` currently points to `7f91f06`; the
+  context-governance audit is integrated, while the earlier candidate `eec999c` is not
+  the current tip. Its four tracked ZIP deletion entries remain outside this task's
+  scope and were left untouched;
 - preserve the fail-closed decision when any role or platform rebind is absent;
 - keep cross-domain parallelism, automatic repair, deployment, promotion, and
   model changes disabled until they receive separate bounded canaries.
