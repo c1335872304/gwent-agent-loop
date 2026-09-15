@@ -1,5 +1,5 @@
 index_version: 1
-workspace_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+workspace_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
 generated_at: "2026-09-16"
 entry_cards:
   core:
@@ -73,7 +73,7 @@ entries:
       - {path: "AGENTS.md", locator: "路由 and Agent sections", source_kind: "rule"}
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "角色与职责", source_kind: "architecture"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["agent routing", "domain owner", "manager agent", "handoff"]
@@ -91,7 +91,7 @@ entries:
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "记录格式 and confirmed lessons", source_kind: "lesson_policy"}
       - {path: "AGENTS.md", locator: "Agent Loop boundaries and no Manager Agent", source_kind: "rule"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["self-evolution", "detour", "path analysis", "avoidance rule", "experience layer", "shadow retrieval", "promotion"]
@@ -108,7 +108,7 @@ entries:
       - {path: ".agents/skills/core-environment/references/ACTION_CONTRACT.md", locator: "action contract", source_kind: "contract"}
       - {path: ".agents/skills/product-integration/SKILL.md", locator: "legal action", source_kind: "skill"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["legal action", "option_index", "action grammar", "frontend action"]
@@ -124,7 +124,7 @@ entries:
       - {path: "AGENTS.md", locator: "Teacher Coding Agent", source_kind: "rule"}
       - {path: ".agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md", locator: "privacy boundary", source_kind: "contract"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["Teacher", "explanation", "hidden information", "privacy", "evidence"]
@@ -141,7 +141,7 @@ entries:
       - {path: ".agents/skills/training-config/SKILL.md", locator: "warm-start/resume/model promotion", source_kind: "skill"}
       - {path: "artifacts/checkpoints/registry.yaml", locator: "registry", source_kind: "contract"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["checkpoint", "warm-start", "resume", "model promotion", "policy.pt"]
@@ -156,7 +156,7 @@ entries:
     source_refs:
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "预算、熔断与退出", source_kind: "architecture"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["token budget", "retry", "infinite loop", "subtask depth", "runner loss"]
@@ -173,7 +173,7 @@ entries:
       - {path: "scripts/agent_loop/codex_bridge.py", locator: "TestReport exact status instruction", source_kind: "host_protocol"}
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "LL-015", source_kind: "lesson"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["TestReport status", "PASS enum", "protocol drift", "Docker evidence"]
@@ -190,7 +190,7 @@ entries:
       - {path: "scripts/agent_loop/execution.py", locator: "RunnerExecution.recover and _finalize_retry_learning", source_kind: "host_protocol"}
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "LL-016", source_kind: "lesson"}
     verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-preflight@44cc1fe; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_snapshot: "external-main@289d53b; local-doc-cleanup@7ad56bb; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["retry learning", "learning delta", "STOP_NO_LEARNING", "repeat failure", "retry gate"]
