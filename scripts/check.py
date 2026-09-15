@@ -204,6 +204,7 @@ def check_agent_loop() -> None:
         "-q",
         "scripts.agent_loop.test_control_plane",
         "scripts.agent_loop.test_documentation",
+        "scripts.agent_loop.test_experience",
         "scripts.agent_loop.test_packaging",
         "scripts.agent_loop.test_schema_validation",
         "scripts.agent_loop.test_persistence",

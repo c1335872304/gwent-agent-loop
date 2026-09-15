@@ -86,6 +86,7 @@ EXACT_FILES = {
     "config/rl_contract.json",
     "contracts/README.md",
     "docs/current/agent-loop/CONTEXT_INDEX.yaml",
+    "docs/current/agent-loop/EXPERIENCE_MANIFEST_TEMPLATE.yaml",
     "python/pyproject.toml",
     "apps/web/backend/requirements.txt",
     "apps/web/backend/requirements-dev.txt",

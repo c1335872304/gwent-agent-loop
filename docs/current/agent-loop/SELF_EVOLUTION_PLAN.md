@@ -1,6 +1,6 @@
 # Agent Loop 自进化阶段计划
 
-> **状态：当前规划，尚未代表运行时已实现**
+> **状态：E0–E1 candidate-only 已实现；E2–E6 尚未启用**
 > **最后整理：2026-09-15**
 > **默认读取：是；历史讨论：见 [`archive/SELF_EVOLUTION_DISCUSSION_20260915.md`](archive/SELF_EVOLUTION_DISCUSSION_20260915.md)**
 
@@ -375,22 +375,28 @@ Rollback Success Rate
 
 > 在相同前置条件下，不重复已经被证据证明可以避免的失败；在不同条件下，不误用旧规则。
 
-## 8. 第一项实施任务
+## 8. E0–E1 实施边界与下一步
 
-第一项 TaskPacket 应限定为：
+E0–E1 已实现为 `scripts/agent_loop/experience.py`：它只接收结构化 Trace 和可选的
+RunManifest/TestReport/ChangeReport，生成 PathAnalysis、DetourRecord、Candidate Lesson
+和 candidate-only ExperienceManifest。当前实现不读取原始对话、不调用模型、不检索经验、不
+注入 ContextBrief，也不修改 Skill、Routing、Scheduler、contract、生产代码或模型。
 
-> 新增 PathAnalysis、Detour Schema、Candidate Store 和确定性 Extractor。输入只允许来自
-> RunManifest、TestReport、ChangeReport 和 Execution Trace；禁止自动注入，禁止修改 Skill、
-> Scheduler、Routing、contract、生产代码和模型。
+## 9. 下一项实施任务：E2 Shadow Retrieval
+
+E0–E1 的确定性路径分析已经完成。下一项 TaskPacket 应限定为：
+
+> 读取 `candidate` 和已确认经验，按显式 domain、task_type、changed paths、contract
+> version、snapshot 和触发条件做 Shadow Retrieval；只记录 selected/excluded 及原因，禁止
+> 注入 ContextBrief，禁止修改 Skill、Scheduler、Routing、contract、生产代码和模型。
 
 必须交付：
 
-- schema 和 validator；
-- 至少覆盖工具失败、重复重试、错误环境、错误文件范围和成功回退；
-- observed facts 与 inference 分离；
-- snapshot、contract、privacy 和 evidence 校验；
-- `ExperienceManifest`；
-- 独立 TestReport；
+- 显式字段匹配器和过期/冲突/版本不兼容过滤；
+- selected、excluded、排除原因和检索成本报告；
+- 检索不可用时继续使用基线 ContextBrief；
+- 独立回归：相关命中、无关排除、过期排除、冲突排除、candidate 不可检索；
 - 不新增 Agent、不引入并行、不改变当前串行安全边界。
 
-这一步完成后，系统才真正拥有“分析弯路”的基础；在此之前直接做自动经验注入，风险高于收益。
+E2 完成前，`candidate` 仍不能影响 Agent 行为；E3 才允许将已确认经验以有限 advisory 形式
+加入 ContextBrief。

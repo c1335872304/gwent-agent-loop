@@ -29,7 +29,7 @@
 | 已确定的 Core / Trainer / Product / Teacher 实施任务 | [`agent-entry/README.md`](agent-entry/README.md) | 只打开对应领域卡 → Skill → 该卡列出的 contract 与最近回归 |
 | 脏工作树、分支、隔离集成或 rollback | [`GIT_MANAGEMENT.md`](GIT_MANAGEMENT.md) | 当前 TaskPacket/snapshot → [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md) |
 | 复核旧决策、Pilot 或实施过程 | [`archive/README.md`](archive/README.md) | [`agent-loop/archive/README.md`](agent-loop/archive/README.md)；只按需读取 |
-| 自进化、弯路分析、经验检索或 Promotion | [`agent-loop/SELF_EVOLUTION_PLAN.md`](agent-loop/SELF_EVOLUTION_PLAN.md) | `RunManifest`、`TestReport`、`PathAnalysis` 和按需读取讨论归档 |
+| 自进化、弯路分析、经验检索或 Promotion | [`agent-loop/SELF_EVOLUTION_PLAN.md`](agent-loop/SELF_EVOLUTION_PLAN.md) | [`agent-loop/EXPERIENCE_PROTOCOL.md`](agent-loop/EXPERIENCE_PROTOCOL.md) → `RunManifest`、`TestReport`、`PathAnalysis`；讨论归档仅按需读取 |
 
 ### 最小读取顺序
 

@@ -1,0 +1,45 @@
+# ExperienceManifest v1：E0-E1 候选经验账本
+schema: "agent-loop.experience-manifest.v1"
+schema_version: 1
+experience_id: "<task-id>-experience-<revision>"
+task_id: ""
+task_revision: 1
+status: "candidate_only"
+
+# E1 必须保持关闭；E2/E3 未完成前不得改为 true。
+injection:
+  enabled: false
+  reason: "E1 candidate-only; no automatic ContextBrief injection"
+
+sources:
+  - ref: ""
+    snapshot: ""
+    kind: "structured_artifact"
+
+compatibility:
+  contract_versions: {}
+
+path_analysis:
+  schema: "agent-loop.path-analysis.v1"
+  counts:
+    planned_steps: 0
+    actual_steps: 0
+    ignored_events: 0
+    failed_actions: 0
+    avoidable_detours: 0
+    necessary_explorations: 0
+    successful_fallbacks: 0
+    repeated_actions: 0
+    extra_tool_calls: 0
+    extra_model_turns: 0
+    extra_elapsed_seconds: 0
+    extra_input_tokens: 0
+    extra_output_tokens: 0
+  detour_ids: []
+
+candidate_lesson_ids: []
+
+promotion:
+  status: "not_started"
+  requires_independent_evidence: true
+  human_gate_required: true
