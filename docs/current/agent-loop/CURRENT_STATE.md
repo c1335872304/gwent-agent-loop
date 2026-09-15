@@ -21,16 +21,18 @@ rebound from a new Scheduler process, handed to an independent Teacher review,
 verified by two independent Docker Test runs, integrated in an isolated
 branch/worktree, rolled back in isolation, and closed with a completed
 RunManifest. Direct mutations outside an explicitly approved path remain
-`HUMAN_REQUIRED`; the external dirty `main` was not touched.
+`HUMAN_REQUIRED`; after explicit approval, the verified candidate is now in the
+external `main` at `eec999c`; only the two historical ZIP changes remain untouched.
 
 Historical live pilot `GW-REAL-PRODUCT-001` completed one Product Owner with a
 controlled Runner loss and same-runner bounded resume, followed by one
 independent Test/Verification run. The candidate was integrated into the
 phase-two Codex worktree after the explicit human decision and passed a second
 independent Test/Verification run there. The separate external `main` checkout
-now contains the approved path-scoped Product, line-ending, and Agent Loop
-documentation commits `481f3b1`, `eecd26f`, and `49d18de`; two historical
-architecture ZIP modifications remain intentionally untouched. The new
+now contains the approved path-scoped Product, line-ending, Agent Loop
+documentation, and final Product candidate commits `481f3b1`, `eecd26f`,
+`49d18de`, `94ff768`, and `eec999c`; two historical architecture ZIP
+modifications remain intentionally untouched. The new
 isolated branch/worktree path also automatically applied the disjoint candidate
 and passed changed-path and clean-worktree checks. Direct mutations outside an
 explicitly approved path remain `HUMAN_REQUIRED`. An initial metric audit stopped at
@@ -221,9 +223,9 @@ change is allowed in this experiment.
 - optionally wire an external Desktop/MCP Codex Host factory to the same durable
   lookup/hydration path; the local CLI reference implementation and its
   separate-process regression are complete;
-- direct integration into `/mnt/c/codes/gwent_v4` `main` remains a human gate;
-  the approved candidate is already applied and verified in an isolated
-  branch/worktree;
+- direct integration into `/mnt/c/codes/gwent_v4` `main` was completed after
+  explicit approval; the final candidate is present at `eec999c`, while the two
+  historical ZIP changes remain uncommitted and untouched;
 - preserve the fail-closed decision when any role or platform rebind is absent;
 - keep cross-domain parallelism, automatic repair, deployment, promotion, and
   model changes disabled until they receive separate bounded canaries.

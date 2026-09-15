@@ -1,7 +1,7 @@
 # 理想 Agent Loop 三阶段路线图
 
 > **当前版本：** 0.1
-> **当前所在：** 阶段三本地 Codex CLI Host 多角色串行 canary 已通过；直接父工作树集成闸门仍需人工处理
+> **当前所在：** 阶段三本地 Codex CLI Host 多角色串行 canary 已通过；经明确授权后已合入外部 `main`
 > **权威现状：** [`CURRENT_STATE.md`](CURRENT_STATE.md)
 
 这份文档把原来的 Phase 0–7 压缩成三个可验收的工程阶段。以后推进只
@@ -173,21 +173,20 @@ Test/Verification 组合成可重复的多 Agent 工作流。
 revision-5 的真实 Product Owner、新 Scheduler 进程 restore/rebind、Teacher
 contract/privacy review、两轮独立 Docker Test、隔离 branch/worktree 集成、
 rollback 和完整 RunManifest。真实 token/elapsed 指标、Docker health/failure/
-cleanup 证据和 changed-path/contract gate 均已收口。直接父工作树集成仍是
-人工闸门；外部 Desktop/MCP Host 适配、并行编排、自动修复和生产写入仍不在
-当前受限运行模式内。
+cleanup 证据和 changed-path/contract gate 均已收口；经明确授权的最终候选已
+合入外部 `main`。外部 Desktop/MCP Host 适配、并行编排、自动修复和生产写入
+仍不在当前受限运行模式内。
 
 阶段三 P0 的串行 Scheduler 已实现并由 `PILOT_009_REPORT.md` 验证：
 `max_concurrency=1` 下按 owner 路由、FIFO 排队，暂停任务继续占用调度槽，
 并对任务数、tokens、turns 和 elapsed 设置硬上限。
 
-阶段三控制面已完成：Scheduler 已接入显式 per-role Runner backend，补齐了
-snapshot restore/rebind、跨角色 contract handoff，并通过模型无关的多角色
-串行 canary（`PILOT_010_REPORT.md`）。下一步只剩把这些 factory 接到真实
-Codex Host，并做一次低风险 live 多角色验证；外部 main 的混合 index 仍保留，只有本次
-明确授权的 `apps/web/frontend/index.html` 已通过路径级提交合入。若要继续直接
-写入该 main，再由人工决定处理方式。当前已应用
-的 Product commit、隔离分支和父工作树现有改动均须继续保留审计记录。
+阶段三控制面和本地真实 Host 现场验证均已完成：Scheduler 已接入显式 per-role
+Runner backend，补齐 snapshot restore/rebind、跨角色 contract handoff，并由
+`PILOT_010_REPORT.md` 和 `PILOT_018_REPORT.md` 分别记录模型无关 canary 与真实
+Product → Teacher → Test canary。最终候选已在明确授权后合入外部 `main`；两个
+历史 ZIP 仍保留为未提交、不可读取的用户改动。后续只处理可选 Host 适配和单独
+门禁，不改变当前串行安全边界。
 
 ## 维护规则
 

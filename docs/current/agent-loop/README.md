@@ -1,5 +1,11 @@
 # Agent Loop 工件模板
 
+## 新对话入口
+
+新 Agent 或新对话先读 [`START_HERE.md`](START_HERE.md)。它集中说明读取顺序、
+责任域路由、默认串行模式、本地 Codex CLI、Docker 验证、停止条件和交付物；
+不要依赖旧聊天记录或临时记忆重新摸索。
+
 这些模板是 [`AGENT_LOOP_PLAN.md`](../AGENT_LOOP_PLAN.md) 的可提交、人工可读部分。
 
 项目导航：[AGENT_LOOP_NAVIGATION.md](../AGENT_LOOP_NAVIGATION.md)；阶段计划：[AGENT_LOOP_PHASE_PLAN.md](../AGENT_LOOP_PHASE_PLAN.md)；模型范围：[MODEL_SCOPE.md](MODEL_SCOPE.md)；坑记录：[LESSONS_LEARNED.md](LESSONS_LEARNED.md)。
@@ -22,9 +28,9 @@
 - Phase 2 integration gate: `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `integration.py`, and its deterministic tests provide read-only planning, explicit approval, disjoint isolated auto-integration, and applied-snapshot recording; direct mutation of a dirty parent remains human-gated;
 - Phase 3 P0 Scheduler: `scheduler.py` and `test_scheduler.py` provide serial FIFO routing, pause/resume/end, hard concurrency/task/token/time limits and append-only scheduling evidence; `PILOT_009_REPORT.md` records the canary;
 - Phase 3 Runner backend: `scheduler_backend.py` and `test_scheduler_backend.py` bind `RunnerExecution` to the Scheduler, preserve cumulative metrics as deltas, count model turns, and require persisted resume artifacts;
-- Phase 3 multi-role control plane: `MultiRoleRunnerExecutionBackend`, strict Scheduler restore/rebind and `ContractHandoffEnvelope` are covered by `PILOT_010_REPORT.md`; the canary is model-free and the live Host rebind remains a separate gate;
+- Phase 3 multi-role control plane: `MultiRoleRunnerExecutionBackend`, strict Scheduler restore/rebind and `ContractHandoffEnvelope` are covered by `PILOT_010_REPORT.md`; the model-free control-plane canary and the real local CLI Host-backed canary are both recorded;
 - Live multi-role canary design: `PILOT_011_TASK_DESIGN.md` defines the bounded Product → Teacher → Test task, restart injection point, budget and fail-closed conditions;
-- Codex transport boundary: `CODEX_TRANSPORT.md`, `scripts/agent_loop/codex_bridge.py`, `scripts/agent_loop/codex_cli_bridge.py`, and `scripts/agent_loop/bounded_loop.py` are implemented; the Desktop MCP adapter remains injectable;
+- Codex transport boundary: `CODEX_TRANSPORT.md`, `scripts/agent_loop/codex_bridge.py`, `scripts/agent_loop/codex_cli_bridge.py`, and `scripts/agent_loop/bounded_loop.py` are implemented and locally verified; the Desktop MCP adapter remains optional;
 - Phase 4 试点：已完成一次无业务代码写入的 Pilot 001，证据位于 `pilots/`；
 - 阶段记录：[PHASE_1_STATUS.md](PHASE_1_STATUS.md)、[PHASE_2_STATUS.md](PHASE_2_STATUS.md)、[PHASE_3_STATUS.md](PHASE_3_STATUS.md)、[PHASE_4_STATUS.md](PHASE_4_STATUS.md)。
 

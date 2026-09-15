@@ -20,12 +20,20 @@ $core-environment      $training-config     $product-integration
 
 不要新增 manager Agent。跨边界任务由最接近事实来源的 Agent 主导，通过 contract 与验证结果 handoff。
 
+## 新对话固定入口
+
+处理 Agent Loop 或仓库研发任务时，先读取
+[`docs/current/agent-loop/START_HERE.md`](docs/current/agent-loop/START_HERE.md)，
+再按其中的顺序读取 `CURRENT_STATE.md`、对应 Skill、contract、测试和 Lessons。
+不要依赖旧聊天记录、临时记忆或全仓库扫描来推断当前状态；未知、越权、权限、
+隐私、snapshot、预算和宿主恢复问题必须停止为 `HUMAN_REQUIRED`。
+
 ## 当前架构阶段边界
 
 - 当前主要工作是 Agent Loop、上下文工程和项目架构；`models/v3/policy.pt` 按 [`docs/current/agent-loop/MODEL_SCOPE.md`](docs/current/agent-loop/MODEL_SCOPE.md) 暂时视为正确且冻结的输入。
 - 架构任务不得自动加载、哈希扫描、重训、迁移、替换或删除模型；需要模型结构、checkpoint、promotion 或 PyTorch loader 验证时，才路由给 Trainer。
-- `python scripts/check.py quick` 是全项目门禁，会进入 Trainer 的 `validate_training.py --all`；它不是架构专用检查。架构任务使用 `python scripts/check.py architecture`，它不进入 Trainer/torch。
-- Test / Verification Agent 的配置已实现于 `.codex/agents/test-verification.toml`，但跨会话自动 Runner 尚未实现；Docker 只有在 TaskPacket 和 TestMatrix 明确需要服务依赖时才启动，并且必须执行 cleanup。
+- `python3 scripts/check.py quick` 是全项目门禁，会进入 Trainer 的 `validate_training.py --all`；它不是架构专用检查。架构任务使用 `python3 scripts/check.py architecture`，它不进入 Trainer/torch。
+- Test / Verification Agent 的配置已实现于 `.codex/agents/test-verification.toml`；本地 Codex CLI 的跨进程 Runner lookup/rebind 已实现并通过现场 canary，Desktop/MCP 仍是可选适配；Docker 只有在 TaskPacket 和 TestMatrix 明确需要服务依赖时才启动，并且必须执行 cleanup。
 
 ## 路由
 
@@ -127,11 +135,11 @@ Strategy Core         --evidence-->   Teacher Runtime --text--> React panel
 ## 验证
 
 ```bash
-python scripts/check.py architecture
-python scripts/check.py quick
-python scripts/check.py test
-python scripts/check.py full
-python scripts/check.py train
+python3 scripts/check.py architecture
+python3 scripts/check.py quick
+python3 scripts/check.py test
+python3 scripts/check.py full
+python3 scripts/check.py train
 
 PYTHONPATH=. pytest -q services/teacher/tests
 PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests
