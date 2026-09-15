@@ -73,7 +73,6 @@ entries:
     claim: "A loop must have whole-task limits for role runs, subtasks, depth, tokens, turns and elapsed time; exhaustion stops new model work."
     source_refs:
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "预算、熔断与退出", source_kind: "architecture"}
-      - {path: "docs/current/AGENT_LOOP_PHASE_PLAN.md", locator: "Phase 2 / budget", source_kind: "architecture"}
     verified_at: "2026-09-13 0000"
     verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
     status: "confirmed"

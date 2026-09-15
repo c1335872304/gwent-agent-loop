@@ -4,16 +4,16 @@
 >
 > 本记录是阶段实施状态，不替代 [`AGENT_LOOP_PHASE_PLAN.md`](../AGENT_LOOP_PHASE_PLAN.md) 的协议定义。
 >
-> 当前状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件中的“尚未实现”均是本阶段当时的历史记录，不是当前待办。
+> 当前状态请以 [`CURRENT_STATE.md`](../../CURRENT_STATE.md) 为准；本文件中的“尚未实现”均是本阶段当时的历史记录，不是当前待办。
 
 ## 已落地
 
-1. [`AGENT_PROFILE_TEMPLATE.yaml`](AGENT_PROFILE_TEMPLATE.yaml)：统一角色能力、读写范围、Docker 权限、预算和停止条件的字段。
-2. `profiles/` 下的四个领域 Owner 与 [`context-integration.yaml`](profiles/context-integration.yaml) 的第一版 Profile。
-3. [`profiles/test-verification.yaml`](profiles/test-verification.yaml)：验证角色的 Profile；允许测试范围内编辑，不允许修改生产实现或降低断言标准。
-4. [`CONTEXT_INDEX_TEMPLATE.yaml`](CONTEXT_INDEX_TEMPLATE.yaml)：事实索引模板，要求来源、snapshot、状态、owner、trigger terms 和坑记录引用。
-5. [`CONTEXT_INDEX.yaml`](CONTEXT_INDEX.yaml)：基于当前未提交工作树的第一版事实索引，包含路由、Core legality、Teacher privacy、模型 provenance 和 Loop 预算五条高频事实。
-6. [`RUN_MANIFEST_TEMPLATE.yaml`](RUN_MANIFEST_TEMPLATE.yaml)：一次任务的角色运行、预算、状态事件、工件、gate 和终止信息账本。
+1. [`AGENT_PROFILE_TEMPLATE.yaml`](../../AGENT_PROFILE_TEMPLATE.yaml)：统一角色能力、读写范围、Docker 权限、预算和停止条件的字段。
+2. `profiles/` 下的四个领域 Owner 与 [`context-integration.yaml`](../../profiles/context-integration.yaml) 的第一版 Profile。
+3. [`profiles/test-verification.yaml`](../../profiles/test-verification.yaml)：验证角色的 Profile；允许测试范围内编辑，不允许修改生产实现或降低断言标准。
+4. [`CONTEXT_INDEX_TEMPLATE.yaml`](../../CONTEXT_INDEX_TEMPLATE.yaml)：事实索引模板，要求来源、snapshot、状态、owner、trigger terms 和坑记录引用。
+5. [`CONTEXT_INDEX.yaml`](../../CONTEXT_INDEX.yaml)：基于当前未提交工作树的第一版事实索引，包含路由、Core legality、Teacher privacy、模型 provenance 和 Loop 预算五条高频事实。
+6. [`RUN_MANIFEST_TEMPLATE.yaml`](../../RUN_MANIFEST_TEMPLATE.yaml)：一次任务的角色运行、预算、状态事件、工件、gate 和终止信息账本。
 
 ## 当前边界
 

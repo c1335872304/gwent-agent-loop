@@ -35,10 +35,11 @@
 5. 根据责任域读取对应 Skill；
 6. 只读取该 Skill 指向的 contract、实现和测试；
 7. 查找相关的 [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) 条目；
-8. 最后读取当前 TaskPacket、ContextBrief、snapshot 和历史报告。
+8. 最后读取当前 TaskPacket、ContextBrief 和 snapshot；历史报告只在任务明确
+   需要复核证据时，从 [`archive/README.md`](archive/README.md) 按需打开。
 
 出现冲突时，优先级是：用户当前明确请求与安全约束、`AGENTS.md`、领域
-Skill/contract、本页 Loop 协议、TaskPacket/报告、代码注释或日志。历史 Pilot
+Skill/contract、本页 Loop 协议、TaskPacket/报告、代码注释或日志。归档 Pilot
 只能提供证据，不能覆盖 `CURRENT_STATE.md`。
 
 ## 2. 先判断任务类型

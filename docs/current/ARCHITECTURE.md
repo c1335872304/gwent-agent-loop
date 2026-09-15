@@ -391,5 +391,4 @@ Product integration
 | Teacher evidence、隐私、动作链 | `TEACHER_AND_WEB.md`、`$teacher-explanation` |
 | 前端/BFF/Core HTTP | `apps/web/docs/CORE_API_CONTRACT.md`、`$product-integration` |
 | 测试范围与未执行项 | `PROJECT_TEST_PLAN.md` |
-| 历史设计和优化过程 | `LOGIC_OPTIMIZATION_PLAN.md`、`AI_DECISION_AND_TEACHER_TURN_PLAN.md` |
-
+| 历史设计和优化过程 | `LOGIC_OPTIMIZATION_PLAN.md`、`archive/design/AI_DECISION_AND_TEACHER_TURN_PLAN.md` |

@@ -177,13 +177,13 @@ cleanup 证据和 changed-path/contract gate 均已收口；经明确授权的�
 合入外部 `main`。外部 Desktop/MCP Host 适配、并行编排、自动修复和生产写入
 仍不在当前受限运行模式内。
 
-阶段三 P0 的串行 Scheduler 已实现并由 `PILOT_009_REPORT.md` 验证：
+阶段三 P0 的串行 Scheduler 已实现并由 `archive/pilots/PILOT_009_REPORT.md` 验证：
 `max_concurrency=1` 下按 owner 路由、FIFO 排队，暂停任务继续占用调度槽，
 并对任务数、tokens、turns 和 elapsed 设置硬上限。
 
 阶段三控制面和本地真实 Host 现场验证均已完成：Scheduler 已接入显式 per-role
 Runner backend，补齐 snapshot restore/rebind、跨角色 contract handoff，并由
-`PILOT_010_REPORT.md` 和 `PILOT_018_REPORT.md` 分别记录模型无关 canary 与真实
+`archive/pilots/PILOT_010_REPORT.md` 和 `PILOT_018_REPORT.md` 分别记录模型无关 canary 与真实
 Product → Teacher → Test canary。最终候选已在明确授权后合入外部 `main`；两个
 历史 ZIP 仍保留为未提交、不可读取的用户改动。后续只处理可选 Host 适配和单独
 门禁，不改变当前串行安全边界。

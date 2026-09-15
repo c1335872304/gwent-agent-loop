@@ -1,11 +1,11 @@
 # 本地 CPU Docker 单机对战方案与实施记录
 
 > **状态：已实现并完成 Core/BFF/Teacher/Web 本地运行态审计。** 当前启动、模型和实际版本以
-> [`LOCAL_DOCKER.md`](LOCAL_DOCKER.md) 与 [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md) 为准。
+> [`LOCAL_DOCKER.md`](../../LOCAL_DOCKER.md) 与 [`PROJECT_BASELINE.md`](../../PROJECT_BASELINE.md) 为准。
 > 本文保留部署设计和实施历史；后文“建议新增”“尚未执行”等措辞描述的是实施前状态。
 
-> M4 自动验收已补充到 [`LOGIC_OPTIMIZATION_PLAN.md`](LOGIC_OPTIMIZATION_PLAN.md) 和
-> [`PROJECT_TEST_PLAN.md`](PROJECT_TEST_PLAN.md)。本文件不再作为 Docker 启动命令的
+> M4 自动验收已补充到 [`LOGIC_OPTIMIZATION_PLAN.md`](../../LOGIC_OPTIMIZATION_PLAN.md) 和
+> [`PROJECT_TEST_PLAN.md`](../../PROJECT_TEST_PLAN.md)。本文件不再作为 Docker 启动命令的
 > 唯一入口；日常操作请直接阅读 `LOCAL_DOCKER.md`。
 
 ## 1. 目标与边界
@@ -73,7 +73,7 @@ Docker 不应封装当前已知的运行时问题。先完成下面四项并加�
       nginx.conf
       entrypoint-core.sh
     .dockerignore
-    docs/current/LOCAL_DOCKER_PLAN.md
+    docs/current/archive/design/LOCAL_DOCKER_PLAN.md
     docs/current/LOCAL_DOCKER.md
 
 `apps/web/backend/requirements.txt` 与 `services/teacher/requirements.txt` 继续是各自服务的唯一依赖来源；
@@ -192,12 +192,12 @@ CPU PyTorch 版本必须以最终 checkpoint 的实际 metadata 与 scripts/inst
 2. 添加 Core runtime Dockerfile 和推理 smoke；
 3. 添加 BFF/Teacher/Web 镜像及 Compose；（已完成）
 4. 添加模型安装、健康检查与本地操作手册；（已完成）
-5. 按 [项目测试计划](PROJECT_TEST_PLAN.md) 执行浏览器交互、异常恢复与回归验收；当前自动 M4 已通过，仅剩浏览器手工点击确认。
+5. 按 [项目测试计划](../../PROJECT_TEST_PLAN.md) 执行浏览器交互、异常恢复与回归验收；当前自动 M4 已通过，仅剩浏览器手工点击确认。
 
 关联文档：
 
-- [系统架构](ARCHITECTURE.md)
-- [Core 与跨层 Contract](CORE_CONTRACTS.md)
-- [Teacher 与 Web 产品](TEACHER_AND_WEB.md)
-- [Core HTTP API Contract](../../apps/web/docs/CORE_API_CONTRACT.md)
-- [V3 模型槽说明](../../models/v3/README.md)
+- [系统架构](../../ARCHITECTURE.md)
+- [Core 与跨层 Contract](../../CORE_CONTRACTS.md)
+- [Teacher 与 Web 产品](../../TEACHER_AND_WEB.md)
+- [Core HTTP API Contract](../../../../apps/web/docs/CORE_API_CONTRACT.md)
+- [V3 模型槽说明](../../../../models/v3/README.md)

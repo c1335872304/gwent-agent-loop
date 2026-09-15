@@ -59,7 +59,7 @@ snapshot:
     - scripts/check.py
     - docs/current/AGENT_LOOP_PLAN.md
     - docs/current/AGENT_LOOP_NAVIGATION.md
-    - docs/current/AGENT_LOOP_PHASE_PLAN.md
+    - docs/current/agent-loop/archive/AGENT_LOOP_PHASE_PLAN.md
     - docs/current/agent-loop/AGENT_PROFILE_TEMPLATE.yaml
     - docs/current/agent-loop/CONTEXT_INDEX.yaml
     - docs/current/agent-loop/TEST_MATRIX.yaml

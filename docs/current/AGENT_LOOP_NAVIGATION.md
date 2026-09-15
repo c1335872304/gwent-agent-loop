@@ -182,13 +182,9 @@ Test、Scheduler 进程 rebind、两轮 Docker 验证、隔离集成和 rollback
 ## 8. Current evidence pointer
 
 `START_HERE.md` is the new-session operational entry and `CURRENT_STATE.md` is the
-only current-status source. Completed live evidence is split by capability: Pilot
-004 records the first CLI Product → Test loop, Pilot
-005 records loss/resume, Pilot 006 records integration and canonical Docker,
-Pilot 007 records isolated integration and budget re-audit, Pilot 008 records
-service-backed Docker, Pilot 009 records the serial Scheduler canary, and
-Pilot 010 records multi-role routing, restart/rebind and contract handoff, and
-Pilot 018 records the completed local Host-backed serial multi-role canary. Raw
+only current-status source. The current live evidence is `PILOT_018_REPORT.md`;
+older Phase and Pilot records are indexed in `agent-loop/archive/README.md` and
+must be read only when auditing a historical decision or regression. Raw
 TaskPacket, ContextBrief, ChangeReport, TestReport, handoff, and RunManifest
 files remain under `.agent-loop/`. The canonical Python pytest command is
 `python3 scripts/check.py docker-test`; host pytest is diagnostic only when

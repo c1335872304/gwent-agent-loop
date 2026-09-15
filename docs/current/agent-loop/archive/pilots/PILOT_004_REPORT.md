@@ -1,6 +1,6 @@
 # Pilot 004: Live Product → Test/Verification
 
-> 记录属性：历史现场证据；当前状态以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准。
+> 记录属性：历史现场证据；当前状态以 [`CURRENT_STATE.md`](../../CURRENT_STATE.md) 为准。
 
 ## Result
 

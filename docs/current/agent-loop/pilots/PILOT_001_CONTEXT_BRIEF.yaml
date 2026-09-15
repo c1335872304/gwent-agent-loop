@@ -9,7 +9,7 @@ source_graph:
       role: "仓库级路由、边界和验证规则"
     - path: docs/current/AGENT_LOOP_PLAN.md
       role: "Agent Loop 基础协议"
-    - path: docs/current/AGENT_LOOP_PHASE_PLAN.md
+    - path: docs/current/agent-loop/archive/AGENT_LOOP_PHASE_PLAN.md
       role: "阶段推进和退出条件"
   executable_contracts:
     - path: docs/current/agent-loop/CONTEXT_INDEX.yaml

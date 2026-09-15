@@ -1,6 +1,6 @@
 # Pilot 009：阶段三串行 Scheduler canary
 
-> 记录属性：历史现场证据；当前状态以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准。
+> 记录属性：历史现场证据；当前状态以 [`CURRENT_STATE.md`](../../CURRENT_STATE.md) 为准。
 
 > 日期：2026-09-14
 > 状态：PASS（模型无关、无 Docker、无生产文件写入）

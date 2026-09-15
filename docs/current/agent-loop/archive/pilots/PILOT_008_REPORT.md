@@ -1,6 +1,6 @@
 # Pilot 008：Product service-backed Docker health/failure/cleanup
 
-> 记录属性：历史现场证据；当前状态以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准。
+> 记录属性：历史现场证据；当前状态以 [`CURRENT_STATE.md`](../../CURRENT_STATE.md) 为准。
 
 > 日期：2026-09-14
 > 状态：PASS；服务健康、受控故障分类和 ownership-scoped cleanup 均有现场证据
@@ -19,7 +19,7 @@
 
 ## 执行结果
 
-由 [run_service_pilot.py](../../../scripts/agent_loop/run_service_pilot.py) 自动
+由 [run_service_pilot.py](../../../../../scripts/agent_loop/run_service_pilot.py) 自动
 执行，project 为 `agent-loop-gw-real-product-001-service-v3`，Web 使用
 `18081` 端口避免共享端口冲突；ownership guard 收紧后重新执行，证据 attempt
 为 `service-verifier-022`。

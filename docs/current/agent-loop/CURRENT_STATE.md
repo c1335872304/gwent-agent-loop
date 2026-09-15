@@ -82,13 +82,13 @@ input budget was aligned to 1,000,000, and the review scope was bounded.
 - Service-backed Product verification: Core/BFF/Web healthy, Product HTTP smoke
   passed, missing-Core injection produced BFF `unhealthy` with classified
   `DOCKER_FAILURE`, and isolated containers/network cleanup completed;
-  `PILOT_008_REPORT.md` and the service TestReport contain the evidence;
+  `archive/pilots/PILOT_008_REPORT.md` and the service TestReport contain the evidence;
 - Phase 3 P0 serial Scheduler canary: two owner-routed tasks passed FIFO
   pause/resume and completion with `max_concurrency=1`; 8 scheduler events and
-  bounded usage evidence are recorded in `PILOT_009_REPORT.md`;
+  bounded usage evidence are recorded in `archive/pilots/PILOT_009_REPORT.md`;
 - Phase 3 multi-role control-plane canary: Product → Core role routing, process
   restart snapshot/rebind without duplicate start, serial completion, and
-  cross-domain `product-http:v1` handoff passed in `PILOT_010_REPORT.md`; model
+  cross-domain `product-http:v1` handoff passed in `archive/pilots/PILOT_010_REPORT.md`; model
   calls `0`, Docker `not_run`;
 - Host rebind regression: a second bridge process looked up the original
   `runner_ref`, attached to the original PID/worktree, and returned `running`
@@ -98,7 +98,7 @@ input budget was aligned to 1,000,000, and the review scope was bounded.
   Scheduler process boundary, Product final snapshot was
   `e1d7d6793ca1f651eedf5e2e34828a4e885c5d5`, Teacher used `512,884` input /
   `10,581` output tokens and stopped on the privacy finding; see
-  `PILOT_011_REPORT.md` and the ignored RunManifest path recorded there;
+  `archive/pilots/PILOT_011_REPORT.md` and the ignored RunManifest path recorded there;
 - Pilot 018 live Host evidence: revision-5 Product/Teacher/Test chain completed;
   Product candidate `c95584faff0747027b9521188a3dcaa4a8c45384`, isolated applied
   snapshot `207fe91f58f545f8614716905230b3db7b0cb35e`, same-runner process rebind,
@@ -124,13 +124,13 @@ input budget was aligned to 1,000,000, and the review scope was bounded.
 | TestReport evidence gate | implemented | `report_validation.py`, `TEST_REPORT_TEMPLATE.yaml` |
 | Docker canonical pytest | implemented for the declared Python test suite | `python3 scripts/check.py docker-test` |
 | Bounded recovery / circuit breaker | implemented deterministically | `recovery.py`, `RECOVERY_POLICY.md` |
-| Recovery decision journaling and bounded resume hook | live controlled loss/resume passed once; bounded | `execution.py`, `PILOT_005_REPORT.md` |
+| Recovery decision journaling and bounded resume hook | live controlled loss/resume passed once; bounded | `execution.py`, `archive/pilots/PILOT_005_REPORT.md` |
 | Codex project-task request | builder implemented | `codex_bridge.py`, `CODEX_TRANSPORT.md` |
 | Host lifecycle mapping | implemented with injected bridge | `codex_host_transport.py` |
 | Real Codex create / wait / resume / close | implemented via Codex CLI bridge | `codex_cli_bridge.py` |
 | Single-domain Owner -> Test orchestration | implemented with bounded waits and evidence gates | `bounded_loop.py` |
 | Main scheduler calling the real platform | real Product create, separate-process rebind, Teacher review, two independent Docker Test runs, isolated integration and rollback passed; direct parent mutation remains human-owned | `scheduler_backend.py`, `codex_cli_bridge.py`, `PILOT_018_REPORT.md` |
-| Worktree integration planning, conflict/scope detection and rollback rehearsal | implemented; disjoint isolated auto-integration and isolated rollback passed, direct parent mutation remains human-owned | `integration.py`, `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `PILOT_006_REPORT.md`, `PILOT_007_REPORT.md` |
+| Worktree integration planning, conflict/scope detection and rollback rehearsal | implemented; disjoint isolated auto-integration and isolated rollback passed, direct parent mutation remains human-owned | `integration.py`, `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `archive/pilots/PILOT_006_REPORT.md`, `archive/pilots/PILOT_007_REPORT.md` |
 | Real Owner and independent Test child tasks | revision-5 Product, Teacher, Test 1 and Test 2 all closed and passed in Pilot 018; Test runs were Docker-backed and independent | `PILOT_018_REPORT.md`, local RunManifest |
 | Cross-domain parallel orchestration | intentionally deferred | Phase 6 |
 
@@ -214,7 +214,7 @@ change is allowed in this experiment.
   `human_required` when the host cannot restore the existing Runner;
 - validate a closed Product → Core contract handoff with contract version,
   references, consumer scope and the same final snapshot evidence;
-- run the model-free multi-role canary recorded in `PILOT_010_REPORT.md`.
+- run the model-free multi-role canary recorded in `archive/pilots/PILOT_010_REPORT.md`.
 
 ### Remaining: bounded local operation and optional host adapters
 
@@ -252,20 +252,20 @@ a link back here and label its claims as historical rather than deleting them.
 
 ## Historical evidence
 
-- [Phase 1 status](PHASE_1_STATUS.md), [Phase 2 status](PHASE_2_STATUS.md),
-  [Phase 3 status](PHASE_3_STATUS.md), and [Phase 4 status](PHASE_4_STATUS.md)
+- [Phase 1 status](archive/phases/PHASE_1_STATUS.md), [Phase 2 status](archive/phases/PHASE_2_STATUS.md),
+  [Phase 3 status](archive/phases/PHASE_3_STATUS.md), and [Phase 4 status](archive/phases/PHASE_4_STATUS.md)
   are transition records;
 - [Pilot 001](pilots/PILOT_001_REPORT.md) is the protocol rehearsal;
 - [Pilot 002](pilots/PILOT_002_REPORT.md) is the low-risk Product pilot;
 - [Pilot 003](pilots/PILOT_003_REPORT.md) is the blocked first-stage execution record;
-- [Pilot 004](PILOT_004_REPORT.md) is the earlier live CLI Product → Test/Verification pilot;
-- [Pilot 005](PILOT_005_REPORT.md) is the live controlled-loss/recovery pilot;
-- [Pilot 006](PILOT_006_REPORT.md) is the integration, Docker and initial budget audit;
-- [Pilot 007](PILOT_007_REPORT.md) is the automatic duplicate-worktree fallback
+- [Pilot 004](archive/pilots/PILOT_004_REPORT.md) is the earlier live CLI Product → Test/Verification pilot;
+- [Pilot 005](archive/pilots/PILOT_005_REPORT.md) is the live controlled-loss/recovery pilot;
+- [Pilot 006](archive/pilots/PILOT_006_REPORT.md) is the integration, Docker and initial budget audit;
+- [Pilot 007](archive/pilots/PILOT_007_REPORT.md) is the automatic duplicate-worktree fallback
   and recalibrated budget audit;
-- [Pilot 008](PILOT_008_REPORT.md) is the service-backed Docker health/failure/
+- [Pilot 008](archive/pilots/PILOT_008_REPORT.md) is the service-backed Docker health/failure/
   cleanup pilot;
-- [Pilot 010](PILOT_010_REPORT.md) is the model-free multi-role Scheduler,
+- [Pilot 010](archive/pilots/PILOT_010_REPORT.md) is the model-free multi-role Scheduler,
   restart/rebind, and cross-domain contract canary;
-- [AGENT_LOOP_PHASE_PLAN.md](../AGENT_LOOP_PHASE_PLAN.md) defines phase entry and
+- [AGENT_LOOP_PHASE_PLAN.md](archive/AGENT_LOOP_PHASE_PLAN.md) defines phase entry and
   exit conditions, while this file defines the current position.

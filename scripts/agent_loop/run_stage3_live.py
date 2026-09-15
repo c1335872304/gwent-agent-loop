@@ -101,7 +101,7 @@ def _context(task_id: str, snapshot: str, *, sources: list[dict[str, str]], clai
         "context_snapshot": snapshot,
         "context_floor_refs": [
             {"path": "AGENTS.md", "locator": "routing and verification"},
-            {"path": "docs/current/agent-loop/PILOT_011_TASK_DESIGN.md", "locator": "Pilot 011"},
+            {"path": "docs/current/agent-loop/archive/pilots/PILOT_011_TASK_DESIGN.md", "locator": "Pilot 011"},
         ],
         "fact_source_graph": sources,
         "fact_ledger": [{"claim": claim, "status": "confirmed", "verified_snapshot": snapshot} for claim in claims],

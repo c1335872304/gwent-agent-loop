@@ -2,14 +2,14 @@
 
 > 状态：历史记录；P0 串行 Scheduler 已落地并通过 canary，完整阶段三多角色运营闭环仍在后续实施
 >
-> 当前状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件记录 Phase 3 当时的状态。
+> 当前状态请以 [`CURRENT_STATE.md`](../../CURRENT_STATE.md) 为准；本文件记录 Phase 3 当时的状态。
 
 ## 已落地
 
-- [`profiles/test-verification.yaml`](profiles/test-verification.yaml)：Test / Verification 的读写和 Docker 能力边界；
-- [`profiles/context-integration.yaml`](profiles/context-integration.yaml)：上下文/文档整合边界，不写生产代码；
-- [`TEST_MATRIX.yaml`](TEST_MATRIX.yaml)：Core、Trainer、Product、Teacher 的测试命令、测试写入范围、compose allowlist 和人工 gate；
-- [`TEST_MODIFICATION_POLICY.md`](TEST_MODIFICATION_POLICY.md)：测试编辑、断言保护、失败分类和 Docker cleanup 规则。
+- [`profiles/test-verification.yaml`](../../profiles/test-verification.yaml)：Test / Verification 的读写和 Docker 能力边界；
+- [`profiles/context-integration.yaml`](../../profiles/context-integration.yaml)：上下文/文档整合边界，不写生产代码；
+- [`TEST_MATRIX.yaml`](../../TEST_MATRIX.yaml)：Core、Trainer、Product、Teacher 的测试命令、测试写入范围、compose allowlist 和人工 gate；
+- [`TEST_MODIFICATION_POLICY.md`](../../TEST_MODIFICATION_POLICY.md)：测试编辑、断言保护、失败分类和 Docker cleanup 规则。
 - `scripts/agent_loop/validate_packet.py`：TestMatrix 的路径、命令、领域和 Docker allowlist 校验。
 - `scripts/agent_loop/scheduler.py`：按 TaskPacket owner 路由、FIFO 排队、串行暂停/恢复/结束、硬预算和 append-only 调度事件。
 - `scripts/agent_loop/test_scheduler.py`：Scheduler 生命周期、FIFO、预算、证据和持久化回归测试。

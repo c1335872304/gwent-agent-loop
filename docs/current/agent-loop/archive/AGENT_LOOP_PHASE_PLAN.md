@@ -1,13 +1,13 @@
 # Gwent Agent Loop 阶段实施计划
 
-> **状态：历史阶段边界；实时状态以 `agent-loop/CURRENT_STATE.md` 为准**
+> **状态：历史阶段边界；实时状态以 `../CURRENT_STATE.md` 为准**
 > **版本：0.5**
-> **配套规范：** [`AGENT_LOOP_PLAN.md`](AGENT_LOOP_PLAN.md)
-> **项目导航：** [`AGENT_LOOP_NAVIGATION.md`](AGENT_LOOP_NAVIGATION.md)
+> **配套规范：** [`AGENT_LOOP_PLAN.md`](../../AGENT_LOOP_PLAN.md)
+> **项目导航：** [`AGENT_LOOP_NAVIGATION.md`](../../AGENT_LOOP_NAVIGATION.md)
 > **原则：先把上下文和控制平面做成可验证的工程，再接入 Codex 子会话。**
 >
-> **当前实现状态：** 请先阅读 [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)；本文件保留 Phase 0–7 的阶段边界和退出条件，不重复维护实时状态。
-> **三阶段路线图：** [`agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md`](agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md)
+> **当前实现状态：** 请先阅读 [`CURRENT_STATE.md`](../CURRENT_STATE.md)；本文件保留 Phase 0–7 的阶段边界和退出条件，不重复维护实时状态。
+> **三阶段路线图：** [`IDEAL_LOOP_3_STAGE_PLAN.md`](../IDEAL_LOOP_3_STAGE_PLAN.md)
 
 ## 0. 这份计划解决什么问题
 
@@ -102,10 +102,10 @@ Codex Runner 适配器
 
 ### 3.2 已完成交付物
 
-- [`AGENT_LOOP_PLAN.md`](AGENT_LOOP_PLAN.md)：基础规范、角色、状态机、预算、权限和 handoff；
-- [`AGENT_LOOP_NAVIGATION.md`](AGENT_LOOP_NAVIGATION.md)：项目事实导航和路由；
-- [`agent-loop/LESSONS_LEARNED.md`](agent-loop/LESSONS_LEARNED.md)：可验证的坑记录；
-- [`agent-loop/CONTEXT_BRIEF_TEMPLATE.yaml`](agent-loop/CONTEXT_BRIEF_TEMPLATE.yaml)；
+- [`AGENT_LOOP_PLAN.md`](../../AGENT_LOOP_PLAN.md)：基础规范、角色、状态机、预算、权限和 handoff；
+- [`AGENT_LOOP_NAVIGATION.md`](../../AGENT_LOOP_NAVIGATION.md)：项目事实导航和路由；
+- [`LESSONS_LEARNED.md`](../LESSONS_LEARNED.md)：可验证的坑记录；
+- [`CONTEXT_BRIEF_TEMPLATE.yaml`](../CONTEXT_BRIEF_TEMPLATE.yaml)；
 - TaskPacket、ChangeReport、ReviewReport、TestReport、HandoffReport 模板；
 - `.agents/evals/tasks/007...018`：Agent Loop 正常流、故障流和上下文 grounding 评估案例；
 - `.gitignore` 对 `.agent-loop/` 本机运行状态的忽略规则。
@@ -135,7 +135,7 @@ Codex Runner 适配器
 
 ### 4.2 交付物
 
-当前已落地：`agent-loop/AGENT_PROFILE_TEMPLATE.yaml`、五个 Profile、`CONTEXT_INDEX.yaml`、`CONTEXT_INDEX_TEMPLATE.yaml`、`RUN_MANIFEST_TEMPLATE.yaml`，以及 Phase 1/2 状态记录。它们仍绑定初始 baseline 前的 working-tree snapshot，创建 Git baseline 后必须复核。
+当前已落地：`../AGENT_PROFILE_TEMPLATE.yaml`、五个 Profile、`CONTEXT_INDEX.yaml`、`CONTEXT_INDEX_TEMPLATE.yaml`、`RUN_MANIFEST_TEMPLATE.yaml`，以及 Phase 1/2 状态记录。它们仍绑定初始 baseline 前的 working-tree snapshot，创建 Git baseline 后必须复核。
 
 新增并冻结以下三个协议对象：
 
@@ -310,7 +310,7 @@ scripts/agent_loop/
 
 ### 6.2 交付物
 
-当前已落地 [`agent-loop/TEST_MATRIX.yaml`](agent-loop/TEST_MATRIX.yaml)、[`agent-loop/TEST_MODIFICATION_POLICY.md`](agent-loop/TEST_MODIFICATION_POLICY.md) 和 TestMatrix 确定性校验。它们先固化测试范围、Docker allowlist、失败分类和人工 gate，尚未授权自动启动 Docker。
+当前已落地 [`TEST_MATRIX.yaml`](../TEST_MATRIX.yaml)、[`TEST_MODIFICATION_POLICY.md`](../TEST_MODIFICATION_POLICY.md) 和 TestMatrix 确定性校验。它们先固化测试范围、Docker allowlist、失败分类和人工 gate，尚未授权自动启动 Docker。
 
 #### TestProfile
 
@@ -360,7 +360,7 @@ docker:
 
 不接自动子会话，人工扮演 Main、Context、Owner、Verification，验证整个协议是否真的减少遗忘和返工。
 
-当前状态：[Phase 4 状态记录](agent-loop/PHASE_4_STATUS.md)。Pilot 001 已完成协议演练，但不计入真实业务试点的退出条件：没有启动真实子会话、没有启动 Docker，也没有修改业务代码。
+当前状态：[Phase 4 状态记录](phases/PHASE_4_STATUS.md)。Pilot 001 已完成协议演练，但不计入真实业务试点的退出条件：没有启动真实子会话、没有启动 Docker，也没有修改业务代码。
 
 ### 7.2 试点组合
 
@@ -508,7 +508,7 @@ Agent Loop 只有同时满足以下条件，才可以称为可用系统：
 
 下一步只做以下顺序，不提前接入 Codex 子会话：
 
-1. 评审并确认本文与 [`AGENT_LOOP_PLAN.md`](AGENT_LOOP_PLAN.md) 没有冲突；
+1. 评审并确认本文与 [`AGENT_LOOP_PLAN.md`](../../AGENT_LOOP_PLAN.md) 没有冲突；
 2. 创建 `AgentProfile`、`ContextIndex`、`RunManifest` 模板；
 3. 创建确定性 schema / 状态 / snapshot / budget 校验工具；
 4. 创建 TestProfile 和 Docker 测试矩阵；
@@ -531,7 +531,7 @@ Agent Loop 只有同时满足以下条件，才可以称为可用系统：
 This section records the 2026-09-13 transition from the initial baseline to the
 Runner implementation. It is retained for auditability, but it is not a current
 roadmap. For current work and remaining gaps, use
-[`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md).
+[`CURRENT_STATE.md`](../CURRENT_STATE.md).
 
 ### 13.1 Completed foundation
 
@@ -568,8 +568,8 @@ At the 2026-09-13 baseline, the deterministic lifecycle contract was implemented
 in `scripts/agent_loop/runner.py` and covered by negative tests. The execution,
 launch, transport, handoff, verification, and report-validation layers were
 then the boundary before a platform-specific external transport. This
-transition note is superseded by [`CODEX_TRANSPORT.md`](agent-loop/CODEX_TRANSPORT.md)
-and [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md), which record the
+transition note is superseded by [`CODEX_TRANSPORT.md`](../CODEX_TRANSPORT.md)
+and [`CURRENT_STATE.md`](../CURRENT_STATE.md), which record the
 later CLI bridge and bounded loop evidence.
 
 ### 13.5 Historical Pilot 002 boundary (superseded)

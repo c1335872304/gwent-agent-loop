@@ -249,7 +249,7 @@ docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.trai
 | 训练 Docker、CPU smoke、服务器 GPU 训练 | [Training Docker](docs/current/TRAINING_DOCKER.md) |
 | AI 教师与 Web 集成 | [Teacher and Web](docs/current/TEACHER_AND_WEB.md) |
 | Agent Loop 基础规范 | [Agent Loop Foundation](docs/current/AGENT_LOOP_PLAN.md) |
-| Agent Loop 阶段计划 | [Agent Loop Phase Plan](docs/current/AGENT_LOOP_PHASE_PLAN.md) |
+| Agent Loop 三阶段路线图 | [Agent Loop Roadmap](docs/current/agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md) |
 | Agent Loop 项目导航 | [Agent Loop Navigation](docs/current/AGENT_LOOP_NAVIGATION.md) |
 | 测试矩阵与未执行项 | [Project Test Plan](docs/current/PROJECT_TEST_PLAN.md) |
 | Skill / Coding Agent 体系 | [Skill System](docs/current/SKILL_SYSTEM.md) |

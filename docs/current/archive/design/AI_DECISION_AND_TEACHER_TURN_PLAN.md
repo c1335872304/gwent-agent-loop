@@ -1,13 +1,13 @@
 # AI 决策过程与 AI 教师单次指导行动：设计与实施记录
 
 > **状态：已实现。** 当前运行时基线见
-> [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md)。本文保留原始设计、分阶段方案和验收意图，方便追溯；
+> [`PROJECT_BASELINE.md`](../../PROJECT_BASELINE.md)。本文保留原始设计、分阶段方案和验收意图，方便追溯；
 > 其中“建议”“规划”“当前问题”等措辞描述的是实施前状态，不再表示当前源码。
 
 > **当前使用方式：** 阅读当前字段和请求方式时，以
-> [`apps/web/docs/CORE_API_CONTRACT.md`](../../apps/web/docs/CORE_API_CONTRACT.md)、
-> [`TEACHER_AND_WEB.md`](TEACHER_AND_WEB.md) 和
-> [`LOGIC_OPTIMIZATION_PLAN.md`](LOGIC_OPTIMIZATION_PLAN.md) 为准。当前教师边界是
+> [`apps/web/docs/CORE_API_CONTRACT.md`](../../../../apps/web/docs/CORE_API_CONTRACT.md)、
+> [`TEACHER_AND_WEB.md`](../../TEACHER_AND_WEB.md) 和
+> [`LOGIC_OPTIMIZATION_PLAN.md`](../../LOGIC_OPTIMIZATION_PLAN.md) 为准。当前教师边界是
 > “一个根行动及其 Core-required choices”，不是完整对局、下一回合或整场比赛。
 
 ## 1. 文档目的
@@ -473,10 +473,10 @@ AI 教师
 
 ## 15. 相关事实来源
 
-- [`tools/server/human_vs_ai.py`](../../tools/server/human_vs_ai.py)：真实 AI 执行、`last_ai_actions`、公开状态和本地模型推理入口。
-- [`apps/web/frontend/src/components/AiPanel.tsx`](../../apps/web/frontend/src/components/AiPanel.tsx)：真实 AI 决策过程展示。
-- [`apps/web/frontend/src/components/TeacherPanel.tsx`](../../apps/web/frontend/src/components/TeacherPanel.tsx)：当前单步 Teacher 展示入口。
-- [`apps/web/backend/app/api/teacher.py`](../../apps/web/backend/app/api/teacher.py)：当前已执行动作解释 BFF。
-- [`services/teacher/`](../../services/teacher/)：Teacher evidence、privacy 和 deterministic explanation。
-- [`docs/current/CORE_CONTRACTS.md`](./CORE_CONTRACTS.md)：Core 规则、动作和跨层 contract 原则。
-- [`docs/current/TEACHER_AND_WEB.md`](./TEACHER_AND_WEB.md)：Teacher 与 Web 的现有边界。
+- [`tools/server/human_vs_ai.py`](../../../../tools/server/human_vs_ai.py)：真实 AI 执行、`last_ai_actions`、公开状态和本地模型推理入口。
+- [`apps/web/frontend/src/components/AiPanel.tsx`](../../../../apps/web/frontend/src/components/AiPanel.tsx)：真实 AI 决策过程展示。
+- [`apps/web/frontend/src/components/TeacherPanel.tsx`](../../../../apps/web/frontend/src/components/TeacherPanel.tsx)：当前单步 Teacher 展示入口。
+- [`apps/web/backend/app/api/teacher.py`](../../../../apps/web/backend/app/api/teacher.py)：当前已执行动作解释 BFF。
+- [`services/teacher/`](../../../../services/teacher/)：Teacher evidence、privacy 和 deterministic explanation。
+- [`docs/current/CORE_CONTRACTS.md`](../../CORE_CONTRACTS.md)：Core 规则、动作和跨层 contract 原则。
+- [`docs/current/TEACHER_AND_WEB.md`](../../TEACHER_AND_WEB.md)：Teacher 与 Web 的现有边界。

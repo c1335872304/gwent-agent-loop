@@ -157,4 +157,4 @@ Compose 传给 Core 的运行时变量如下：
 6. 分别关闭 Teacher 和切换 `manual_test`，确认前者不阻断游戏、后者才显示双方手牌。
 
 相关边界见 [Core HTTP Contract](../../apps/web/docs/CORE_API_CONTRACT.md)、
-[本地 Docker 方案](LOCAL_DOCKER_PLAN.md) 和 [V3 模型槽说明](../../models/v3/README.md)。
+[本地 Docker 方案历史](archive/design/LOCAL_DOCKER_PLAN.md) 和 [V3 模型槽说明](../../models/v3/README.md)。

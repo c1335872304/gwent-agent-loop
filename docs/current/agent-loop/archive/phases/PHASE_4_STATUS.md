@@ -2,7 +2,7 @@
 
 状态：已结束（历史记录；后续 Pilot 004–008 已覆盖真实 CLI、恢复和 service-backed Docker）
 
-当前实时状态请以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本文件保留 Phase 4 和 Pilot 002 的历史证据，文中的“尚未完成”是当时结论。
+当前实时状态请以 [`CURRENT_STATE.md`](../../CURRENT_STATE.md) 为准；本文件保留 Phase 4 和 Pilot 002 的历史证据，文中的“尚未完成”是当时结论。
 
 ## 已完成
 
@@ -12,7 +12,7 @@
 - 确认 Docker 可用，但本次没有启动服务或创建容器。
 - 完成一次低风险 Product 真实改动试点，并由 Docker pytest 和架构门禁复核。
 
-详见：[Pilot 001 任务包](./pilots/PILOT_001_TASK_PACKET.yaml)、[上下文简报](./pilots/PILOT_001_CONTEXT_BRIEF.yaml)、[运行清单](./pilots/PILOT_001_RUN_MANIFEST.yaml)、[报告](./pilots/PILOT_001_REPORT.md)。
+详见：[Pilot 001 任务包](../../pilots/PILOT_001_TASK_PACKET.yaml)、[上下文简报](../../pilots/PILOT_001_CONTEXT_BRIEF.yaml)、[运行清单](../../pilots/PILOT_001_RUN_MANIFEST.yaml)、[报告](../../pilots/PILOT_001_REPORT.md)。
 
 ## 尚未完成（当时记录）
 
@@ -54,6 +54,6 @@ Evidence:
 - canonical Docker pytest passed 66 tests;
 - architecture gate passed with 29 Agent Loop tests;
 - host async pytest failure was classified as ENVIRONMENT_FAILURE because the host lacks pytest-asyncio;
-- TaskPacket, ContextBrief, ChangeReport, TestReport, RunManifest, and final report are stored under `pilots/PILOT_002_*`.
+- TaskPacket, ContextBrief, ChangeReport, TestReport, RunManifest, and final report are stored under `../pilots/PILOT_002_*`.
 
 Phase 4 remains in progress: this is a manual Owner to Test/Verification pilot with a deterministic execution-record layer, not proof of a real Codex child session, automatic resume, or bounded automatic repair.
