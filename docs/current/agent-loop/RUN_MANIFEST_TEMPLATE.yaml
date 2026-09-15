@@ -55,6 +55,7 @@ role_runs:
     artifact_refs: []
     verification_refs: []
     recovery_decisions: []
+    retry_learning: []
     failure_class: "none | model | runner | docker | test | code | permission | context | budget"
     stop_reason: ""
 
@@ -67,6 +68,20 @@ artifacts:
     sha256: ""
     redaction_status: "not_required | pending | verified"
     retention: "task_lifetime | project_record | discard_after_summary"
+
+retry_learning:
+  schema: "agent-loop.retry-learning.v1"
+  retry_count: 0
+  lesson_created: []
+  lesson_applied: []
+  learning_delta: []
+  savings:
+    status: "measured | unavailable"
+    elapsed_seconds: 0
+    input_tokens: 0
+    output_tokens: 0
+    reason: ""
+  events: []
 
 state_events:
   - event_seq: 1

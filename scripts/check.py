@@ -221,6 +221,7 @@ def check_agent_loop() -> None:
         "scripts.agent_loop.test_pilot_artifacts",
         "scripts.agent_loop.test_runner",
         "scripts.agent_loop.test_execution",
+        "scripts.agent_loop.test_retry_learning",
         "scripts.agent_loop.test_launch",
         "scripts.agent_loop.test_external",
         "scripts.agent_loop.test_handoff",

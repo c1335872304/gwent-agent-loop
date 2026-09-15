@@ -39,7 +39,7 @@ Skill 和卡片指定的 contract / 最近回归。入口卡只负责定位，�
 - 当前主要工作是 Agent Loop、上下文工程和项目架构；`models/v3/policy.pt` 按 [`docs/current/agent-loop/MODEL_SCOPE.md`](docs/current/agent-loop/MODEL_SCOPE.md) 暂时视为正确且冻结的输入。
 - 架构任务不得自动加载、哈希扫描、重训、迁移、替换或删除模型；需要模型结构、checkpoint、promotion 或 PyTorch loader 验证时，才路由给 Trainer。
 - `python3 scripts/check.py quick` 是全项目门禁，会进入 Trainer 的 `validate_training.py --all`；它不是架构专用检查。架构任务使用 `python3 scripts/check.py architecture`，它不进入 Trainer/torch。
-- Test / Verification Agent 的配置已实现于 `.codex/agents/test-verification.toml`；本地 Codex CLI 的跨进程 Runner lookup/rebind 已实现并通过现场 canary，Desktop/MCP 仍是可选适配；Docker 只有在 TaskPacket 和 TestMatrix 明确需要服务依赖时才启动，并且必须执行 cleanup。
+- Test / Verification Agent 的配置已实现于 `.codex/agents/test-verification.toml`；本地 Codex CLI 的跨进程 Runner lookup/rebind 已实现并通过现场 canary，Desktop/MCP 仍是可选适配；Retry Learning Gate 要求模型重试携带新的结构化 learning delta，成功后只生成 candidate-only 经验；Docker 只有在 TaskPacket 和 TestMatrix 明确需要服务依赖时才启动，并且必须执行 cleanup。
 
 ## 路由
 
@@ -114,6 +114,7 @@ Skill 不写项目百科，也不为一次性任务临时新增。重复出现�
 - 只能在 TaskPacket 声明的 `test_write_roots` 内修改测试；测试修改必须由领域 Owner 或人工 Review gate 复核。
 - 默认不启动 Docker、不加载 `policy.pt`、不派生子 Agent；服务集成才按 TestMatrix 的 compose allowlist 使用 Docker。
 - 所有结果必须区分代码、contract、环境、Docker、权限、flaky、协议和预算失败，并交付 TestReport/ReviewReport。
+- `RETURN_TO_OWNER` 和 `RETRY_TEST` 必须经过 `scripts/agent_loop/retry_learning.py` 的 Retry Learning Gate；同一失败签名和未改变的 delta 不得再次消耗模型调用。
 
 ## Runtime Teacher 与 Coding Agent 的区别
 

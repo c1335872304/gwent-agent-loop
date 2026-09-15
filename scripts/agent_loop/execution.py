@@ -14,8 +14,18 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 
+from .errors import ValidationError
 from .runner import RunnerEvent, RunnerRequest, runner_event_dict
 from .recovery import RecoveryDecision, decide_recovery
+from .retry_learning import (
+    RETRY_ACTIONS,
+    RECOVERY_ONLY_ACTIONS,
+    build_retry_experience,
+    evaluate_retry_learning,
+    normalise_savings,
+    validate_failure_signature,
+    validate_retry_learning_event,
+)
 
 
 class ExecutionRecordError(ValueError):
@@ -102,6 +112,7 @@ class ExecutionRecord:
     final_snapshot: Optional[str] = None
     changed_paths: list[str] = field(default_factory=list)
     recovery_decisions: list[dict[str, Any]] = field(default_factory=list)
+    retry_learning: list[dict[str, Any]] = field(default_factory=list)
     input_tokens: int = 0
     output_tokens: int = 0
     elapsed_seconds: float = 0.0
@@ -170,6 +181,7 @@ class ExecutionRecord:
         *,
         failure_class: str | None,
         remaining_budget: int,
+        learning_event: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Persist a recovery decision before the caller executes it."""
         entry = {
@@ -185,6 +197,10 @@ class ExecutionRecord:
             "remaining_budget": int(remaining_budget),
             "persisted_before_action": True,
         }
+        if learning_event is not None:
+            validate_retry_learning_event(learning_event)
+            entry["retry_learning"] = dict(learning_event)
+            self.retry_learning.append(dict(learning_event))
         self.recovery_decisions.append(entry)
         return entry
 
@@ -202,6 +218,7 @@ class ExecutionRecord:
             "final_snapshot": self.final_snapshot,
             "changed_paths": list(self.changed_paths),
             "recovery_decisions": list(self.recovery_decisions),
+            "retry_learning": list(self.retry_learning),
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "elapsed_seconds": self.elapsed_seconds,
@@ -215,13 +232,21 @@ class ExecutionRecord:
         raw_events = payload.get("events", [])
         raw_artifacts = payload.get("artifact_refs", [])
         raw_recovery = payload.get("recovery_decisions", [])
+        raw_retry_learning = payload.get("retry_learning", [])
         raw_changed = payload.get("changed_paths", [])
-        if not all(isinstance(value, list) for value in (raw_events, raw_artifacts, raw_recovery, raw_changed)):
+        if not all(isinstance(value, list) for value in (raw_events, raw_artifacts, raw_recovery, raw_retry_learning, raw_changed)):
             raise ExecutionRecordError("execution record lists are invalid")
         if len(raw_events) > 32 or any(not isinstance(event, Mapping) for event in raw_events):
             raise ExecutionRecordError("execution record events are invalid")
         if any(not isinstance(item, Mapping) for item in raw_recovery):
             raise ExecutionRecordError("execution record recovery decisions are invalid")
+        if any(not isinstance(item, Mapping) for item in raw_retry_learning):
+            raise ExecutionRecordError("execution record retry learning is invalid")
+        for item in raw_retry_learning:
+            try:
+                validate_retry_learning_event(item)
+            except ValidationError as exc:
+                raise ExecutionRecordError("execution record retry learning is invalid") from exc
         try:
             status = str(payload["status"])
             record = cls(
@@ -236,6 +261,7 @@ class ExecutionRecord:
                 final_snapshot=(str(payload["final_snapshot"]) if payload.get("final_snapshot") else None),
                 changed_paths=[str(item) for item in raw_changed],
                 recovery_decisions=[dict(item) for item in raw_recovery],
+                retry_learning=[dict(item) for item in raw_retry_learning],
                 input_tokens=int(payload.get("input_tokens", 0)),
                 output_tokens=int(payload.get("output_tokens", 0)),
                 elapsed_seconds=float(payload.get("elapsed_seconds", 0.0)),
@@ -287,6 +313,7 @@ class ExecutionRecord:
             "failure_class": "runner" if self.status == "lost" else "none",
             "stop_reason": self.last_reason or "",
             "recovery_decisions": list(self.recovery_decisions),
+            "retry_learning": list(self.retry_learning),
             "elapsed_seconds": self.elapsed_seconds,
         }
 
@@ -355,6 +382,7 @@ class RunnerExecution:
         budget_release: Optional[BudgetRelease] = None,
         max_resumes: int = 2,
         record: ExecutionRecord | None = None,
+        retry_learning_context: Mapping[str, Any] | None = None,
     ):
         if max_resumes < 0:
             raise ExecutionRecordError("max_resumes must be non-negative")
@@ -370,6 +398,29 @@ class RunnerExecution:
         self._budget_token: Any = None
         self._opened = False
         self._last_event: RunnerEvent | None = None
+        self.retry_learning_context = dict(retry_learning_context or {})
+        prior_retry_learning = self.retry_learning_context.get("prior_retry_learning", [])
+        if prior_retry_learning:
+            if not isinstance(prior_retry_learning, list):
+                raise ExecutionRecordError("prior retry learning must be a list")
+            existing_keys = {
+                str(item.get("retry_id") or item.get("learning_delta_digest") or "")
+                for item in self.record.retry_learning
+                if isinstance(item, Mapping)
+            }
+            for item in prior_retry_learning:
+                if not isinstance(item, Mapping):
+                    raise ExecutionRecordError("prior retry learning event is invalid")
+                try:
+                    validate_retry_learning_event(item)
+                except ValidationError as exc:
+                    raise ExecutionRecordError("prior retry learning event is invalid") from exc
+                key = str(item.get("retry_id") or item.get("learning_delta_digest") or "")
+                if key and key in existing_keys:
+                    continue
+                self.record.retry_learning.append(dict(item))
+                if key:
+                    existing_keys.add(key)
 
     @classmethod
     def rebind(
@@ -381,6 +432,7 @@ class RunnerExecution:
         journal: Optional[ExecutionJournal] = None,
         budget_release: Optional[BudgetRelease] = None,
         max_resumes: int = 2,
+        retry_learning_context: Mapping[str, Any] | None = None,
     ) -> "RunnerExecution":
         """Hydrate a journal and attach the same external Runner reference."""
         if not record.runner_ref:
@@ -397,6 +449,7 @@ class RunnerExecution:
             budget_release=budget_release,
             max_resumes=max_resumes,
             record=record,
+            retry_learning_context=retry_learning_context,
         )
         event = adapter.rebind(record.runner_ref)
         execution._accept(event)
@@ -447,6 +500,14 @@ class RunnerExecution:
         *,
         artifact_refs: list[str],
         failure_class: str | None = "RUNNER_FAILURE",
+        failure_signature: str | None = None,
+        failure_action: Mapping[str, Any] | None = None,
+        preconditions: list[str] | None = None,
+        preconditions_changed: bool = False,
+        learning_delta: Mapping[str, Any] | None = None,
+        lesson_ids_applied: list[str] | None = None,
+        eligible_lesson_ids: list[str] | None = None,
+        savings: Mapping[str, Any] | None = None,
         attempts_used: int = 0,
         max_attempts: int = 2,
         remaining_budget: int = 1,
@@ -470,10 +531,96 @@ class RunnerExecution:
             report_valid=report_valid,
             external_runner_available=external_runner_available,
         )
+        previous_learning = next(
+            (
+                item
+                for item in reversed(self.record.retry_learning)
+                if item.get("failure_signature")
+            ),
+            {},
+        )
+        learning_status = "not_retryable"
+        safe_failure_signature = ""
+        try:
+            safe_failure_signature = validate_failure_signature(failure_signature)
+        except ValidationError:
+            pass
+        safe_failure_action = {}
+        if isinstance(failure_action, Mapping):
+            safe_failure_action = {
+                field: str(failure_action[field]).strip()
+                for field in ("tool", "operation", "target_scope", "failure_class")
+                if str(failure_action.get(field, "")).strip()
+            }
+        learning_event: dict[str, Any] = {
+            "schema": "agent-loop.retry-learning.v1",
+            "retry_id": f"{self.record.identity.attempt_id}-retry-{len(self.record.retry_learning) + 1}",
+            "status": learning_status,
+            "action": decision.action,
+            "reason": decision.reason,
+            "failure_class": failure_class or "unknown",
+            "failure_signature": safe_failure_signature,
+            "failure_action": safe_failure_action,
+            "preconditions": list(preconditions or []),
+            "preconditions_changed": bool(preconditions_changed),
+            "learning_delta": None,
+            "learning_delta_digest": "",
+            "lesson_created": [],
+            "lesson_applied": [],
+            "savings": normalise_savings(savings),
+            "failed_elapsed_seconds": self.record.elapsed_seconds,
+            "failed_input_tokens": self.record.input_tokens,
+            "failed_output_tokens": self.record.output_tokens,
+            "failed_model_turns": self.record.model_turns_used,
+        }
+        if decision.action in RETRY_ACTIONS:
+            if not isinstance(failure_action, Mapping):
+                learning_gate_reason = "retry requires a structured failure_action"
+                gate_allowed = False
+                gate_digest = ""
+            else:
+                gate = evaluate_retry_learning(
+                    action=decision.action,
+                    failure_signature=str(failure_signature or ""),
+                    learning_delta=learning_delta,
+                    previous_failure_signature=previous_learning.get("failure_signature"),
+                    previous_learning_delta_digest=previous_learning.get("learning_delta_digest"),
+                    preconditions_changed=preconditions_changed,
+                    lesson_ids_applied=lesson_ids_applied or [],
+                    eligible_lesson_ids=eligible_lesson_ids or [],
+                )
+                learning_gate_reason = gate.reason
+                gate_allowed = gate.allowed
+                gate_digest = gate.delta_digest
+            if not gate_allowed:
+                decision = RecoveryDecision(
+                    "STOP_NO_LEARNING",
+                    learning_gate_reason,
+                    False,
+                    True,
+                    True,
+                )
+                learning_status = "blocked_no_learning"
+            else:
+                learning_status = "retry_allowed"
+                learning_event["learning_delta"] = dict(learning_delta or {})
+                learning_event["learning_delta_digest"] = gate_digest
+                learning_event["lesson_applied"] = [
+                    str(item).strip()
+                    for item in (lesson_ids_applied or [])
+                    if str(item).strip()
+                ]
+        elif decision.action in RECOVERY_ONLY_ACTIONS:
+            learning_status = "recovery_only"
+        learning_event["status"] = learning_status
+        learning_event["action"] = decision.action
+        learning_event["reason"] = decision.reason
+        validate_retry_learning_event(learning_event)
         self.record.record_recovery_decision(
             decision,
             failure_class=failure_class,
             remaining_budget=remaining_budget,
+            learning_event=learning_event,
         )
         if self.journal is not None:
             self.journal.write(self.record)
@@ -493,7 +640,105 @@ class RunnerExecution:
             self._runner_ref(),
             report_ref=report_ref,
         )
-        return self._accept(event)
+        event = self._accept(event)
+        if event.status == "closed":
+            self._finalize_retry_learning()
+        return event
+
+    def _finalize_retry_learning(self) -> None:
+        """Create candidate-only Lessons after a successful retry fallback."""
+
+        retry_events = [
+            event
+            for event in self.record.retry_learning
+            if event.get("status") == "retry_allowed"
+        ]
+        if not retry_events:
+            return
+        for event in retry_events:
+            # A cross-Runner retry may already carry counters from the failed
+            # Runner.  Preserve those measured values instead of replacing
+            # them with the new Runner's unrelated totals.
+            if "retry_elapsed_seconds" not in event:
+                event["retry_elapsed_seconds"] = max(
+                    0.0,
+                    self.record.elapsed_seconds
+                    - float(event.get("failed_elapsed_seconds", 0.0) or 0.0),
+                )
+            if "retry_input_tokens" not in event:
+                event["retry_input_tokens"] = max(
+                    0,
+                    self.record.input_tokens
+                    - int(event.get("failed_input_tokens", 0) or 0),
+                )
+            if "retry_output_tokens" not in event:
+                event["retry_output_tokens"] = max(
+                    0,
+                    self.record.output_tokens
+                    - int(event.get("failed_output_tokens", 0) or 0),
+                )
+            if "retry_model_turns" not in event:
+                event["retry_model_turns"] = max(
+                    0,
+                    self.record.model_turns_used
+                    - int(event.get("failed_model_turns", 0) or 0),
+                )
+
+        context = dict(self.retry_learning_context)
+        output_dir = context.get("output_dir")
+        if output_dir is None and self.journal is not None:
+            output_dir = (
+                self.journal.path.parent.parent
+                / "experience"
+                / self.record.identity.attempt_id
+            )
+        if output_dir is None:
+            for event in retry_events:
+                event["lesson_creation_status"] = "unavailable"
+                event["lesson_creation_reason"] = "no candidate output directory configured"
+            self._persist_record()
+            return
+
+        source_refs = [str(ref) for ref in context.get("source_refs", []) if str(ref).strip()]
+        if self.journal is not None:
+            source_refs.append(str(self.journal.path))
+        if self.record.report_ref:
+            source_refs.append(str(self.record.report_ref))
+        try:
+            experience_manifest, lessons = build_retry_experience(
+                retry_events,
+                task_id=self.record.identity.task_id,
+                task_revision=self.record.identity.task_revision,
+                snapshot=self.record.final_snapshot or self.record.identity.snapshot,
+                source_refs=list(dict.fromkeys(source_refs)),
+                domain=str(context.get("domain", "loop")),
+                task_type=str(context.get("task_type", "retry_recovery")),
+                changed_paths=self.record.changed_paths,
+                contract_versions=context.get(
+                    "contract_versions", {"agent-loop": "retry-learning:v1"}
+                ),
+            )
+            from .experience import write_experience_store
+
+            write_experience_store(output_dir, experience_manifest, lessons)
+            lesson_ids = [str(lesson["lesson_id"]) for lesson in lessons]
+            for index, event in enumerate(retry_events):
+                event["lesson_creation_status"] = "created"
+                event["lesson_created"] = (
+                    [lesson_ids[index]] if index < len(lesson_ids) else []
+                )
+                event["candidate_experience_ref"] = str(Path(output_dir) / "ExperienceManifest.yaml")
+        except (OSError, TypeError, ValueError, ValidationError) as exc:
+            for event in retry_events:
+                event["lesson_creation_status"] = "blocked"
+                event["lesson_creation_reason"] = type(exc).__name__
+        for event in retry_events:
+            validate_retry_learning_event(event)
+        self._persist_record()
+
+    def _persist_record(self) -> None:
+        if self.journal is not None:
+            self.journal.write(self.record)
 
     def _require_open(self) -> None:
         if not self._opened:

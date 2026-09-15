@@ -16,6 +16,7 @@ from .handoff import HandoffEnvelope, build_handoff
 from .launch import RunnerLaunchSpec
 from .manifest import validate_run_manifest
 from .report_validation import validate_test_report
+from .retry_learning import summarize_retry_learning
 from .runner import RunnerEvent
 from .verification import VerificationPlan, build_verification_plan
 
@@ -228,6 +229,10 @@ class SingleDomainLoop:
                 final_snapshot,
             ),
         ]
+        role_runs = [
+            self.owner_execution.record.to_manifest_role_run(),
+            self.verifier_execution.record.to_manifest_role_run(),
+        ]
         manifest = {
             "protocol_version": 1,
             "run_id": handoff.task_id,
@@ -257,11 +262,9 @@ class SingleDomainLoop:
                 "elapsed_seconds_used": elapsed_seconds_used,
                 "exhaustion_action": "transition_to_human_required_and_stop_new_runs",
             },
-            "role_runs": [
-                self.owner_execution.record.to_manifest_role_run(),
-                self.verifier_execution.record.to_manifest_role_run(),
-            ],
+            "role_runs": role_runs,
             "artifacts": artifacts,
+            "retry_learning": summarize_retry_learning(role_runs),
             "state_events": self._state_events(handoff.task_revision),
             "gates": self._gates(plan),
             "termination": {

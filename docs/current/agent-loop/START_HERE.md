@@ -100,6 +100,15 @@ Test Agent 只从 Owner 最终 commit/snapshot 出发，独立检查：
 没有独立证据，不得写 PASS；不能运行时写清楚 `ENVIRONMENT_FAILURE` 或
 `HUMAN_REQUIRED`，不要把主机上的半成功当作最终结论。
 
+### 3.3a 重试必须产生学习增量
+
+`RETRY_TEST` 和 `RETURN_TO_OWNER` 不是无条件的“再跑一次”。调用
+`RunnerExecution.recover()` 前必须提供脱敏失败签名、改变项、前置检查和
+成功替代动作组成的 `RetryLearningDelta`。同一失败签名、前置条件未变且
+delta 未变时，控制面进入 `STOP_NO_LEARNING`；未经确认或晋级的 Lesson 不得
+作为下一次任务上下文。成功的 retry 会自动写入 candidate-only Lesson，供
+后续 E2/E3/E4 审核，不能在当前任务中直接提升为正式规则。
+
 ### 3.4 集成和关闭
 
 只有最终 snapshot、changed paths、contract、TestReport 和预算都通过后，才生成

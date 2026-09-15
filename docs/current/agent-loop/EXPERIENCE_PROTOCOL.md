@@ -1,6 +1,6 @@
 # Experience Layer Protocol
 
-> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory、E4 fixed regression、E5 read-only proposals、E6 training readiness**
+> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory、Retry Learning Gate、E4 fixed regression、E5 read-only proposals、E6 training readiness**
 > **当前状态：** E4 只生成可审计 PromotionReport，E5 只生成提案，E6 只判断是否可以交给 Trainer；训练和正式规则变化仍需要人工 Gate。
 
 本协议是 [`SELF_EVOLUTION_PLAN.md`](SELF_EVOLUTION_PLAN.md) 的运行时补充。它不新增 Agent，
@@ -79,6 +79,29 @@ fallback_of: 1
 
 规则只基于可见的结构化事实，不自行猜测根因。模型总结若在未来加入，必须写入
 `inference`，不能覆盖 `observed_facts`。
+
+## 3.1 Retry Learning Gate
+
+重试不是重复执行。任何 `RETURN_TO_OWNER` 或 `RETRY_TEST` 必须在
+`RunnerExecution.recover()` 中携带结构化 `RetryLearningDelta`，至少说明：
+
+- 脱敏的 `failure_signature`，且与失败动作一致；
+- 本次改变的 `changed_refs`；
+- 下一次必须执行的 `preflight_checks`；
+- 成功替代路径 `fallback_action`；
+- 是否改变了前置条件，以及可注入的 Lesson 是否已经是 confirmed/promoted。
+
+同一失败签名在前置条件未改变、且 learning delta 未改变时，必须进入
+`STOP_NO_LEARNING`，不得再消耗模型调用。缺少 delta、delta 格式错误或引用
+未确认 Lesson 时同样 fail-closed。
+
+成功关闭的 retry 会把本次 fallback 转换为 `candidate_only` 的结构化 Lesson，
+写入任务的 `experience/` 目录；candidate 不会自动进入下一次 ContextBrief。
+只有 E2/E3 明确选中并通过后续回归的 Lesson 才能出现在后续上下文中。
+
+每个 RunManifest 的 `retry_learning` 必须记录 `lesson_created`、
+`lesson_applied`、`learning_delta` 和 `savings`。没有反事实基线时，
+`savings.status` 必须为 `unavailable`，不得把零值解释为节省为零或声称已节省。
 
 ## 4. CLI
 

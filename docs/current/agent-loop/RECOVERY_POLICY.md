@@ -20,6 +20,12 @@ it does not launch a model, a child task, or Docker.
 | Owner defect within attempt limit | RETURN_TO_OWNER | yes | no |
 | Any failure at attempt limit | WAIT_HUMAN | no | yes |
 
+For `RETRY_TEST` and `RETURN_TO_OWNER`, `RunnerExecution.recover()` additionally
+requires a valid `RetryLearningDelta`. A missing, malformed, repeated, or
+unapproved delta changes the action to `STOP_NO_LEARNING` and requires human
+review. `RESUME_SAME_RUNNER` is a recovery of the same logical attempt and is
+recorded separately; it does not require inventing a Lesson.
+
 ## Safety invariants
 
 1. A failed test never starts an unbounded loop.
@@ -31,6 +37,14 @@ it does not launch a model, a child task, or Docker.
 6. `RunnerExecution.recover()` persists the decision and counters in the
    ExecutionJournal before it invokes a bounded resume; the caller must project
    the same entry into the RunManifest before executing any later action.
+7. A model-spending retry requires a failure signature, a changed reference,
+   preflight checks, and an explicit fallback action. The same failure
+   signature with unchanged preconditions and the same delta is stopped.
+8. A successful retry writes only a candidate-only ExperienceManifest and
+   Lesson when the execution has an evidence journal; it never injects the
+   candidate into a later ContextBrief automatically.
+9. Savings are recorded as `unavailable` unless a caller supplies a measured
+   counterfactual baseline. Zero is not interpreted as zero cost saved.
 
 ## Current implementation boundary
 
@@ -43,3 +57,9 @@ the same Runner. An earlier immediate-loss attempt failed with Codex's
 instead of fabricating recovery. The local CLI bridge now exposes token and
 elapsed metrics; Pilot 006 recorded them and correctly stopped when the
 TaskPacket budget was exceeded.
+
+The Retry Learning Gate is implemented in
+`scripts/agent_loop/retry_learning.py`. It is called by
+`RunnerExecution.recover()`, journals `lesson_created`, `lesson_applied`,
+`learning_delta` and savings fields, and generates candidate-only experience
+after a successful fallback. E2/E3 promotion remains an explicit later step.

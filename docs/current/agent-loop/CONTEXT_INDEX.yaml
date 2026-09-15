@@ -182,6 +182,23 @@ entries:
     supersedes: []
     superseded_by: []
     notes: "Keep report validation strict; repair the producer instruction or rerun the Test Agent instead of normalizing unknown statuses."
+  - id: "agent-loop-retry-learning"
+    domain: "project"
+    claim: "A model-spending retry requires a new structured learning delta; a successful fallback creates candidate-only experience and never self-injects it."
+    source_refs:
+      - {path: "scripts/agent_loop/retry_learning.py", locator: "evaluate_retry_learning and build_retry_experience", source_kind: "validator"}
+      - {path: "scripts/agent_loop/execution.py", locator: "RunnerExecution.recover and _finalize_retry_learning", source_kind: "host_protocol"}
+      - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "LL-016", source_kind: "lesson"}
+    verified_at: "2026-09-15"
+    verified_snapshot: "external-main@289d53b; local-e4@661eb7a; architecture-gate 2026-09-15; E4-approved; E5-blocked-missing-independent-lesson"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["retry learning", "learning delta", "STOP_NO_LEARNING", "repeat failure", "retry gate"]
+    owner: "project"
+    lesson_refs: ["LL-016"]
+    supersedes: []
+    superseded_by: []
+    notes: "Same failure signature plus unchanged preconditions and delta is stopped; savings remain unavailable unless a counterfactual baseline is supplied."
 
 maintenance:
   stale_after_days: 30

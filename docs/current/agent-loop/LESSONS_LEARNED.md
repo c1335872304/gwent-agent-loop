@@ -347,6 +347,31 @@ regression_test: "scripts/agent_loop/test_codex_bridge.py"
 trigger_terms: ["TestReport status", "passed vs PASS", "report enum", "protocol drift"]
 ```
 
+### LL-016：重试必须先产生可审计的学习增量
+
+```yaml
+id: "LL-016"
+status: "confirmed"
+discovered_at: "2026-09-15"
+task_id: "GW-RETRY-LEARNING-GATE"
+scope: "loop"
+symptom: "失败后只重复调用 Owner 或 Test，重试没有声明改变了什么，也没有把结果写入经验账本。"
+impact: "相同失败可能反复消耗 token、时间和 Docker 资源，且下一次任务无法知道前一次为什么失败。"
+root_cause: "Recovery policy 原先只判断动作和次数，没有把失败签名、learning delta、Lesson 资格和成功后的候选经验连接起来。"
+evidence:
+  - ref: "scripts/agent_loop/retry_learning.py"
+  - ref: "scripts/agent_loop/execution.py"
+    snapshot: "local-retry-learning-gate"
+  - ref: "scripts/agent_loop/test_retry_learning.py"
+    snapshot: "local-retry-learning-gate"
+correct_practice: "RETURN_TO_OWNER 和 RETRY_TEST 必须携带与失败匹配的脱敏签名、changed_refs、preflight_checks 和 fallback_action；同一签名在前置条件未改变且 delta 未改变时进入 STOP_NO_LEARNING。成功 fallback 只生成 candidate-only Lesson，经过 E2/E3/E4 后才能进入后续上下文。"
+verification:
+  - "python3 -m unittest -q scripts.agent_loop.test_retry_learning"
+  - "python3 -m unittest -q scripts.agent_loop.test_execution scripts.agent_loop.test_manifest_completion"
+regression_test: "scripts/agent_loop/test_retry_learning.py"
+trigger_terms: ["retry learning", "learning delta", "STOP_NO_LEARNING", "重复失败", "retry gate"]
+```
+
 1. 先确认它不是已有 Skill、contract 或导航条目的重复内容；
 2. 保存最小可验证症状，不复制整段聊天或敏感日志；
 3. 记录来源和 snapshot；

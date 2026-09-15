@@ -119,6 +119,8 @@ class BoundedLoopTests(unittest.TestCase):
             saved = json.loads((Path(temp) / "run-manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(saved["workspace"]["final_snapshot"], "final-snapshot")
             self.assertEqual(len(saved["role_runs"]), 2)
+            self.assertEqual(saved["retry_learning"]["retry_count"], 0)
+            self.assertEqual(saved["retry_learning"]["savings"]["status"], "unavailable")
 
 
 if __name__ == "__main__":

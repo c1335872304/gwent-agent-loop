@@ -100,13 +100,13 @@ condition.
 | Test / Verification role | profile and policy implemented | `TEST_AGENT.md`, `profiles/test-verification.yaml` |
 | TaskPacket / ContextBrief / Profile validation | implemented | `validate_packet.py`, `launch.py` |
 | ContextIndex and lessons navigation | implemented; entry-card, policy and snapshot consistency are gated, fact re-verification remains manual | `CONTEXT_INDEX.yaml`, `LESSONS_LEARNED.md`, `check_docs.py` |
-| Self-evolution / detour analysis | E0–E6 control code implemented; E4 approved; E5 proposal generation is blocked until two independent structured Lessons are available; E6 execution, training and formal rule changes remain closed | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `E4_REGRESSION_20260915_REPORT.md`, `regression.py`, `proposal.py`, `training_readiness.py` |
+| Self-evolution / detour analysis | E0–E6 control code implemented; Retry Learning Gate now requires a learning delta before model retry and writes candidate-only experience after success; E4 approved; E5 proposal generation is blocked until two independent structured Lessons are available; E6 execution, training and formal rule changes remain closed | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `RECOVERY_POLICY.md`, `scripts/agent_loop/retry_learning.py`, `regression.py`, `proposal.py`, `training_readiness.py` |
 | State, budget, lock, snapshot and persistence | implemented deterministically | `state_machine.py`, `budget.py`, `locks.py`, `persistence.py` |
 | Runner lifecycle and execution journal | implemented as model-free contracts | `runner.py`, `execution.py` |
 | Owner to Test handoff and verification plan | implemented as validators | `handoff.py`, `verification.py` |
 | TestReport evidence gate | implemented | `report_validation.py`, `TEST_REPORT_TEMPLATE.yaml` |
 | Docker canonical pytest | implemented for the declared Python test suite | `python3 scripts/check.py docker-test` |
-| Bounded recovery / circuit breaker | implemented deterministically | `recovery.py`, `RECOVERY_POLICY.md` |
+| Bounded recovery / circuit breaker | implemented deterministically; retry learning gate blocks same-failure retries without a changed delta | `recovery.py`, `retry_learning.py`, `RECOVERY_POLICY.md` |
 | Recovery decision journaling and bounded resume hook | live controlled loss/resume passed once; bounded | `execution.py`, `archive/pilots/PILOT_005_REPORT.md` |
 | Codex project-task request | builder implemented | `codex_bridge.py`, `CODEX_TRANSPORT.md` |
 | Host lifecycle mapping | implemented with injected bridge | `codex_host_transport.py` |

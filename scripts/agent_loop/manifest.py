@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 from .errors import ValidationError
+from .retry_learning import validate_retry_learning_event, validate_retry_learning_summary
 from .validate_artifact import validate_artifact_record
 
 RUN_STATUSES = {"created", "running", "blocked", "human_required", "completed", "cancelled", "failed", "superseded"}
@@ -54,6 +55,13 @@ def validate_run_manifest(manifest: Mapping[str, Any]) -> None:
             raise ValidationError(f"invalid role run status: {role_run.get('status')}")
         if not str(role_run.get("attempt_id", "")).strip() or not str(role_run.get("profile_id", "")).strip():
             raise ValidationError("role run requires attempt_id and profile_id")
+        retry_learning = role_run.get("retry_learning", [])
+        if not isinstance(retry_learning, list):
+            raise ValidationError("role run retry_learning must be a list")
+        for event in retry_learning:
+            if not isinstance(event, Mapping):
+                raise ValidationError("role run retry_learning events must be mappings")
+            validate_retry_learning_event(event)
 
     artifacts = manifest["artifacts"]
     if not isinstance(artifacts, list):
@@ -62,6 +70,9 @@ def validate_run_manifest(manifest: Mapping[str, Any]) -> None:
         if not isinstance(artifact, Mapping):
             raise ValidationError("each artifact must be a mapping")
         validate_artifact_record(artifact)
+
+    if "retry_learning" in manifest:
+        validate_retry_learning_summary(manifest["retry_learning"])
 
     events = manifest["state_events"]
     if not isinstance(events, list):

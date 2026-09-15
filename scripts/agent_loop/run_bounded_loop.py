@@ -120,7 +120,26 @@ def run(args: argparse.Namespace) -> dict:
         )
         adapter = ExternalRunnerAdapter(spec, transport)
         journal = ExecutionJournal.for_task(root / ".agent-loop", task_id, spec.request.attempt_id)
-        return RunnerExecution(adapter, spec.request, journal=journal, max_resumes=2)
+        return RunnerExecution(
+            adapter,
+            spec.request,
+            journal=journal,
+            max_resumes=2,
+            retry_learning_context={
+                "output_dir": root
+                / ".agent-loop"
+                / "tasks"
+                / task_id
+                / "experience"
+                / spec.request.attempt_id,
+                "source_refs": [owner_packet_ref, owner_context_ref],
+                "domain": spec.request.role,
+                "task_type": str(packet.get("task_type", "bounded_retry")),
+                "contract_versions": packet.get(
+                    "contract_versions", {"agent-loop": "retry-learning:v1"}
+                ),
+            },
+        )
 
     def make_verifier(handoff, _plan):
         budgets = _limits(packet, test_profile, args)
