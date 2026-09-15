@@ -1,5 +1,12 @@
 # Development and Runtime
 
+## Agent entry
+
+- 任务路由、目录地图、contract handoff 和验证选择：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
+- 受限串行任务的读取顺序与停止条件：[`START_HERE.md`](agent-loop/START_HERE.md)；
+- 当前能力与现场证据：[`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)；
+- 本文只提供常用构建/运行命令；开始修改前仍必须读取对应领域 Skill 和 contract。
+
 ## 1. 快速验证
 
 ```bash

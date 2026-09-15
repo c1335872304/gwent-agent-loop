@@ -1,22 +1,32 @@
 # Gwent Git 版本管理规范
 
-> **状态：Proposed**  
-> **版本：0.1**  
+> **状态：当前工作规范**
 > **适用范围：本地开发、Agent Loop、测试、跨域 contract 变更和未来远程协作**
 
-## 0. 当前仓库状态
+## Agent entry
 
-最后核验：2026-09-13。
+- 先用 [`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md) 判断责任域、最小验证和 handoff；
+- 受限串行任务的 snapshot、scope、工件和停止条件见 [`START_HERE.md`](agent-loop/START_HERE.md)；
+- 外部 `main` 的特殊 ZIP 边界见 [`START_HERE.md`](agent-loop/START_HERE.md) 的“特殊文件边界”；
+- 当前 Git 状态必须以 `git status --short`、`git branch --show-current` 和 `git log -1 --oneline` 的实际输出为准。
+
+## 0. 当前仓库上下文
+
+最后整理：2026-09-15。以下是稳定工作约束，不替代实时命令输出。
 
 ```text
-本地 Git 仓库：已初始化
-默认分支：main
-远程仓库：未配置
-首次提交：待配置作者身份后创建
-Git LFS：当前环境不可用
+维护分支：main
+Codex 任务：默认使用 codex/<topic> 隔离分支或 worktree
+外部集成 checkout：/mnt/c/codes/gwent_v4（main）
+远程仓库：当前未配置；不得假设存在 remote
+基线与后续提交：已经存在；不得重跑“首次提交”流程
+Git LFS：未配置；大二进制的长期远程策略仍需人工决定
 ```
 
-首次初始化时已按现有 `.gitignore` 暂存项目文件。当前规则会排除缓存、`node_modules`、`.agent-loop/`、训练运行输出和 checkpoint；`models/v3/policy.pt` 以及 `release_assets/` 中的发布资产目前会被纳入候选提交。它们是大文件，未来配置远程仓库前必须重新确认存储策略。
+外部 `main` 中两个 `packages/gwent_architecture_*.zip` 是不可读取的用户改动；它们
+不属于当前任务 scope，禁止读取、哈希、暂存、覆盖、删除或通过 reset/clean/stash 处理。
+`.gitignore` 默认排除缓存、`node_modules/`、`.agent-loop/`、训练运行输出和 checkpoint。
+`models/v3/policy.pt` 与发布资产是否适合未来远程存储，仍需在配置 remote 前单独决定。
 
 本文件是管理规范，不替代 Git 的实际状态。任何状态结论必须以命令输出为准。
 
@@ -65,33 +75,29 @@ Git 不负责保存完整聊天历史、隐藏推理、临时 Docker 状态或�
 
 没有 Git LFS 时，不要继续向仓库添加更大的 checkpoint、embedding 或构建包。未来若需要远程协作，应在远程策略确定后再启用 LFS 或 Release 存储，避免把大文件历史永久写入普通 Git。
 
-## 3. 首次基线提交
+## 3. 已有基线与新的任务提交
 
-首次提交是“当前工作区基线”，不是对所有运行结果已经验证的声明。配置作者身份后按顺序执行：
+维护 checkout 已有 Git 基线和后续提交；不要重复执行初始化、批量暂存或“建立首个
+commit”步骤。每个新任务只处理已声明的 changed paths，并在提交前运行：
 
-```powershell
-git config user.name "你的姓名"
-git config user.email "你的邮箱"
-
+```bash
 git status --short
-git diff --cached --stat
-git diff --cached --name-only
+git diff -- <declared-path>
+git add <declared-path>
 git diff --cached --check
-
-git commit -m "chore: establish project baseline"
+git diff --cached --name-status
+git commit -m "<type>(<scope>): <short outcome>"
 git status --short
 ```
 
-提交前必须检查：
+提交前必须确认：
 
-- 没有 `.env`、密钥、个人临时文件；
-- 没有 `node_modules/`、Python cache、训练 checkpoint；
-- 大文件属于已确认的公开资产；
-- 新增文档和 `.gitignore` 规则已在 staged diff 中；
-- `git diff --cached --check` 没有 whitespace error；
-- 当前目录没有与用户无关的未声明改动。
-
-没有配置作者身份时，可以保持“已初始化、已暂存、未提交”，不得伪造作者邮箱。
+- 没有 `.env`、密钥、个人临时文件、cache、训练 checkpoint 或未声明生成物；
+- staged diff 只包含 TaskPacket/任务 scope 中允许的路径；
+- 用户已有改动与本次改动可区分，且没有被覆盖；
+- 大文件和发布资产符合已确认策略；
+- `git diff --cached --check` 无 whitespace error；
+- 对应领域验证和独立 Test 所使用的 snapshot 已记录。
 
 ## 4. 日常工作流
 
@@ -107,9 +113,10 @@ git log -1 --oneline
 
 ### 4.2 分支命名
 
-未来有远程协作时，推荐：
+Codex 自动任务默认使用 `codex/` 前缀；人工或未来远程协作分支可使用：
 
 ```text
+codex/<topic>
 feat/core-<topic>
 fix/product-<topic>
 fix/teacher-<topic>
@@ -119,7 +126,9 @@ docs/agent-loop-<topic>
 chore/<topic>
 ```
 
-当前没有远程仓库且没有 Git 历史时，可以先在 `main` 建立初始基线；进入正式开发后，跨域或高风险任务 SHOULD 使用独立分支或独立 worktree。
+当前没有配置 remote，但本地 `main` 与 Codex 隔离 worktree 都已存在。普通 Codex 任务使用
+`codex/<topic>`；跨域、高风险或需要独立 Test 的任务使用独立 worktree。直接修改外部脏
+`main`、解决冲突或覆盖用户改动必须进入 `HUMAN_REQUIRED`。
 
 ### 4.3 修改和暂存
 
@@ -133,7 +142,7 @@ git add <声明过的路径>
 git diff --cached --check
 ```
 
-不建议在 Agent Loop 中无条件使用 `git add -A`，因为它可能把用户临时文件、未声明生成物或测试输出一起加入。只有首次基线或明确审查过范围时才允许全量暂存。
+不建议在 Agent Loop 中无条件使用 `git add -A`，因为它可能把用户临时文件、未声明生成物或测试输出一起加入。只有经过明确授权且完整审查范围的导入/维护任务才允许全量暂存。
 
 ### 4.4 提交边界
 
@@ -282,16 +291,13 @@ git status --short --ignored
 
 ## 10. Git 管理验收清单
 
-### 初始基线
+### 维护 checkout
 
-- [ ] `.git` 已初始化；
-- [ ] 作者身份已配置；
-- [ ] `.gitignore` 已审查；
-- [ ] staged 文件列表已审查；
-- [ ] 大文件策略已确认；
-- [ ] `git diff --cached --check` 通过；
-- [ ] 初始 commit 已创建；
-- [ ] `git status --short` 干净或剩余项已解释。
+- [x] Git 基线和后续提交存在；
+- [x] `.gitignore`、目录契约和 Agent Loop 本机状态边界已定义；
+- [x] 外部 `main` 的两个不可读取 ZIP 已被记录为保留项；
+- [ ] remote / LFS / 发布二进制的长期存储策略尚未授权，不由 Agent 自动配置；
+- [ ] 每次开始仍必须用实时 Git 命令确认 branch、HEAD、dirty paths 和用户改动。
 
 ### 每个 Agent 任务
 
@@ -304,11 +310,10 @@ git status --short --ignored
 - [ ] 没有临时产物、密钥或大文件误入；
 - [ ] 失败时保存 RunManifest 和回退信息。
 
-## 11. 当前下一步
+## 11. 持续维护项
 
-1. 用户提供本地 Git `user.name` 和 `user.email`；
-2. 审查当前已暂存的 445 个文件和三个大文件；
-3. 创建 `chore: establish project baseline` 初始 commit；
-4. 决定是否补 `.gitattributes`；
-5. 决定 `release_assets/` 和 `policy.pt` 的长期远程存储策略；
-6. 再为 Agent Loop 的 Phase 1 引入分支、snapshot 和 RunManifest 约束。
+1. 每个任务从实际 branch、HEAD、dirty paths 和 TaskPacket scope 开始，不从本文猜测状态；
+2. 文档、代码和测试提交保持小且可解释，提交前做 staged scope 和 whitespace 检查；
+3. 需要外部 `main` 集成时，先产出隔离 candidate、IntegrationManifest、独立 Test 和 rollback 证据；
+4. remote、`.gitattributes`、LFS、`release_assets/` 和产品模型的长期存储策略，只有在用户明确授权后才配置；
+5. 新出现的 Git/工作树失败模式经复现后写入 `LESSONS_LEARNED.md`，而不是留在聊天记忆里。

@@ -5,6 +5,9 @@
 >
 > 当前状态只以 [`CURRENT_STATE.md`](CURRENT_STATE.md) 为准；本页的规则是
 > 稳定操作约束，现场数字和试点结论不要复制到这里。
+>
+> 先用 [`../AGENT_ONBOARDING_INDEX.md`](../AGENT_ONBOARDING_INDEX.md) 识别责任域、
+> 最小事实集和验证等级；本页只负责受限串行 Loop 的操作顺序与停止条件。
 
 ## 0. 一句话理解
 
@@ -30,12 +33,13 @@
 
 1. 用户当前请求，以及权限、数据保留和外部写入边界；
 2. 根目录 [`AGENTS.md`](../../../AGENTS.md)；
-3. 本页；
-4. [`CURRENT_STATE.md`](CURRENT_STATE.md)；
-5. 根据责任域读取对应 Skill；
-6. 只读取该 Skill 指向的 contract、实现和测试；
-7. 查找相关的 [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) 条目；
-8. 最后读取当前 TaskPacket、ContextBrief 和 snapshot；历史报告只在任务明确
+3. [`../AGENT_ONBOARDING_INDEX.md`](../AGENT_ONBOARDING_INDEX.md)；
+4. 本页；
+5. [`CURRENT_STATE.md`](CURRENT_STATE.md)；
+6. 根据责任域读取对应 Skill；
+7. 只读取该 Skill 指向的 contract、实现和测试；
+8. 查找相关的 [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) 条目；
+9. 最后读取当前 TaskPacket、ContextBrief 和 snapshot；历史报告只在任务明确
    需要复核证据时，从 [`archive/README.md`](archive/README.md) 按需打开。
 
 出现冲突时，优先级是：用户当前明确请求与安全约束、`AGENTS.md`、领域

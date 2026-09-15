@@ -1,5 +1,16 @@
 # Teacher and Web Product
 
+## Agent entry
+
+- 路由、handoff 与验证选择：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
+- Teacher evidence/privacy：[`teacher-explanation`](../../.agents/skills/teacher-explanation/SKILL.md)、[`EVIDENCE_CONTRACT.md`](../../.agents/skills/teacher-explanation/references/EVIDENCE_CONTRACT.md)、[`PRIVACY_BOUNDARY.md`](../../.agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md)；
+- React/BFF/Core HTTP：[`product-integration`](../../.agents/skills/product-integration/SKILL.md)、[`CORE_API_CONTRACT.md`](../../apps/web/docs/CORE_API_CONTRACT.md)；
+- 局部实现入口：[`apps/web/README.md`](../../apps/web/README.md)、[`services/teacher/README.md`](../../services/teacher/README.md)。
+
+先区分真实 AI 已执行动作、Core clone 已执行的反事实根行动链和纯 UI 展示。缺少
+authoritative evidence 时向 Core/Strategy 请求结构化字段；不要让 Teacher 决策、重算
+legal actions、解析展示文本或把隐藏信息传入浏览器。
+
 ## 1. Teacher Runtime
 
 `services/teacher/` 是 Strategy 之后的只读解释层：

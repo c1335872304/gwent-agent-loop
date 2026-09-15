@@ -2,9 +2,10 @@
 
 ## 新对话入口
 
-新 Agent 或新对话先读 [`START_HERE.md`](START_HERE.md)。它集中说明读取顺序、
-责任域路由、默认串行模式、本地 Codex CLI、Docker 验证、停止条件和交付物；
-不要依赖旧聊天记录或临时记忆重新摸索。
+新 Agent 或新对话先读 [`../AGENT_ONBOARDING_INDEX.md`](../AGENT_ONBOARDING_INDEX.md)
+定位责任域和最小事实集，再读 [`START_HERE.md`](START_HERE.md)。本目录集中说明
+受限串行模式、本地 Codex CLI、Docker 验证、停止条件和交付物；不要依赖旧聊天
+记录或临时记忆重新摸索。
 
 这些模板是 [`AGENT_LOOP_PLAN.md`](../AGENT_LOOP_PLAN.md) 的可提交、人工可读部分。
 

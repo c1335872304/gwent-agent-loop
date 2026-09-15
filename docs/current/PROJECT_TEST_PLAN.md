@@ -1,5 +1,13 @@
 # Gwent 项目完整测试规划
 
+## Agent entry
+
+- 先用 [`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md) 确定领域 Owner、contract 和最小验证；
+- 独立 Test/Verification 的读写边界、Docker allowlist 和报告要求见 [`TEST_AGENT.md`](agent-loop/TEST_AGENT.md)；
+- 当前受限 Loop 的任务范围和最终 snapshot 以 TaskPacket、TestMatrix、TestReport 和 [`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md) 为准；
+- `python3 scripts/check.py architecture` 是索引/控制面默认门禁，`python3 scripts/check.py docker-test` 是 Product、Teacher 与 Loop Python pytest 的最终环境；
+- 本文记录完整测试分层、手工验收和暂缓项，不能替代领域 Skill 或最终 TestReport。
+
 ## 1. 目标与当前结论
 
 本计划用于验收以下完整链路：

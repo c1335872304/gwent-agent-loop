@@ -3,6 +3,13 @@
 本文档目录按“事实来源”和“使用场景”组织。当前源码的结论以基线和
 contract 为准；方案/实施记录只用于解释为什么这样设计，不能覆盖当前代码。
 
+## 新 Agent / 新对话
+
+1. [`../AGENTS.md`](../AGENTS.md) — 治理、路由和不可跨越的边界；
+2. [`current/AGENT_ONBOARDING_INDEX.md`](current/AGENT_ONBOARDING_INDEX.md) — 按任务定位 Owner、Skill、contract、目录和验证；
+3. [`current/agent-loop/START_HERE.md`](current/agent-loop/START_HERE.md) — 受限串行任务的最小读取顺序和生命周期；
+4. [`current/agent-loop/CURRENT_STATE.md`](current/agent-loop/CURRENT_STATE.md) — 唯一实时运行状态。
+
 ## 当前事实来源
 
 1. [`current/PROJECT_BASELINE.md`](current/PROJECT_BASELINE.md) — 当前架构、运行版本、模型资产和已验证链路；

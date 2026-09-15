@@ -2,6 +2,16 @@
 
 m14 固定了一个轻量 trace 协议：`gwent-golden-trace-v1`。
 
+## Agent entry
+
+- Core 任务路由：[`AGENT_ONBOARDING_INDEX.md`](../../docs/current/AGENT_ONBOARDING_INDEX.md)；
+- 必读 Skill：[`core-environment`](../../.agents/skills/core-environment/SKILL.md)；
+- Action/pending-choice 语义：[`ACTION_CONTRACT.md`](../../.agents/skills/core-environment/references/ACTION_CONTRACT.md)；
+- schema/version 边界：[`SCHEMA_CONTRACT.md`](../../.agents/skills/core-environment/references/SCHEMA_CONTRACT.md)。
+
+Golden/trace 用于证明同一规则、动作序列和 legal surface 在实现边界上保持一致；它不是
+模型能力评估，也不能替代真实 `Game::create()`、卡牌级回归或 C API 可见性测试。
+
 目标是：同一副牌、同一 seed、同一先手、同一动作脚本，Python core 和 C++ core 各输出一份 JSON trace，然后用 `compare_trace.py` 对比。
 
 ## C++ 输出 trace

@@ -1,5 +1,17 @@
 # Core and Cross-layer Contracts
 
+## Agent entry
+
+- 路由、目录、handoff 和验证选择：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
+- 必读 Skill：[`core-environment`](../../.agents/skills/core-environment/SKILL.md)；
+- action/pending-choice 语义：[`ACTION_CONTRACT.md`](../../.agents/skills/core-environment/references/ACTION_CONTRACT.md)；
+- schema/version 规则：[`SCHEMA_CONTRACT.md`](../../.agents/skills/core-environment/references/SCHEMA_CONTRACT.md)；
+- card/runtime catalog 任务：[`CARD_EXTENSION.md`](../../.agents/skills/core-environment/references/CARD_EXTENSION.md) 与 [`RUNTIME_CARD_CATALOG.md`](../../.agents/skills/core-environment/references/RUNTIME_CARD_CATALOG.md)。
+
+Core 是规则、legal action、C ABI 与环境 contract 的 authoritative Owner。变更前先判断是
+规则、Action Grammar、Observation Schema 还是 Reward ABI；消费者只能通过明确 handoff
+同步，不能在 Python、BFF、React 或 Teacher 复制规则。
+
 ## 1. C++ Core 是唯一规则来源
 
 卡牌效果、状态变化、随机目标、合法动作和多阶段 decision 都由 C++ Core 决定。Python、Teacher 和 React 只能消费结构化结果。

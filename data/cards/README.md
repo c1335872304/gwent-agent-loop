@@ -3,6 +3,18 @@
 This directory separates reference data from cards that the Core runtime truly
 supports.
 
+## Agent entry
+
+- Core 任务路由：[`AGENT_ONBOARDING_INDEX.md`](../../docs/current/AGENT_ONBOARDING_INDEX.md)；
+- 必读 Skill：[`core-environment`](../../.agents/skills/core-environment/SKILL.md)；
+- 规则与 schema 边界：[`CORE_CONTRACTS.md`](../../docs/current/CORE_CONTRACTS.md)；
+- 牌组组成：[`data/decks/README.md`](../decks/README.md)；
+- 验证：`python3 tools/codegen/generate_card_data.py --check` 与 `python3 tools/codegen/validate_card_data.py`。
+
+新增或扩展卡牌时，先按 Core Skill 找相似行为和测试；只有 effect bindings、真实
+运行时 catalog 和回归测试一起具备时，card 才能从 reference 进入 supported set。
+JSON 不是运行时规则解释器，不能在这里实现游戏行为。
+
 - `reference/all_cards.json` is a normalized, reference-only catalog used to
   search and plan future card work. It is not a runtime input and carries no
   effect bindings.

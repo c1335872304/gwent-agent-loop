@@ -1,5 +1,17 @@
 # Training and V3 Model
 
+## Agent entry
+
+- 路由、任务类型与验证等级：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
+- 必读 Skill：[`training-config`](../../.agents/skills/training-config/SKILL.md)；
+- 正式 task 与运行资产：[`training/README.md`](../../training/README.md)、[`artifacts/README.md`](../../artifacts/README.md)、[`runs/README.md`](../../runs/README.md)；
+- Core schema/action 的事实来源：[`CORE_CONTRACTS.md`](CORE_CONTRACTS.md) 与 [`rl_contract.json`](../../config/rl_contract.json)；
+- 产品模型槽与冻结边界：[`models/v3/README.md`](../../models/v3/README.md)。
+
+先分类为 config、Training Task、resume、warm-start、evaluation 或 promotion。Trainer 只判断
+模型与 Core contract 的兼容性；规则、legal action 和 schema 语义仍由 Core 定义，不能用
+`strict=False`、伪 metadata、静默裁剪或调参掩盖 incompatibility。
+
 ## 1. RL Pipeline
 
 ```text

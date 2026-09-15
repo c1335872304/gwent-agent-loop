@@ -1,5 +1,17 @@
 # 本地 CPU Docker 单机对战
 
+## Agent entry
+
+- 路由与运行时边界：[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)；
+- Product 任务 Skill：[`product-integration`](../../.agents/skills/product-integration/SKILL.md)；
+- Docker 测试角色与 cleanup：[`TEST_AGENT.md`](agent-loop/TEST_AGENT.md)；
+- 验证分层和浏览器手工项目：[`PROJECT_TEST_PLAN.md`](PROJECT_TEST_PLAN.md)；
+- 冻结模型的读取边界：[`models/v3/README.md`](../../models/v3/README.md)。
+
+先确认任务是否真的声明了服务依赖。只有 TaskPacket/TestMatrix 要求服务验证时才启动
+Compose；测试只清理本次拥有的资源，任何端口、ownership、模型或 Docker 权限不确定性
+都要停止并报告，不能用 host pytest 或共享容器伪造最终 PASS。
+
 本目录提供的是产品运行时，而不是训练环境：它只加载 `models/v3/` 中的最终 V3 `policy.pt`。PPO、
 Collector、CUDA、`runs/` 和服务器训练资产均不会进入 Docker 镜像或挂载目录。
 

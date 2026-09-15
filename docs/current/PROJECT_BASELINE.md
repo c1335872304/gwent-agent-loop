@@ -2,6 +2,10 @@
 
 > 本文是本地 CPU 产品运行时与当前源码边界的基线。它记录已落地的能力、稳定 contract、验证入口和已知维护事项；计划类文档只保留设计与历史决策，不替代本文。
 
+> 新 Agent 先用 [`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md) 定位责任域和
+> 最小事实集；受限 Agent Loop 当前状态以 [`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)
+> 为准。本页描述产品架构基线，不替代最终代码 snapshot、TaskPacket 或 TestReport。
+
 ## 1. 当前目标与非目标
 
 项目提供本地 Docker 单机的“人类 vs AI”昆特牌对战：C++ Core 是规则唯一事实来源，产品只加载一份已封盘的 V3 模型进行 CPU 推理。

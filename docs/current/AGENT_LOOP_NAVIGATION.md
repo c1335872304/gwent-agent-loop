@@ -5,9 +5,11 @@
 > **用途：给主 Agent、Context / Integration Agent 和各领域 Owner 提供稳定的上下文入口。**
 > **当前实现状态：** [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md) 是唯一现状入口。
 
-新 Agent 或新对话的第一份操作文档是
-[`agent-loop/START_HERE.md`](agent-loop/START_HERE.md)。本导航负责定位事实来源；
-START_HERE 负责给出最短可执行路径，避免依赖旧聊天记忆试错。
+新 Agent 或新对话先读
+[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md)，再读
+[`agent-loop/START_HERE.md`](agent-loop/START_HERE.md)。前者负责按责任域定位最小
+事实集、contract 与验证；后者负责受限串行任务的操作顺序。本导航保留跨域事实
+来源和路由细节，避免依赖旧聊天记忆试错。
 
 这不是项目百科，也不是新的规则来源。它回答三个问题：
 
@@ -22,12 +24,13 @@ START_HERE 负责给出最短可执行路径，避免依赖旧聊天记忆试错
 ```text
 1. 用户当前请求与安全/权限边界
 2. AGENTS.md
-3. `agent-loop/START_HERE.md`
-4. 本导航文件和 `CURRENT_STATE.md`
-5. 对应领域 Skill
-6. 对应 contract / architecture / 代码事实来源
-7. 相关测试、trace、历史坑记录
-8. 当前 TaskPacket / ContextBrief / snapshot
+3. `AGENT_ONBOARDING_INDEX.md`
+4. `agent-loop/START_HERE.md`
+5. 本导航文件和 `CURRENT_STATE.md`
+6. 对应领域 Skill
+7. 对应 contract / architecture / 代码事实来源
+8. 相关测试、trace、历史坑记录
+9. 当前 TaskPacket / ContextBrief / snapshot
 ```
 
 如果任务只是讨论方案，可以停在第 5 步；如果任务要修改代码，必须继续读取对应事实来源。不要一开始读取整个仓库，也不要只读取用户点名的一个文件就开始改。

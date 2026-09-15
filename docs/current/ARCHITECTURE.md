@@ -2,6 +2,10 @@
 
 > 本文是当前源码、运行时、Docker、模型和 contract 的架构说明。它描述已经落地的边界，不把历史计划或旧实验任务当作当前运行依赖。
 
+> 新 Agent 先读 [`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md) 选择 Owner、Skill、
+> contract 和验证，再按本页进入具体层；当前运行/Loop 结论以
+> [`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md) 与最终 snapshot 为准。
+
 ## 1. 一句话概览
 
 项目由两条相互隔离的运行链组成：
