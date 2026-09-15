@@ -361,9 +361,9 @@ root_cause: "Recovery policy 原先只判断动作和次数，没有把失败签
 evidence:
   - ref: "scripts/agent_loop/retry_learning.py"
   - ref: "scripts/agent_loop/execution.py"
-    snapshot: "local-retry-learning-gate"
+    snapshot: "local-retry-learning@0efd21b"
   - ref: "scripts/agent_loop/test_retry_learning.py"
-    snapshot: "local-retry-learning-gate"
+    snapshot: "local-retry-learning@0efd21b"
 correct_practice: "RETURN_TO_OWNER 和 RETRY_TEST 必须携带与失败匹配的脱敏签名、changed_refs、preflight_checks 和 fallback_action；同一签名在前置条件未改变且 delta 未改变时进入 STOP_NO_LEARNING。成功 fallback 只生成 candidate-only Lesson，经过 E2/E3/E4 后才能进入后续上下文。"
 verification:
   - "python3 -m unittest -q scripts.agent_loop.test_retry_learning"
