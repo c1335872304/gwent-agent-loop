@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.agent_loop.validate_packet import load_yaml, validate_context_index, validate_profile, validate_test_matrix  # noqa: E402
+from scripts.agent_loop.check_docs import validate_documentation  # noqa: E402
 
 
 def main() -> int:
@@ -22,6 +23,7 @@ def main() -> int:
         validate_profile(load_yaml(path), root=ROOT)
     context_index = ROOT / "docs/current/agent-loop/CONTEXT_INDEX.yaml"
     validate_context_index(load_yaml(context_index), root=ROOT)
+    validate_documentation(root=ROOT)
     test_matrix = ROOT / "docs/current/agent-loop/TEST_MATRIX.yaml"
     validate_test_matrix(load_yaml(test_matrix), root=ROOT)
     test_agent_path = ROOT / ".codex/agents/test-verification.toml"
@@ -43,6 +45,7 @@ def main() -> int:
         f"PASS agent-loop assets: profiles={len(profiles)} context_index={context_index} "
         f"test_matrix={test_matrix} test_agent={test_agent_path}"
     )
+    print("PASS documentation consistency: 4 entry cards/current markers")
     return 0
 
 

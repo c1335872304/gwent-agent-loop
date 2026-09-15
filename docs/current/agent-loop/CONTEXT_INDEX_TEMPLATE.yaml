@@ -3,6 +3,27 @@
 index_version: 1
 workspace_snapshot: "<git commit, worktree manifest, or pending-baseline marker>"
 generated_at: "YYYY-MM-DD hhmm"
+entry_cards:
+  core:
+    card: "docs/current/agent-entry/CORE.md"
+    owner: "core"
+    skill: ".agents/skills/core-environment/SKILL.md"
+    required_markers: ["Core", "check_schema.py", "handoff"]
+  trainer:
+    card: "docs/current/agent-entry/TRAINER.md"
+    owner: "trainer"
+    skill: ".agents/skills/training-config/SKILL.md"
+    required_markers: ["Trainer", "validate_training.py", "handoff"]
+  product:
+    card: "docs/current/agent-entry/PRODUCT.md"
+    owner: "product"
+    skill: ".agents/skills/product-integration/SKILL.md"
+    required_markers: ["Product", "npm run build", "handoff"]
+  teacher:
+    card: "docs/current/agent-entry/TEACHER.md"
+    owner: "teacher"
+    skill: ".agents/skills/teacher-explanation/SKILL.md"
+    required_markers: ["Teacher", "check_teacher.py", "handoff"]
 entries:
   - id: "<stable-fact-id>"
     domain: "core | trainer | product | teacher | verification | project"

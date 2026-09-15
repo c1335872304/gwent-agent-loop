@@ -1,6 +1,27 @@
 index_version: 1
-workspace_snapshot: "working-tree-uncommitted; initial-baseline-pending"
-generated_at: "2026-09-13 0000"
+workspace_snapshot: "codex/stage3-host-rebind; documentation gate 2026-09-15"
+generated_at: "2026-09-15 0000"
+entry_cards:
+  core:
+    card: "docs/current/agent-entry/CORE.md"
+    owner: "core"
+    skill: ".agents/skills/core-environment/SKILL.md"
+    required_markers: ["Core", "check_schema.py", "handoff"]
+  trainer:
+    card: "docs/current/agent-entry/TRAINER.md"
+    owner: "trainer"
+    skill: ".agents/skills/training-config/SKILL.md"
+    required_markers: ["Trainer", "validate_training.py", "handoff"]
+  product:
+    card: "docs/current/agent-entry/PRODUCT.md"
+    owner: "product"
+    skill: ".agents/skills/product-integration/SKILL.md"
+    required_markers: ["Product", "npm run build", "handoff"]
+  teacher:
+    card: "docs/current/agent-entry/TEACHER.md"
+    owner: "teacher"
+    skill: ".agents/skills/teacher-explanation/SKILL.md"
+    required_markers: ["Teacher", "check_teacher.py", "handoff"]
 entries:
   - id: "project-routing"
     domain: "project"
@@ -8,8 +29,8 @@ entries:
     source_refs:
       - {path: "AGENTS.md", locator: "路由 and Agent sections", source_kind: "rule"}
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "角色与职责", source_kind: "architecture"}
-    verified_at: "2026-09-13 0000"
-    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    verified_at: "2026-09-15 0000"
+    verified_snapshot: "codex/stage3-host-rebind; documentation gate 2026-09-15"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["agent routing", "domain owner", "manager agent", "handoff"]
@@ -25,8 +46,8 @@ entries:
       - {path: "AGENTS.md", locator: "Core Agent / Product Agent", source_kind: "rule"}
       - {path: ".agents/skills/core-environment/references/ACTION_CONTRACT.md", locator: "action contract", source_kind: "contract"}
       - {path: ".agents/skills/product-integration/SKILL.md", locator: "legal action", source_kind: "skill"}
-    verified_at: "2026-09-13 0000"
-    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    verified_at: "2026-09-15 0000"
+    verified_snapshot: "codex/stage3-host-rebind; documentation gate 2026-09-15"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["legal action", "option_index", "action grammar", "frontend action"]
@@ -41,8 +62,8 @@ entries:
     source_refs:
       - {path: "AGENTS.md", locator: "Teacher Coding Agent", source_kind: "rule"}
       - {path: ".agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md", locator: "privacy boundary", source_kind: "contract"}
-    verified_at: "2026-09-13 0000"
-    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    verified_at: "2026-09-15 0000"
+    verified_snapshot: "codex/stage3-host-rebind; documentation gate 2026-09-15"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["Teacher", "explanation", "hidden information", "privacy", "evidence"]
@@ -58,8 +79,8 @@ entries:
       - {path: "AGENTS.md", locator: "Trainer Agent", source_kind: "rule"}
       - {path: ".agents/skills/training-config/SKILL.md", locator: "warm-start/resume/model promotion", source_kind: "skill"}
       - {path: "artifacts/checkpoints/registry.yaml", locator: "registry", source_kind: "contract"}
-    verified_at: "2026-09-13 0000"
-    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    verified_at: "2026-09-15 0000"
+    verified_snapshot: "codex/stage3-host-rebind; documentation gate 2026-09-15"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["checkpoint", "warm-start", "resume", "model promotion", "policy.pt"]
@@ -73,8 +94,8 @@ entries:
     claim: "A loop must have whole-task limits for role runs, subtasks, depth, tokens, turns and elapsed time; exhaustion stops new model work."
     source_refs:
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "预算、熔断与退出", source_kind: "architecture"}
-    verified_at: "2026-09-13 0000"
-    verified_snapshot: "working-tree-uncommitted; initial-baseline-pending"
+    verified_at: "2026-09-15 0000"
+    verified_snapshot: "codex/stage3-host-rebind; documentation gate 2026-09-15"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["token budget", "retry", "infinite loop", "subtask depth", "runner loss"]

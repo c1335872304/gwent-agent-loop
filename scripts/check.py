@@ -203,6 +203,7 @@ def check_agent_loop() -> None:
         "unittest",
         "-q",
         "scripts.agent_loop.test_control_plane",
+        "scripts.agent_loop.test_documentation",
         "scripts.agent_loop.test_schema_validation",
         "scripts.agent_loop.test_persistence",
         "scripts.agent_loop.test_file_locks",

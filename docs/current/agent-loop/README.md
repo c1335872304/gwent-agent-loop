@@ -9,11 +9,9 @@
 
 这些模板是 [`AGENT_LOOP_PLAN.md`](../AGENT_LOOP_PLAN.md) 的可提交、人工可读部分。
 
-项目导航：[AGENT_LOOP_NAVIGATION.md](../AGENT_LOOP_NAVIGATION.md)；三阶段路线图：[IDEAL_LOOP_3_STAGE_PLAN.md](IDEAL_LOOP_3_STAGE_PLAN.md)；模型范围：[MODEL_SCOPE.md](MODEL_SCOPE.md)；坑记录：[LESSONS_LEARNED.md](LESSONS_LEARNED.md)。
+项目导航：[AGENT_LOOP_NAVIGATION.md](../AGENT_LOOP_NAVIGATION.md)；三阶段路线图：[IDEAL_LOOP_3_STAGE_PLAN.md](IDEAL_LOOP_3_STAGE_PLAN.md)；模型范围：[MODEL_SCOPE.md](MODEL_SCOPE.md)；坑记录：[LESSONS_LEARNED.md](LESSONS_LEARNED.md)。领域任务卡和开场模板见 [`../agent-entry/README.md`](../agent-entry/README.md)。
 
 当前唯一现状入口：[`CURRENT_STATE.md`](CURRENT_STATE.md)。本目录中的 Phase 状态和 Pilot 报告保留历史证据，不覆盖当前状态。
-
-三阶段路线图：[`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)。
 
 ## 当前默认上下文
 

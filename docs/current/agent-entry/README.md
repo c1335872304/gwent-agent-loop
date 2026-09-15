@@ -13,3 +13,5 @@
 | Teacher evidence、隐私、provider、TeacherPanel | [`TEACHER.md`](TEACHER.md) | [`teacher-explanation`](../../../.agents/skills/teacher-explanation/SKILL.md) |
 
 若任务涉及两个领域，先由最接近 authoritative fact 的 Owner 打开自己的卡并定义 contract 差异；另一个 Owner 只接收明确的 handoff、最终 snapshot 和消费者范围。不要同时把两张卡当作并行写入授权。
+
+常见任务的可复制开场字段见 [`TASK_TEMPLATES.md`](TASK_TEMPLATES.md)；模板不能替代本次 TaskPacket，也不能扩大权限或验证范围。
