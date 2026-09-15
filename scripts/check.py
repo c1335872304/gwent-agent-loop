@@ -209,6 +209,7 @@ def check_agent_loop() -> None:
         "scripts.agent_loop.test_injection",
         "scripts.agent_loop.test_regression",
         "scripts.agent_loop.test_proposal",
+        "scripts.agent_loop.test_training_readiness",
         "scripts.agent_loop.test_packaging",
         "scripts.agent_loop.test_schema_validation",
         "scripts.agent_loop.test_persistence",

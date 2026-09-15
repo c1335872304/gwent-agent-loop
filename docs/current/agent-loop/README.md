@@ -20,7 +20,8 @@ Loop 执行、停止和交付只看 [`START_HERE.md`](START_HERE.md)；当前能
 `SHADOW_RETRIEVAL_TEMPLATE.yaml`；E3 生成的 ContextBrief advisory 区域按
 `CONTEXT_BRIEF_TEMPLATE.yaml` 的 `advisory` 字段校验。E4 固定回归使用
 `REGRESSION_SET_TEMPLATE.yaml`，比较结果使用 `PROMOTION_REPORT_TEMPLATE.yaml`；E5
-只读提案使用 `PROPOSAL_BUNDLE_TEMPLATE.yaml`。
+只读提案使用 `PROPOSAL_BUNDLE_TEMPLATE.yaml`；E6 训练前置审查使用
+`TRAINING_READINESS_TEMPLATE.yaml`。
 
 ## 使用规则
 

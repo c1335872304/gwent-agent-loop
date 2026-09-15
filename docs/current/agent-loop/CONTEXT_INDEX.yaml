@@ -99,7 +99,7 @@ entries:
     lesson_refs: []
     supersedes: []
     superseded_by: []
-    notes: "E0–E5 deterministic experience stages, fixed Baseline/Evolved PromotionReport gates and read-only proposals are implemented; formal rule changes and E6 remain disabled."
+    notes: "E0–E5 deterministic experience stages, fixed Baseline/Evolved PromotionReport gates and read-only proposals are implemented; E6 training readiness is gated, while training and formal rule changes remain disabled."
   - id: "core-legality-source"
     domain: "core"
     claim: "Core actions are the legality source; consumers must render and submit the returned option_index."

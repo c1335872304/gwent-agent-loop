@@ -1,0 +1,55 @@
+# E6 training-readiness v1：只证明是否可以交给 Trainer 审查，不启动训练
+schema: "agent-loop.e6-training-readiness.v1"
+schema_version: 1
+readiness_id: "E6-READINESS-<revision>"
+status: "blocked | ready_for_trainer_review"
+objective: "<one bounded training hypothesis>"
+sources:
+  promotion_report_ref: "<approved E4 PromotionReport>"
+  promotion_report_status: "approved"
+  proposal_bundle_ref: "<approved E5 ProposalBundle>"
+  evaluation_ref: "<complete independent evaluation index>"
+contract:
+  observation_schema: "v<version>"
+  action_grammar: "v<version>"
+  reward_config: "v<version>"
+trainer_task:
+  ref: "training/tasks/<explicit-task>.yaml"
+  owner: "trainer"
+  mode: "scratch | resume | warm_start"
+trainer_validation:
+  status: "not_run | passed | failed"
+  evidence_refs: []
+evaluation:
+  completed_games: 0
+  required_games: 1
+  illegal_result_count: 0
+  matchup_refs: []
+stability:
+  status: "stable | unstable | unknown"
+  independent_rounds: 0
+  evidence_refs: []
+approvals:
+  formal_rules:
+    status: "pending | approved | rejected"
+    decided_by: ""
+    evidence_ref: ""
+  model_change:
+    status: "pending | approved | rejected"
+    decided_by: ""
+    evidence_ref: ""
+permissions:
+  model_write_enabled: false
+  model_promotion_enabled: false
+  human_gate_required: true
+gates:
+  context_stable: {status: "blocked", evidence_refs: []}
+  experience_stable: {status: "blocked", evidence_refs: []}
+  formal_rules_approved: {status: "blocked", evidence_refs: []}
+  e4_regression_approved: {status: "blocked", evidence_refs: []}
+  evaluation_complete: {status: "blocked", evidence_refs: []}
+  contract_pinned: {status: "blocked", evidence_refs: []}
+  trainer_task_validated: {status: "blocked", evidence_refs: []}
+  model_gate: {status: "blocked", evidence_refs: []}
+evidence:
+  contract_refs: []

@@ -1,7 +1,7 @@
 # Experience Layer Protocol
 
-> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory、E4 fixed regression、E5 read-only proposals**
-> **当前状态：** E4 只生成可审计 PromotionReport，E5 只生成提案；正式规则变化仍需要人工 Gate。
+> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory、E4 fixed regression、E5 read-only proposals、E6 training readiness**
+> **当前状态：** E4 只生成可审计 PromotionReport，E5 只生成提案，E6 只判断是否可以交给 Trainer；训练和正式规则变化仍需要人工 Gate。
 
 本协议是 [`SELF_EVOLUTION_PLAN.md`](SELF_EVOLUTION_PLAN.md) 的运行时补充。它不新增 Agent，
 不改变当前串行 Scheduler，不读取原始对话，也不让经验覆盖 AGENTS、Skill、contract、
@@ -27,6 +27,7 @@ PathAnalysis
   -> E3 Advisory ContextBrief（仅 confirmed/promoted，受限且可回溯）
   -> E4 PromotionReport（Baseline/Evolved 固定回归，仍不自动晋级）
   -> E5 ProposalBundle（Skill/Routing/Validation，只读草案）
+  -> E6 TrainingReadiness（训练前置审查，仍不启动训练）
 ```
 
 未被明确证明可避免的失败不会自动生成 Avoidance Rule。
@@ -227,7 +228,30 @@ python3 scripts/agent_loop/proposal.py \
 固定回归引用和证据引用，并声明 `review_required=true`。输出只供 Review，不修改正式
 Skill、`AGENTS.md`、`scripts/check.py`、Routing、Scheduler、contract、权限、预算或模型。
 
-## 10. 后续阶段边界
+## 10. E6 Training Readiness
+
+E6 目前只实现训练前置审查，使用 `training_readiness.py` 生成或校验
+`TRAINING_READINESS_TEMPLATE.yaml`。它要求 E4 PromotionReport 已 approved、E5 正式规则
+已有人工批准、至少两轮独立稳定性证据、当前 observation/action/reward contract 已固定、
+Trainer Task 已由 Trainer 校验，以及完整评估达到 `required_games` 且
+`illegal_result_count=0`。
+
+显式校验一份 readiness 报告：
+
+```bash
+python3 scripts/agent_loop/training_readiness.py \
+  --input .agent-loop/e6/TrainingReadiness.yaml \
+  --output .agent-loop/e6/TrainingReadiness.checked.yaml
+```
+
+缺少任一条件时状态必须是 `blocked`。即使状态为 `ready_for_trainer_review`，也只表示可以
+交给 Trainer 和人工审核；`model_write_enabled`、`model_promotion_enabled` 仍必须为
+`false`，本工具不会加载 checkpoint、启动训练、安装模型或修改 `models/`、`runs/`、
+`artifacts/`、`configs/` 和 `training/`。
+
+## 11. 后续阶段边界
 
 任何影响 Harness Policy 的规则仍然需要人工 Gate；E6 模型训练仍然不是当前范围。没有
-多个独立 Detour、approved PromotionReport 或反例回归证据时，不能生成可晋级规则。
+多个独立 Detour、approved PromotionReport 或反例回归证据时，不能生成可晋级规则。真正
+执行训练必须另建明确的 Trainer Task，按 `training-config` Skill 先校验、再 smoke、再扩大
+预算，并单独保留模型 Promotion 证据。

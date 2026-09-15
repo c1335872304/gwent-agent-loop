@@ -1,6 +1,6 @@
 # Agent Loop 自进化阶段计划
 
-> **状态：E0–E4 已实现；E5 只读 ProposalBundle 已实现；E6 尚未启用**
+> **状态：E0–E4 已实现；E5 只读 ProposalBundle 和 E6 training-readiness 已实现；训练尚未启用**
 > **最后整理：2026-09-15**
 > **默认读取：是；历史讨论：见 [`archive/SELF_EVOLUTION_DISCUSSION_20260915.md`](archive/SELF_EVOLUTION_DISCUSSION_20260915.md)**
 
@@ -375,7 +375,7 @@ Rollback Success Rate
 
 > 在相同前置条件下，不重复已经被证据证明可以避免的失败；在不同条件下，不误用旧规则。
 
-## 8. E0–E4 实施边界与下一步
+## 8. E0–E6 实施边界与下一步
 
 E0–E1 已实现为 `scripts/agent_loop/experience.py`：它只接收结构化 Trace 和可选的
 RunManifest/TestReport/ChangeReport，生成 PathAnalysis、DetourRecord、Candidate Lesson
@@ -395,6 +395,11 @@ E0–E4 的确定性分析、旁路检索、受限 advisory 和固定回归闸�
 `scripts/agent_loop/proposal.py`，只接受 approved PromotionReport 与至少两个独立
 Detour 来源，生成只读 ProposalBundle，不直接修改正式文件。
 
+E6 已实现为 `scripts/agent_loop/training_readiness.py`：它只验证训练是否具备交给 Trainer
+审查的前置条件，不读取 checkpoint、不启动训练、不安装模型，也不打开模型写入或 promotion。
+缺少 E4 approved 回归、E5 正式规则批准、稳定性、contract、Trainer 校验或完整评估时，
+状态保持 `blocked`。
+
 > 基于多个独立 Detour 和已通过的 PromotionReport 生成只读 Skill/Routing/Validation
 > Proposal；不得自动合并正式规则。
 
@@ -408,3 +413,6 @@ Detour 来源，生成只读 ProposalBundle，不直接修改正式文件。
 
 E4 的 `approved` 只表示人工 Gate 已明确记录；没有固定回归、canary、rollback 或人工决定
 时，PromotionReport 必须保持 `not_ready` 或 `ready_for_human_gate`，不能被解释为已晋级。
+
+E6 的 `ready_for_trainer_review` 也不表示已经开始训练或完成模型 Promotion；真实训练必须
+由单独的 Trainer Task 按 `training-config` Skill 执行，并另行经过人工 model gate。
