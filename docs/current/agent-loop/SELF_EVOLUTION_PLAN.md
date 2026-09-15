@@ -1,6 +1,6 @@
 # Agent Loop 自进化阶段计划
 
-> **状态：E0–E3 已实现；E4 固定回归与 PromotionReport 已实现；E5–E6 尚未启用**
+> **状态：E0–E4 已实现；E5 只读 ProposalBundle 已实现；E6 尚未启用**
 > **最后整理：2026-09-15**
 > **默认读取：是；历史讨论：见 [`archive/SELF_EVOLUTION_DISCUSSION_20260915.md`](archive/SELF_EVOLUTION_DISCUSSION_20260915.md)**
 
@@ -389,17 +389,18 @@ Baseline/Evolved 固定回归集，要求独立 Test/Verification 证据，统�
 回归、negative transfer 和 false avoidance，并生成 PromotionReport。它不会自动修改
 Skill、Routing、Scheduler、contract、生产代码或模型。
 
-## 9. 下一项实施任务：E5 Skill / Routing / Validation Proposal
+## 9. E5 Skill / Routing / Validation Proposal
 
-E0–E4 的确定性分析、旁路检索、受限 advisory 和固定回归闸门已经完成。下一项 TaskPacket
-应限定为：
+E0–E4 的确定性分析、旁路检索、受限 advisory 和固定回归闸门已经完成。E5 已实现为
+`scripts/agent_loop/proposal.py`，只接受 approved PromotionReport 与至少两个独立
+Detour 来源，生成只读 ProposalBundle，不直接修改正式文件。
 
 > 基于多个独立 Detour 和已通过的 PromotionReport 生成只读 Skill/Routing/Validation
 > Proposal；不得自动合并正式规则。
 
 必须交付：
 
-- 至少两个独立 Detour 证据和对应的 PromotionReport；
+- 至少两个独立 Detour 证据和对应的 approved PromotionReport；
 - Skill diff、Routing diff、Validation Plan 三份只读 Proposal；
 - 每项 Proposal 的来源、触发条件、反例和回归引用；
 - 人工批准、拒绝和回滚路径；

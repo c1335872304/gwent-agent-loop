@@ -300,6 +300,15 @@ def validate_promotion_report(value: Mapping[str, Any]) -> None:
         raise ValidationError("PromotionReport must reference a frozen regression set")
     _text_list(regression_set.get("source_refs"), "PromotionReport.regression_set.source_refs", required=True)
     _text_list(regression_set.get("case_ids"), "PromotionReport.regression_set.case_ids", required=True)
+    provenance = _mapping(report.get("provenance"), "PromotionReport.provenance")
+    _text_list(provenance.get("advisory_lesson_ids"), "PromotionReport.provenance.advisory_lesson_ids")
+    cases_by_kind = _mapping(provenance.get("cases_by_kind"), "PromotionReport.provenance.cases_by_kind")
+    listed_case_ids: list[str] = []
+    for kind in CASE_KINDS:
+        values = _text_list(cases_by_kind.get(kind), f"PromotionReport.provenance.cases_by_kind.{kind}")
+        listed_case_ids.extend(values)
+    if set(listed_case_ids) != set(str(item) for item in regression_set["case_ids"]):
+        raise ValidationError("PromotionReport provenance case ids do not match regression set")
     metrics = _mapping(report.get("metrics"), "PromotionReport.metrics")
     for side in ("baseline", "evolved"):
         aggregate = _mapping(metrics.get(side), f"PromotionReport.metrics.{side}")
@@ -470,6 +479,19 @@ def build_promotion_report(
             "frozen": True,
             "source_refs": list(regression_set["source_refs"]),
             "case_ids": [str(case["case_id"]) for case in cases],
+        },
+        "provenance": {
+            "advisory_lesson_ids": sorted(
+                {
+                    str(lesson_id)
+                    for case in cases
+                    for lesson_id in case["advisory"]["lesson_ids"]
+                }
+            ),
+            "cases_by_kind": {
+                kind: [str(case["case_id"]) for case in cases if case["kind"] == kind]
+                for kind in sorted(CASE_KINDS)
+            },
         },
         "metrics": {
             "baseline": baseline,

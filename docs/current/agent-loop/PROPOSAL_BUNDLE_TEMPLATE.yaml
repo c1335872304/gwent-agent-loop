@@ -1,0 +1,57 @@
+# E5 read-only proposal bundle v1
+schema: "agent-loop.e5-proposal-bundle.v1"
+schema_version: 1
+proposal_id: "E5-<revision>"
+status: "draft_read_only"
+source:
+  promotion_report_ref: "<approved PromotionReport>"
+  promotion_report_snapshot: "git:<snapshot>"
+  lesson_ids: ["LESSON-<id>", "LESSON-<independent-id>"]
+  detour_ids: ["DETOUR-<id>", "DETOUR-<independent-id>"]
+  task_snapshots: ["git:<snapshot-1>", "git:<snapshot-2>"]
+  regression_refs: ["<PromotionReport>", "<PromotionReport>#<case-id>"]
+proposals:
+  - proposal_id: "E5-skill_diff-<lessons>"
+    kind: "skill_diff"
+    status: "draft_read_only"
+    read_only: true
+    suggested_targets: [".agents/skills/<domain>/SKILL.md"]
+    source_lesson_ids: []
+    trigger_conditions: []
+    avoidance_rules: []
+    counterexamples: []
+    change: {}
+    regression_refs: []
+    evidence_refs: []
+    review_required: true
+  - proposal_id: "E5-routing-<lessons>"
+    kind: "routing"
+    status: "draft_read_only"
+    read_only: true
+    suggested_targets: ["AGENTS.md", "docs/current/agent-entry/<DOMAIN>.md"]
+    source_lesson_ids: []
+    trigger_conditions: []
+    avoidance_rules: []
+    counterexamples: []
+    change: {}
+    regression_refs: []
+    evidence_refs: []
+    review_required: true
+  - proposal_id: "E5-validation_plan-<lessons>"
+    kind: "validation_plan"
+    status: "draft_read_only"
+    read_only: true
+    suggested_targets: ["scripts/check.py", "docs/current/agent-loop/TEST_MATRIX.yaml"]
+    source_lesson_ids: []
+    trigger_conditions: []
+    avoidance_rules: []
+    counterexamples: []
+    change: {}
+    regression_refs: []
+    evidence_refs: []
+    review_required: true
+boundaries:
+  modifies_formal_files: false
+  auto_merges: false
+  auto_promotes: false
+  human_gate_required: true

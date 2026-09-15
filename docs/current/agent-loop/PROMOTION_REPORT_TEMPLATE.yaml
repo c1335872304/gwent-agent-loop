@@ -7,6 +7,12 @@ regression_set:
   frozen: true
   source_refs: []
   case_ids: []
+provenance:
+  advisory_lesson_ids: []
+  cases_by_kind:
+    control: []
+    safety: []
+    target: []
 metrics:
   baseline: {}
   evolved: {}

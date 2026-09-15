@@ -1,7 +1,7 @@
 # Experience Layer Protocol
 
-> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory、E4 fixed regression**
-> **当前状态：** E4 只生成可审计 PromotionReport；实际晋级仍需要 canary、rollback 和明确人工 Gate。
+> **当前实现：E0–E1 candidate-only、E2 shadow-only、E3 bounded advisory、E4 fixed regression、E5 read-only proposals**
+> **当前状态：** E4 只生成可审计 PromotionReport，E5 只生成提案；正式规则变化仍需要人工 Gate。
 
 本协议是 [`SELF_EVOLUTION_PLAN.md`](SELF_EVOLUTION_PLAN.md) 的运行时补充。它不新增 Agent，
 不改变当前串行 Scheduler，不读取原始对话，也不让经验覆盖 AGENTS、Skill、contract、
@@ -26,6 +26,7 @@ PathAnalysis
   -> E2 Shadow Retrieval（selected/excluded report，仍不注入）
   -> E3 Advisory ContextBrief（仅 confirmed/promoted，受限且可回溯）
   -> E4 PromotionReport（Baseline/Evolved 固定回归，仍不自动晋级）
+  -> E5 ProposalBundle（Skill/Routing/Validation，只读草案）
 ```
 
 未被明确证明可避免的失败不会自动生成 Avoidance Rule。
@@ -202,7 +203,31 @@ python3 scripts/agent_loop/regression.py \
 `rolled_back` 必须保留原报告及相应证据。E4 不修改 Skill、Routing、Scheduler、contract、
 生产代码或模型。
 
-## 9. 后续阶段边界
+## 9. E5 Skill / Routing / Validation Proposals
 
-E5 才允许形成 Skill、Routing 或 Validation Proposal。任何影响 Harness Policy 的规则仍然
-需要人工 Gate；E6 模型训练仍然不是当前范围。
+E5 的输入必须是 `approved` 的 E4 PromotionReport 和至少两个独立 Lesson。独立性要求
+Lesson 的 `evidence.detour_id`、证据来源和 snapshot 均可区分；`candidate`、`rejected`、
+`deprecated` 或仅有 `ready_for_human_gate` 的记录必须 fail-closed。Lesson ID 必须出现在
+PromotionReport 的 provenance 中，避免提案脱离已验证回归证据。
+
+显式生成只读提案：
+
+```bash
+python3 scripts/agent_loop/proposal.py \
+  --promotion-report .agent-loop/e4/PromotionReport.yaml \
+  --lesson .agent-loop/experience/confirmed/LESSON-1.yaml \
+  --lesson .agent-loop/experience/confirmed/LESSON-2.yaml \
+  --promotion-report-ref .agent-loop/e4/PromotionReport.yaml \
+  --proposal-id E5-PROPOSAL-<revision> \
+  --output .agent-loop/e5/ProposalBundle.yaml
+```
+
+输出固定包含三个 `draft_read_only` Proposal：Skill diff、Routing 和 Validation Plan。
+每个提案必须保留来源 Lesson、触发条件、条件化 avoidance rule、control/safety 反例、
+固定回归引用和证据引用，并声明 `review_required=true`。输出只供 Review，不修改正式
+Skill、`AGENTS.md`、`scripts/check.py`、Routing、Scheduler、contract、权限、预算或模型。
+
+## 10. 后续阶段边界
+
+任何影响 Harness Policy 的规则仍然需要人工 Gate；E6 模型训练仍然不是当前范围。没有
+多个独立 Detour、approved PromotionReport 或反例回归证据时，不能生成可晋级规则。

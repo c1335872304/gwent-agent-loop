@@ -90,7 +90,7 @@ condition.
 | Test / Verification role | profile and policy implemented | `TEST_AGENT.md`, `profiles/test-verification.yaml` |
 | TaskPacket / ContextBrief / Profile validation | implemented | `validate_packet.py`, `launch.py` |
 | ContextIndex and lessons navigation | implemented; entry-card, policy and snapshot consistency are gated, fact re-verification remains manual | `CONTEXT_INDEX.yaml`, `LESSONS_LEARNED.md`, `check_docs.py` |
-| Self-evolution / detour analysis | E0–E3 are implemented; E4 fixed Baseline/Evolved regression and PromotionReport gates are implemented; actual promotion remains human-gated | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `experience.py`, `retrieval.py`, `injection.py`, `regression.py` |
+| Self-evolution / detour analysis | E0–E4 are implemented; E5 read-only Skill/Routing/Validation proposals are implemented; formal rule changes and E6 remain human-gated/disabled | `SELF_EVOLUTION_PLAN.md`, `EXPERIENCE_PROTOCOL.md`, `experience.py`, `retrieval.py`, `injection.py`, `regression.py`, `proposal.py` |
 | State, budget, lock, snapshot and persistence | implemented deterministically | `state_machine.py`, `budget.py`, `locks.py`, `persistence.py` |
 | Runner lifecycle and execution journal | implemented as model-free contracts | `runner.py`, `execution.py` |
 | Owner to Test handoff and verification plan | implemented as validators | `handoff.py`, `verification.py` |
