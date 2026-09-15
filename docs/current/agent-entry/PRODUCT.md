@@ -21,7 +21,7 @@
 ## 最小验收
 
 - 先检查 Core HTTP contract、Pydantic model、TS type 和 UI 是否同步；breaking change 必须明确 `api_version` 处理；
-- BFF 诊断：`PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests` 与 `python -m compileall -q apps/web/backend/app`；
+- BFF 诊断：`PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests` 与 `python3 -m compileall -q apps/web/backend/app`；
 - 前端改动：`cd apps/web/frontend && npm run build`；
 - Product / Teacher Python pytest 的最终 PASS/FAIL 使用 TaskPacket 声明的 `python3 scripts/check.py docker-test`，host pytest 只用于诊断。
 

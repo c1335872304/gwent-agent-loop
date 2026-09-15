@@ -207,10 +207,10 @@ Get-Content -LiteralPath "models\v3\README.md"
 本轮不直接执行 `python scripts/check.py quick`，因为该入口还会调用 training task validation。先执行不涉及训练的检查：
 
 ```powershell
-python tools/codegen/generate_card_data.py --check
-python tools/codegen/validate_card_data.py
-python .agents/skills/core-environment/scripts/check_schema.py
-python .agents/skills/teacher-explanation/scripts/check_teacher.py
+python3 tools/codegen/generate_card_data.py --check
+python3 tools/codegen/validate_card_data.py
+python3 .agents/skills/core-environment/scripts/check_schema.py
+python3 .agents/skills/teacher-explanation/scripts/check_teacher.py
 ```
 
 宿主无 Python 时，在包含项目 Python 依赖的 Docker 镜像中执行等价命令：
@@ -221,7 +221,7 @@ python .agents/skills/teacher-explanation/scripts/check_teacher.py
   -w /workspace `
   -e PYTHONPATH=/workspace/python/src `
   gwent-local-core:latest `
-  sh -c "python tools/codegen/generate_card_data.py --check && python tools/codegen/validate_card_data.py && python .agents/skills/core-environment/scripts/check_schema.py && python .agents/skills/teacher-explanation/scripts/check_teacher.py"
+  sh -c "python3 tools/codegen/generate_card_data.py --check && python3 tools/codegen/validate_card_data.py && python3 .agents/skills/core-environment/scripts/check_schema.py && python3 .agents/skills/teacher-explanation/scripts/check_teacher.py"
 ```
 
 本轮非训练检查必须覆盖并通过：
@@ -362,7 +362,7 @@ docker run --rm `
   -w /workspace `
   -e PYTHONPATH=/workspace/python/src `
   gwent-local-core:latest `
-  python python/tests/smoke_ctypes_collector.py `
+  python3 python/tests/smoke_ctypes_collector.py `
     --num-envs 1 --rounds 2 --seed 46 `
     --library /opt/gwent/lib/libgwent_core.so
 
@@ -371,7 +371,7 @@ docker run --rm `
   -w /workspace `
   -e PYTHONPATH=/workspace/python/src `
   gwent-local-core:latest `
-  python python/tests/smoke_training_loop.py `
+  python3 python/tests/smoke_training_loop.py `
     --library /opt/gwent/lib/libgwent_core.so
 ```
 
@@ -380,7 +380,7 @@ docker run --rm `
 ### 8.2 后续恢复正式训练时执行
 
 ```powershell
-python scripts/check.py train
+python3 scripts/check.py train
 ```
 
 恢复训练测试后，只执行最短 collector/PPO smoke，不启动正式长跑。需要验证：
@@ -413,9 +413,9 @@ python scripts/check.py train
 ### 9.1 Teacher 静态和单元测试
 
 ```powershell
-python .agents/skills/teacher-explanation/scripts/check_teacher.py
-PYTHONPATH=. pytest -q services/teacher/tests
-PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests/test_teacher_api.py
+python3 .agents/skills/teacher-explanation/scripts/check_teacher.py
+PYTHONPATH=. python3 -m pytest -q services/teacher/tests
+PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests/test_teacher_api.py
 ```
 
 通过标准：
@@ -432,7 +432,7 @@ PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests/test_teacher_api.py
 使用固定测试镜像，不在每次运行时临时安装 pytest：
 
 ```powershell
-docker compose --env-file deploy/docker/.env -f deploy/docker/compose.cpu.yml --profile test run --rm test python -m pytest -q apps/web/backend/tests
+docker compose --env-file deploy/docker/.env -f deploy/docker/compose.cpu.yml --profile test run --rm test python3 -m pytest -q apps/web/backend/tests
 ```
 
 覆盖：
@@ -615,13 +615,13 @@ Teacher 集成单独验证：
 ### 14.1 不启动 Docker 的 Core/Product/Teacher 验收
 
 ```powershell
-python tools/codegen/generate_card_data.py --check
-python tools/codegen/validate_card_data.py
-python .agents/skills/core-environment/scripts/check_schema.py
-python .agents/skills/teacher-explanation/scripts/check_teacher.py
+python3 tools/codegen/generate_card_data.py --check
+python3 tools/codegen/validate_card_data.py
+python3 .agents/skills/core-environment/scripts/check_schema.py
+python3 .agents/skills/teacher-explanation/scripts/check_teacher.py
 
-PYTHONPATH=. pytest -q services/teacher/tests
-PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests
+PYTHONPATH=. python3 -m pytest -q services/teacher/tests
+PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests
 
 cd apps/web/frontend
 npm ci

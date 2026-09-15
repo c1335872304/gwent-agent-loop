@@ -134,8 +134,10 @@ RunManifest、IntegrationManifest 和 rollback 证据。关闭会话不能删除
 6. 所有事件先写 ExecutionJournal，再推进下一步；
 7. 最终关闭前校验报告、预算和 changed paths。
 
-操作细节以 [`CODEX_TRANSPORT.md`](CODEX_TRANSPORT.md) 为准。首次使用或参数
-不确定时先查看脚本帮助，不要凭聊天记忆发明参数：
+操作细节以 [`CODEX_TRANSPORT.md`](CODEX_TRANSPORT.md) 为准。当前现场 canary 不使用旧
+Pilot 启动器。`run_stage3_live.py` 固定的是历史 Pilot 011 的 task、snapshot 和预算，
+只能在追溯该 Pilot 时查看帮助，不能作为当前任务入口。首次使用或参数不确定时先查看
+当前 TaskPacket，不要凭聊天记忆发明参数：
 
 ```bash
 python3 scripts/agent_loop/run_stage3_live.py --help
@@ -151,8 +153,8 @@ python3 scripts/check.py architecture
 python3 scripts/check.py docker-test
 
 # 领域专项验证，按对应 Skill 选择，不要无条件全部运行
-PYTHONPATH=. pytest -q services/teacher/tests
-PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests
+PYTHONPATH=. python3 -m pytest -q services/teacher/tests
+PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests
 cd apps/web/frontend && npm run build
 ```
 

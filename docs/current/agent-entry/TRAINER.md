@@ -20,10 +20,10 @@
 
 ## 最小验收
 
-- 先用 `python scripts/validate_training.py --all` 验证任务定义，再以最小 smoke 验证运行路径；
+- 先用 `python3 scripts/validate_training.py --all` 验证任务定义，再以最小 smoke 验证运行路径；
 - evaluation 按完整 episode 记录 matchup、swap-sides、illegal results 和 completed games；
 - resume / warm-start / promotion 记录 source、target contract metadata、预算、final checkpoint 与验证证据；
-- 训练范围需要时运行 `python scripts/check.py train`；不要用 `architecture` PASS 代替 training validation。
+- 训练范围需要时运行 `python3 scripts/check.py train`；不要用 `architecture` PASS 代替 training validation。
 
 ## 何时 handoff
 

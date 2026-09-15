@@ -23,7 +23,7 @@
 
 ## 最小验收
 
-- schema / ABI / action 任务运行 `python .agents/skills/core-environment/scripts/check_schema.py`；
+- schema / ABI / action 任务运行 `python3 .agents/skills/core-environment/scripts/check_schema.py`；
 - 新卡、顺序决策或 runtime catalog 运行最接近的 Core unit、golden / trace，并补真实 `Game::create()` 回归；
 - 记录 final snapshot、执行命令和退出码。跨产品或训练消费者时，由独立 Test 在声明的 matrix 中补验证。
 

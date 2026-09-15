@@ -122,6 +122,21 @@ contract 差异；下一个 Owner 只接收声明的事实和工件，不读取�
 所有 PASS 都需要对应的最终 snapshot、命令、退出码和失败分类。Docker 仅在 TaskPacket 和
 TestMatrix 明确声明时启动，并且只清理本次拥有的资源。
 
+### 5.1 启动前环境预检（唯一入口）
+
+先确认工具和依赖，再执行任务命令；不要用失败后的别名切换来代替预检：
+
+| 任务需要 | 预检 | 预检失败时的结论 |
+|---|---|---|
+| 架构 / Loop 门禁 | `command -v python3`、`python3 --version`、`python3 -c 'import yaml'` | `ENVIRONMENT_FAILURE`；架构任务不能启动 |
+| Python pytest | `python3 -m pytest --version`；最终证据还要先执行 `docker info` | host 依赖缺失是诊断阻塞；Docker 不可用则 `DOCKER_FAILURE` 或 `PERMISSION_REQUIRED` |
+| Teacher host 检查 | `python3 -c 'import fastapi'` | 仅记为 host `ENVIRONMENT_FAILURE`；不要把它当代码失败，按 TaskPacket 转 Docker |
+| 前端构建 | `node --version`、`npm --version` | 任一失败为 `ENVIRONMENT_FAILURE`，不要继续反复运行 `npm` |
+
+WSL/Linux 的 Python 命令统一使用 `python3`；PowerShell 文档中的 `python` / `py -3`
+只适用于 Windows 解释器。容器内的 `python -m pytest` 是容器命令，不应复制到 host。
+预检失败后必须保留失败分类、命令和退出码；没有新的环境变化时，不得再次消耗模型或重复同一命令。
+
 ## 6. 受限串行 Loop 索引
 
 当前默认流程是：

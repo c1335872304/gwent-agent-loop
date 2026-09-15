@@ -47,6 +47,10 @@ shared library、checkpoint 或 Core HTTP 服务。
 
 ## 启动前条件
 
+本页标注为 `powershell` 的命令在 Windows PowerShell 执行；WSL/Linux 宿主机统一使用
+`python3`，容器内命令使用镜像提供的 `python3`。启动前先按
+[`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md) 第 5.1 节完成 Docker 预检。
+
 1. 安装 Docker Desktop，并切换到 Linux containers / WSL2 后端。
 2. 将从服务器下载的最优模型放入 `models/v3/policy.pt`。这一个文件是单机推理的必需模型资产；不需要
    下载任何中间 checkpoint、`runs/` 或 `artifacts/`。
@@ -54,7 +58,7 @@ shared library、checkpoint 或 Core HTTP 服务。
 3. 推荐（但不是启动前置条件）使用生产安装入口对模型做本地校验并记录来源：
 
    ```powershell
-   python scripts/install_model.py C:\path\to\best.pt
+   py -3 scripts/install_model.py C:\path\to\best.pt
    ```
 
 4. 可选的 `models/v3/installed.json` 由安装入口生成，用于记录哈希与 contract 元数据。它缺失时 Docker
@@ -101,7 +105,7 @@ docker compose --env-file deploy/docker/.env -f deploy/docker/compose.cpu.yml --
 只运行 BFF 测试：
 
 ```powershell
-docker compose --env-file deploy/docker/.env -f deploy/docker/compose.cpu.yml --profile test run --rm test python -m pytest -q apps/web/backend/tests
+docker compose --env-file deploy/docker/.env -f deploy/docker/compose.cpu.yml --profile test run --rm test python3 -m pytest -q apps/web/backend/tests
 ```
 
 第一次 `build` 会下载依赖并生成 `gwent-local-test` 镜像；之后 `run` 直接复用镜像，不会重新安装

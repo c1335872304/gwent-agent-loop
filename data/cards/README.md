@@ -73,14 +73,14 @@ and must be resolved before treating the data as authoritative or redistributabl
 Re-import explicitly when the external artifact changes:
 
 ```bash
-python tools/codegen/import_reference_cards.py /path/to/gwent_cards_deduplicated.zip
+python3 tools/codegen/import_reference_cards.py /path/to/gwent_cards_deduplicated.zip
 ```
 
 Validate the boundary between the reference catalog, supported cards, and all
 deck manifests with:
 
 ```bash
-python tools/codegen/validate_card_data.py
+python3 tools/codegen/validate_card_data.py
 ```
 
 The validator requires every non-token supported id to exist in the reference

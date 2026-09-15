@@ -309,7 +309,7 @@ SSH 只用于登录训练服务器主机：
 
 ```powershell
 docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.train.yml -f deploy/docker/compose.train.cpu.yml run --rm trainer `
-  python -m gwent_rl.training.cli plan `
+  python3 -m gwent_rl.training.cli plan `
   --task /workspace/training/tasks/smoke.yaml `
   --project-root /workspace `
   --library /opt/gwent/lib/libgwent_core.so
@@ -319,7 +319,7 @@ docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.trai
 
 ```powershell
 docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.train.yml -f deploy/docker/compose.train.cpu.yml run --rm trainer `
-  python -m gwent_rl.training.cli run `
+  python3 -m gwent_rl.training.cli run `
   --task /workspace/training/tasks/smoke.yaml `
   --project-root /workspace `
   --library /opt/gwent/lib/libgwent_core.so
@@ -346,7 +346,7 @@ cd /path/to/gwent_v3
 cp deploy/docker/.env.train.example deploy/docker/.env.train
 # 根据服务器实际目录、UID/GID 修改 .env.train 后执行：
 docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.train.yml -f deploy/docker/compose.train.gpu.yml build trainer
-docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.train.yml -f deploy/docker/compose.train.gpu.yml run --rm trainer python -m gwent_rl.training.cli plan --task /workspace/training/tasks/<task>.yaml --project-root /workspace --library /opt/gwent/lib/libgwent_core.so
+docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.train.yml -f deploy/docker/compose.train.gpu.yml run --rm trainer python3 -m gwent_rl.training.cli plan --task /workspace/training/tasks/<task>.yaml --project-root /workspace --library /opt/gwent/lib/libgwent_core.so
 ```
 
 确认 `plan`、GPU 和小规模任务都通过后，才将正式 task 的 `runtime.num_envs` 设为或保留为 512。

@@ -255,7 +255,7 @@ inputs:
 acceptance:
   behavioral: ["可观察结果"]
   verification_commands:
-    - "PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests"
+    - "PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests"
   manual_checks: []
 risks:
   - type: "privacy | schema | compatibility | operational | none"
@@ -629,18 +629,18 @@ TaskPacket 必须从对应 Skill 提取命令，不允许无差别“全量跑�
 | Core 规则 / 卡牌 / action | 对应 C++ / golden / trace / schema 检查 | 必须验证 catalog dependency closure 与合法动作不变量。 |
 | Trainer | config/schema/unit check；必要时 smoke 或 train 验证 | 先分类 environment、collector、reward/GAE、优化问题，不能盲调参数。 |
 | Product | BFF tests、前端 build、Core HTTP 契约验证 | 前端必须原样提交 `option_index`，不得自行推导 legal action。 |
-| Teacher | `PYTHONPATH=. pytest -q services/teacher/tests` 与隐私/证据测试 | 不能泄露 AI 隐藏手牌或未公开候选动作。 |
+| Teacher | `PYTHONPATH=. python3 -m pytest -q services/teacher/tests` 与隐私/证据测试 | 不能泄露 AI 隐藏手牌或未公开候选动作。 |
 | 跨域 | 各 Owner 的本地验证 + 声明的集成检查 | 不同 snapshot 的成功结果不能拼成一个 PASS。 |
 
 仓库现有通用入口可以被引用：
 
 ```powershell
-python scripts/check.py quick
-python scripts/check.py test
-python scripts/check.py full
-python scripts/check.py train
-PYTHONPATH=. pytest -q services/teacher/tests
-PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests
+python3 scripts/check.py quick
+python3 scripts/check.py test
+python3 scripts/check.py full
+python3 scripts/check.py train
+PYTHONPATH=. python3 -m pytest -q services/teacher/tests
+PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests
 cd apps/web/frontend; npm ci; npm run build
 ```
 

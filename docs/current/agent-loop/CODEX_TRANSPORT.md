@@ -50,10 +50,9 @@ and durable `rebind_task` operations and provide normalized responses to
 `CodexHostTransport`, which maps them to the existing `ExternalRunnerAdapter`
 event contract. The local CLI bridge is the reference implementation for the
 same contract. The code-level independent-process rebind regression passes.
-Pilot 011 then exercised the live multi-role Product → Teacher path: create,
-process restart/rebind, Product close and contract handoff passed, while the
-Teacher privacy/budget gate stopped the run before independent Test. Its
-`human_required` RunManifest is the authoritative field result.
+The current complete field evidence is [`PILOT_018_REPORT.md`](PILOT_018_REPORT.md);
+Pilot 011 is historical evidence of an earlier privacy/budget stop and is not
+the current canary result.
 
 No model or reasoning override is included. The temporary model scope remains
 in force. A non-Git project or a file-hash/working-tree snapshot is rejected
@@ -73,6 +72,8 @@ worktree.
 8. Apply `RECOVERY_POLICY.md` after a failure; never retry from the host API
    without a persisted decision.
 
-The first real experiment must remain one domain Owner followed by one
-independent Test / Verification task. Recursive spawning and cross-domain
-parallelism remain disabled.
+`run_stage3_live.py` and Pilot 011 are historical compatibility artifacts only;
+they use an old task, snapshot and budget and must not be used as the current
+canary entry point. The first real experiment must remain one domain Owner
+followed by one independent Test / Verification task. Recursive spawning and
+cross-domain parallelism remain disabled.

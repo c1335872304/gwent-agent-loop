@@ -188,16 +188,26 @@ docs/current/       当前系统文档（不保留研发历史）
 
 ## 8. 验证入口
 
-快速检查：
+Agent Loop / 架构默认检查：
 
 ```bash
-python scripts/check.py quick
+python3 scripts/check.py architecture
 ```
 
-完整工程测试：
+全项目 quick 和完整工程测试会进入更广的依赖范围，按任务需要选择：
 
 ```bash
-python scripts/check.py test
+python3 scripts/check.py quick
+```
+
+```bash
+python3 scripts/check.py test
+```
+
+更完整的工程测试：
+
+```bash
+python3 scripts/check.py full
 ```
 
 更完整的构建、训练、Teacher 和 Web 启动方式见 [开发与运行](docs/current/DEVELOPMENT.md)。

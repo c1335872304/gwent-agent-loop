@@ -7,20 +7,27 @@
 - 当前能力与现场证据：[`CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md)；
 - 本文只提供常用构建/运行命令；开始修改前仍必须读取对应领域 Skill 和 contract。
 
-## 1. 快速验证
+## 1. 验证入口
 
 ```bash
-python scripts/check.py quick
+python3 scripts/check.py architecture
 ```
 
-该入口用于源码卫生检查，默认要求仓库不携带产品模型二进制。已经安装
+这是 Agent Loop、文档和控制面任务的默认门禁，不进入 Trainer/torch。全项目
+quick 只在任务明确允许 Trainer 校验时运行：
+
+```bash
+python3 scripts/check.py quick
+```
+
+quick 用于全项目源码卫生检查，默认要求仓库不携带产品模型二进制。已经安装
 `models/v3/policy.pt` 的本地 Docker 工作区，应额外使用 `LOCAL_DOCKER.md` 的模型、schema 和
 healthcheck 验收；不要把该模型存在误判为模型不兼容。
 
 完整测试入口：
 
 ```bash
-python scripts/check.py test
+python3 scripts/check.py test
 ```
 
 ## 2. C++ 构建
@@ -49,7 +56,7 @@ export PYTHONPATH=$PWD/python/src:$PYTHONPATH
 测试：
 
 ```bash
-python -m pytest python/tests
+python3 -m pytest python/tests
 ```
 
 ## 4. V3 模型
@@ -63,7 +70,7 @@ models/v3/policy.pt
 可使用：
 
 ```bash
-python scripts/install_model.py /path/to/gwent_v3_final.pt
+python3 scripts/install_model.py /path/to/gwent_v3_final.pt
 ```
 
 一个 checkpoint 同时包含 Deck A / Deck B。
@@ -73,7 +80,7 @@ python scripts/install_model.py /path/to/gwent_v3_final.pt
 训练入口示例：
 
 ```bash
-python -m gwent_rl.train_ppo \
+python3 -m gwent_rl.train_ppo \
   --config configs/training/ppo_ab_joint_v3_50k.yaml \
   --library build-release/libgwent_core.so
 ```
@@ -85,7 +92,7 @@ python -m gwent_rl.train_ppo \
 CLI：
 
 ```bash
-PYTHONPATH=. python -m services.teacher.cli \
+PYTHONPATH=. python3 -m services.teacher.cli \
   services/teacher/examples/decision_packet.json \
   --level beginner
 ```
@@ -93,7 +100,7 @@ PYTHONPATH=. python -m services.teacher.cli \
 HTTP：
 
 ```bash
-python -m pip install -r services/teacher/requirements.txt
+python3 -m pip install -r services/teacher/requirements.txt
 uvicorn services.teacher.api:app --host 127.0.0.1 --port 8020
 ```
 

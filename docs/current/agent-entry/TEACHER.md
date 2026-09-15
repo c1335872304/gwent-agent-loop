@@ -20,8 +20,8 @@
 
 ## 最小验收
 
-- `python .agents/skills/teacher-explanation/scripts/check_teacher.py`；
-- 诊断测试：`PYTHONPATH=. pytest -q services/teacher/tests` 与 `PYTHONPATH=apps/web/backend pytest -q apps/web/backend/tests/test_teacher_api.py`；
+- `python3 .agents/skills/teacher-explanation/scripts/check_teacher.py`；
+- 诊断测试：`PYTHONPATH=. python3 -m pytest -q services/teacher/tests` 与 `PYTHONPATH=apps/web/backend python3 -m pytest -q apps/web/backend/tests/test_teacher_api.py`；
 - 改动 `TeacherPanel` 时运行 `cd apps/web/frontend && npm run build`；
 - Python pytest 的最终 PASS/FAIL 仍以 TaskPacket 声明的 Docker 测试和 final snapshot 为准；同时证明隐私过滤与“Teacher failure 不阻断 gameplay”。
 

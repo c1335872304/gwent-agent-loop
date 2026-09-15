@@ -1,8 +1,8 @@
 # Agent Loop Current State
 
 > **Canonical current-state document**
-> **Last verified:** 2026-09-15
-> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；E4 固定回归已获人工批准，E5 因缺少至少两个独立结构化 Lesson 暂时阻塞，E6 仍关闭；外部 `main` 最新已知集成提交为 `289d53b`；未明确批准的父工作树变更仍保持人工 gate
+> **Last verified:** 2026-09-16
+> **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；E4 固定回归已获人工批准，E5 因缺少至少两个独立结构化 Lesson 暂时阻塞，E6 仍关闭；本地隔离分支已加入 Retry Learning Gate；外部 `main` 最新已知集成提交为 `289d53b`；未明确批准的父工作树变更仍保持人工 gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
 This is the only document that describes the current Agent Loop status. Phase
@@ -14,8 +14,9 @@ infer the latest implementation state.
 The context contracts, deterministic control plane, evidence gates, Docker
 canonical test entry point, bounded recovery policy, Codex project-task request
 builder, concrete Codex CLI Host Bridge, bounded multi-role orchestration,
-recovery journaling, contract handoff and IntegrationManifest gate are
-implemented and verified. The latest live canary is recorded in
+recovery journaling, contract handoff, IntegrationManifest gate and the local
+Retry Learning Gate are implemented and verified by the architecture gate. The
+latest live canary is recorded in
 [`PILOT_018_REPORT.md`](PILOT_018_REPORT.md): a real Product Owner was created,
 rebound from a new Scheduler process, handed to an independent Teacher review,
 verified by two independent Docker Test runs, integrated in an isolated
@@ -42,12 +43,16 @@ condition.
 
 ## Verified evidence
 
-- Architecture gate: 159 deterministic Agent Loop tests passed against the current local snapshot;
+- Architecture gate: 169 deterministic Agent Loop tests passed against the current local snapshot;
 - Documentation links: 405 local links passed against the current local snapshot;
 - Historical Docker canonical pytest: 145 tests passed, with 2 existing warnings;
 - Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
   elapsed `364.257s`, 4 model turns; budget gate passed;
-- Python syntax gate: 130 files passed against the current local snapshot;
+- Python syntax gate: 132 files passed against the current local snapshot;
+- Current WSL/Linux host preflight: `python3` and PyYAML are available; host `pytest` and
+  FastAPI are unavailable; Docker CLI is present but Docker API access is denied; Linux
+  Node.js is unavailable. These are environment facts, not code PASS/FAIL evidence; use
+  the preflight and failure classifications in `AGENT_ONBOARDING_INDEX.md`.
 - E4 fixed regression: 4 cases validated (2 target, 1 control, 1 safety); all
   machine gates passed and explicit human approval is recorded, with target
   avoidable detours 2 → 0. T001 revision-3 Baseline/Evolved RunManifests are

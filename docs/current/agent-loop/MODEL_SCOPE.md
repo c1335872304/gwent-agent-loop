@@ -10,7 +10,7 @@
 
 ## 检查边界
 
-当前 `python scripts/check.py architecture` 只确认：
+当前 `python3 scripts/check.py architecture` 只确认：
 
 - 产品代码指向规范路径 `models/v3/policy.pt`；
 - 模型槽位和说明文档存在；
