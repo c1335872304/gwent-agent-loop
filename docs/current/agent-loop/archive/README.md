@@ -31,6 +31,7 @@
 - [`PILOT_012_TASK_DESIGN.md`](pilots/PILOT_012_TASK_DESIGN.md)
 - [`PILOT_013_TASK_DESIGN.md`](pilots/PILOT_013_TASK_DESIGN.md)
 - [`PILOT_014_TASK_DESIGN.md`](pilots/PILOT_014_TASK_DESIGN.md)
+- [`SELF_EVOLUTION_DISCUSSION_20260915.md`](SELF_EVOLUTION_DISCUSSION_20260915.md)：自进化、弯路分析和经验 Promotion 的设计讨论归档；默认不读取。
 
 更早的 Pilot 001–003 及其 YAML 工件保留在 [`../pilots/`](../pilots/)，因为它们
 被确定性历史工件测试引用；它们同样只按需读取。

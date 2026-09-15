@@ -82,6 +82,23 @@ entries:
     supersedes: []
     superseded_by: []
     notes: "Cross-boundary work must identify an authoritative owner before implementation."
+  - id: "self-evolution-detour-analysis"
+    domain: "project"
+    claim: "Self-evolution first analyzes avoidable execution detours and verified fallbacks; experience is advisory and cannot override current authority."
+    source_refs:
+      - {path: "docs/current/agent-loop/SELF_EVOLUTION_PLAN.md", locator: "第一优先级：弯路分析 and Promotion Gate", source_kind: "architecture"}
+      - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "记录格式 and confirmed lessons", source_kind: "lesson_policy"}
+      - {path: "AGENTS.md", locator: "Agent Loop boundaries and no Manager Agent", source_kind: "rule"}
+    verified_at: "2026-09-15 0000"
+    verified_snapshot: "codex/stage3-host-rebind; documentation gate 2026-09-15"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["self-evolution", "detour", "path analysis", "avoidance rule", "experience layer", "promotion"]
+    owner: "project"
+    lesson_refs: []
+    supersedes: []
+    superseded_by: []
+    notes: "The plan is current design only; runtime extraction, retrieval and promotion remain disabled until their staged exit criteria pass."
   - id: "core-legality-source"
     domain: "core"
     claim: "Core actions are the legality source; consumers must render and submit the returned option_index."
