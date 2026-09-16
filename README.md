@@ -28,8 +28,16 @@ Agent Loop 的核心职责是控制一次工程任务的生命周期，而不是
 flowchart TB
     U[用户目标] --> P[TaskPacket<br/>范围 / Owner / snapshot / 预算]
     P --> C[ContextBrief<br/>事实来源 / 假设 / Lessons]
-    C --> R[责任域路由<br/>Core / Trainer / Product / Teacher]
-    R --> O[单一 Owner<br/>隔离 worktree 中实施]
+    C --> R[责任域路由]
+    R --> A{选择唯一 Owner}
+    A --> CA[Core Agent<br/>规则 / schema / ABI]
+    A --> TA[Trainer Agent<br/>PPO / collector / task]
+    A --> PA[Product Agent<br/>React / FastAPI / HTTP]
+    A --> TEA[Teacher Agent<br/>evidence / privacy / explanation]
+    CA --> O[选中的唯一 Owner<br/>隔离 worktree 中实施]
+    TA --> O
+    PA --> O
+    TEA --> O
     O --> CR[ChangeReport<br/>changed paths / 自检 / 限制]
     CR --> T[独立 Test Agent<br/>只看最终 snapshot]
     T --> G{证据闸门}
@@ -51,6 +59,28 @@ flowchart TB
 - **证据绑定 snapshot**：命令、退出码、changed paths、测试报告、模型消耗、耗时和恢复次数都必须绑定可复现的 Git snapshot。
 
 详细入口：[Agent Onboarding Index](docs/current/AGENT_ONBOARDING_INDEX.md) → [START_HERE](docs/current/agent-loop/START_HERE.md) → 当前状态。
+
+## 四个专业 Agent：职责与边界
+
+四个 Agent 是**按事实来源划分的专业 Owner**，不是按编程语言划分的四个聊天窗口。一次任务只选择一个主 Owner；跨领域变化通过 contract 和 handoff 串行交接，不新增一个 Manager Agent 来替代专业判断。
+
+| Agent | Skill | 负责的事实与代码 | 明确不负责 | 交接条件 |
+|---|---|---|---|---|
+| **Core Agent** | [`core-environment`](.agents/skills/core-environment/SKILL.md) | C++ 游戏规则、卡牌效果、legal action、pending choice、C ABI、Observation / Action Grammar | 不在 Python、TypeScript 或 Teacher 中复制规则；不负责 PPO 和 UI | Core HTTP、schema、ABI 或 evidence 字段变化时交给 Product / Trainer / Teacher |
+| **Trainer Agent** | [`training-config`](.agents/skills/training-config/SKILL.md) | PPO、collector、reward、Training Task、resume / warm-start、评估和模型 provenance | 不修改产品 runtime 规则；不把 `runs/` 或临时 checkpoint 当作产品模型 | Core schema/action grammar 或产品模型槽位变化时与 Core / Product handoff |
+| **Product Agent** | [`product-integration`](.agents/skills/product-integration/SKILL.md) | `apps/web/` 的 React、FastAPI BFF、Core HTTP contract、合法动作交互和 UX | 不 import `gwent_rl`、不加载 C++ shared library 或 checkpoint；不自行推导规则 | HTTP contract 或 Teacher evidence / privacy 受影响时交给 Core / Teacher |
+| **Teacher Agent** | [`teacher-explanation`](.agents/skills/teacher-explanation/SKILL.md) | `services/teacher/`、结构化 evidence、解释输出、provider、privacy filter 和 Teacher API | 不重算 legal action、不修改 `option_index`、不参与 reward shaping、不泄露隐藏信息 | 缺少 authoritative evidence 时交给 Core / Strategy；纯 UI 变更交给 Product |
+
+### 一次任务如何选择 Agent
+
+```text
+卡牌 / 规则 / schema / ABI       -> Core Agent
+训练 / collector / reward / 模型  -> Trainer Agent
+React / FastAPI / HTTP / UX       -> Product Agent
+解释 / evidence / privacy         -> Teacher Agent
+```
+
+Agent 选择后遵循同一条执行链：读取对应任务卡和 Skill → 绑定 contract 与最小上下文 → 在隔离 worktree 实施 → 交付 ChangeReport → 由独立 Test Agent 从最终 snapshot 验证。Test Agent 是验证角色，不是第五个业务 Owner；它不能借验证之名修改生产代码。
 
 ## 自进化架构：从弯路到可验证经验
 
