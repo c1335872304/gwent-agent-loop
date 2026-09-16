@@ -1,10 +1,131 @@
-# Gwent-AI：昆特牌智能决策与解释系统
+# Gwent-AI：Agent Loop 驱动的昆特牌智能决策与解释系统
 
-Gwent-AI 是一个 **Skill-driven Coding Agent** 游戏 AI 工程。项目的重点不是单独展示某个模型，而是展示如何用 **专用 Coding Agent + Skill + Contract + Eval** 驱动一个跨 C++ 规则引擎、强化学习、Teacher Runtime 和 Web 产品的复杂系统持续演进。
+Gwent-AI 不只是一个昆特牌模型项目，也是一个可审计的 **Agent Loop + 自进化工程系统**：用专用 Coding Agent、Skill、Contract、独立验证和结构化经验，持续维护 C++ 规则引擎、强化学习、Teacher Runtime 与 Web 产品。
 
-运行时使用 **Transformer + PPO** 策略模型；本地产品支持 Docker 人机对战和 AI 教师指导。Teacher 基于结构化 evidence 解释 Core 已执行的动作或反事实分支，不把语言模型作为游戏决策者。
+运行时使用 **Transformer + PPO** 策略模型；开发时使用受限、串行、单写者的 Agent Loop。模型负责游戏决策，Agent Loop 负责工程任务的上下文、责任边界、恢复、验证和证据；两者不是同一个自治系统。
 
-## 1. 项目核心：Skill-driven 开发系统
+> 当前实现状态、现场证据和仍关闭的能力，以 [`docs/current/agent-loop/CURRENT_STATE.md`](docs/current/agent-loop/CURRENT_STATE.md) 为准。本 README 解释系统设计和上手路径，不复制会过期的试点数字。
+
+## 一句话理解
+
+```text
+项目需求
+  -> 最小上下文装配
+  -> 一个领域 Owner 实施
+  -> 独立 Test / Verification
+  -> 证据闸门
+  -> 隔离集成 / rollback
+  -> 结构化弯路分析与候选经验
+```
+
+默认运行模式是 **串行、单写者、有界、可恢复、证据优先**：`max_concurrency=1`，先由一个 Owner 修改，再由独立 Test Agent 从最终 snapshot 验证。遇到权限、隐私、contract、snapshot、Docker、预算或宿主恢复不确定性，流程停止为 `HUMAN_REQUIRED`。
+
+## Agent Loop 架构
+
+Agent Loop 的核心职责是控制一次工程任务的生命周期，而不是增加一个“万能 Manager Agent”。每个任务都绑定不可变的 `TaskPacket`、必要时绑定 `ContextBrief`，并沿着明确的责任域路由到 Core、Trainer、Product 或 Teacher。
+
+```mermaid
+flowchart TB
+    U[用户目标] --> P[TaskPacket<br/>范围 / Owner / snapshot / 预算]
+    P --> C[ContextBrief<br/>事实来源 / 假设 / Lessons]
+    C --> R[责任域路由<br/>Core / Trainer / Product / Teacher]
+    R --> O[单一 Owner<br/>隔离 worktree 中实施]
+    O --> CR[ChangeReport<br/>changed paths / 自检 / 限制]
+    CR --> T[独立 Test Agent<br/>只看最终 snapshot]
+    T --> G{证据闸门}
+    G -->|PASS| I[隔离集成<br/>IntegrationManifest]
+    G -->|失败且有新 learning delta| RG[Retry Learning Gate<br/>有限恢复 / 重试]
+    RG --> O
+    G -->|同一失败且无变化| S[STOP_NO_LEARNING<br/>停止消耗模型]
+    G -->|权限 / contract / 环境不确定| H[HUMAN_REQUIRED]
+    I --> M[RunManifest<br/>TestReport / rollback / 终止原因]
+    M --> E[PathAnalysis<br/>分析执行弯路]
+```
+
+这里的关键不是“多开几个 Agent”，而是让每个角色只接收完成工作所需的上下文：
+
+- **上下文先于执行**：先读权威来源、当前 snapshot 和任务边界，再读取对应 Skill、contract 与最近回归；不依赖旧聊天或全仓库扫描。
+- **Owner 与 Test 解耦**：Owner 交付最终 commit 和 ChangeReport；Test Agent 不读取 Owner 的实现过程，只验证功能、contract、文件范围和证据。
+- **串行而非并行**：同一时刻只有一个写入 Owner；Test 是后置验证者，不与 Owner 并行修改同一工作树。
+- **失败先分类再恢复**：区分代码、contract、环境、Docker、权限、协议、flaky 和预算失败，不用“再试一次”掩盖根因。
+- **证据绑定 snapshot**：命令、退出码、changed paths、测试报告、模型消耗、耗时和恢复次数都必须绑定可复现的 Git snapshot。
+
+详细入口：[Agent Onboarding Index](docs/current/AGENT_ONBOARDING_INDEX.md) → [START_HERE](docs/current/agent-loop/START_HERE.md) → 当前状态。
+
+## 自进化架构：从弯路到可验证经验
+
+本项目的自进化不是让 Agent 自由修改自身，也不是每次失败后立刻改 Skill 或重训模型。它是一条受闸门约束的经验治理链：记录执行事实，分析可避免的弯路，生成候选经验，经回归和人工批准后才允许形成只读 Proposal。
+
+```mermaid
+flowchart LR
+    J[ExecutionJournal<br/>工具 / 状态 / 失败 / 恢复] --> PA[PathAnalysis<br/>planned vs actual]
+    PA --> D[DetourRecord<br/>触发条件 / 错误签名 / 影响]
+    D --> RL[Retry Learning Gate<br/>重试必须声明改变项]
+    RL -->|同签名 + 无新变化| STOP[STOP_NO_LEARNING]
+    RL -->|成功替代路径| CL[Candidate Lesson<br/>仅候选，不立即生效]
+    CL --> E4[E4 固定回归<br/>Baseline / Evolved / 反例]
+    E4 -->|人工批准| E5[E5 ProposalBundle<br/>只读改进提案]
+    E5 -->|再次批准| E6[E6 Training Readiness<br/>训练前检查]
+    E6 --> CLOSED[默认关闭<br/>不自动改生产 / Skill / 模型]
+```
+
+### 自进化的四条硬边界
+
+1. **经验是建议，不是权威**：Lesson 只能进入 ContextBrief 的 advisory 区域，不能覆盖当前 contract、权限、预算、停止条件或 allowed paths。
+2. **重试必须产生学习增量**：每次消耗模型的 retry 都要写明失败签名、改变了什么、前置检查和成功替代动作；同一失败且 delta 不变时自动停止。
+3. **成功也不能立即升级规则**：成功重试只生成 candidate-only Lesson；必须经过独立证据、固定回归和人工 Gate，才能进入下一阶段 Proposal。
+4. **自进化不等于自动训练**：E6 training-readiness 与正式训练、模型 promotion、Skill/routing 修改默认关闭，必须拥有独立任务、预算和验证证据。
+
+典型路径是：
+
+```text
+失败命令
+  -> 规范化错误签名
+  -> 判断是必要探索还是可避免弯路
+  -> 记录成功 fallback 与节省的时间 / token
+  -> 生成候选 Lesson
+  -> 固定回归验证
+  -> 人工批准后才形成只读 Proposal
+```
+
+详见 [自进化阶段计划](docs/current/agent-loop/SELF_EVOLUTION_PLAN.md) 和 [经验协议](docs/current/agent-loop/EXPERIENCE_PROTOCOL.md)。
+
+## 三层系统总览
+
+```mermaid
+flowchart TB
+    subgraph CONTROL[开发与控制平面]
+        AG[领域 Coding Agents]
+        SK[Skills + Contracts + Evals]
+        LOOP[TaskPacket<br/>Scheduler / Host Bridge / Evidence Gates]
+        AG --> SK --> LOOP
+    end
+
+    subgraph EXPERIENCE[经验治理平面]
+        TRACE[Execution Trace]
+        DETOUR[PathAnalysis / Detour]
+        LESSON[Candidate Lesson]
+        PROMO[E4 Regression / E5 Proposal]
+        TRACE --> DETOUR --> LESSON --> PROMO
+    end
+
+    subgraph RUNTIME[昆特牌运行时平面]
+        CORE[C++ Game Core<br/>规则 / legal actions]
+        STRATEGY[V3 Strategy<br/>Transformer + PPO]
+        WEB[FastAPI + React]
+        TEACHER[Teacher Runtime<br/>structured evidence]
+        CORE --> STRATEGY
+        STRATEGY --> WEB
+        STRATEGY --> TEACHER
+    end
+
+    LOOP --> TRACE
+    SK -.维护.-> RUNTIME
+```
+
+控制平面维护工程过程，经验平面维护已验证的执行知识，运行时平面负责真正的游戏能力。自进化不能绕过控制平面的 contract、权限和证据闸门。
+
+## Skill-driven 开发系统
 
 ```text
 需求
@@ -37,7 +158,7 @@ Validated Change
 
 详见 [Skill 与 Agent 架构](docs/current/SKILL_SYSTEM.md)。
 
-## 2. 两层架构
+## 两层架构
 
 项目明确区分开发平面和运行时平面。
 
@@ -77,7 +198,7 @@ FastAPI / React        Teacher Runtime
 
 详见 [系统架构](docs/current/ARCHITECTURE.md)。
 
-## 3. C++ Game Core
+## C++ Game Core
 
 Core 负责：
 
@@ -98,7 +219,7 @@ Core 负责：
 
 详见 [Core 与跨层 Contract](docs/current/CORE_CONTRACTS.md)。
 
-## 4. V3 双卡组策略模型
+## V3 双卡组策略模型
 
 V3 使用一个 checkpoint 同时服务 Deck A 与 Deck B：
 
@@ -129,7 +250,7 @@ V3 使用一个 checkpoint 同时服务 Deck A 与 Deck B：
 
 详见 [训练与 V3 模型](docs/current/TRAINING_AND_MODEL.md)。
 
-## 5. Teacher Agent
+## Teacher Agent
 
 Teacher 有两层含义：
 
@@ -148,7 +269,7 @@ Teacher                            -X-> option_index / legal action / reward
 
 详见 [Teacher 与 Web](docs/current/TEACHER_AND_WEB.md)。
 
-## 6. Web Product 与本地 Docker
+## Web Product 与本地 Docker
 
 ```text
 Browser :8080
@@ -167,7 +288,7 @@ Core :8008   Teacher :8020（可选）
 
 宿主机只公开 `127.0.0.1:8080`；Core、BFF 和 Teacher 位于 Compose 内部网络。模型目录以只读卷挂载给 Core。
 
-## 7. 仓库结构
+## 仓库结构
 
 ```text
 .agents/            Skills、references、scripts、Agent Evals
@@ -186,7 +307,7 @@ tools/              golden trace、server adapter、profiling 等工程工具
 docs/current/       当前系统文档；研发历史统一在 docs/current/archive/（早期回归夹具除外）
 ```
 
-## 8. 验证入口
+## 验证入口
 
 Agent Loop / 架构默认检查：
 
@@ -212,7 +333,7 @@ python3 scripts/check.py full
 
 更完整的构建、训练、Teacher 和 Web 启动方式见 [开发与运行](docs/current/DEVELOPMENT.md)。
 
-## 9. Docker 快速开始
+## Docker 快速开始
 
 ### 本地 CPU 人机对战
 
@@ -249,7 +370,7 @@ docker compose --env-file deploy/docker/.env.train -f deploy/docker/compose.trai
 
 默认 Trainer 命令只检查 smoke task 计划，不会开始训练。详细操作见 [训练 Docker](docs/current/TRAINING_DOCKER.md)。
 
-## 10. 当前文档入口
+## 当前文档入口
 
 | 需求 | 首先阅读 |
 |---|---|
