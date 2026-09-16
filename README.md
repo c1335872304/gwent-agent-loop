@@ -26,29 +26,36 @@ Agent Loop 的核心职责是由主 Codex 编排一次工程任务的生命周�
 
 ```mermaid
 flowchart TB
-    U[用户目标] --> P[TaskPacket<br/>范围 / Owner / snapshot / 预算]
-    P --> C[ContextBrief<br/>事实来源 / 假设 / Lessons]
+    U[用户目标] --> P[任务包 TaskPacket<br/>范围 / Owner / 快照 / 预算]
+    P --> C[上下文简报 ContextBrief<br/>事实来源 / 假设 / 经验]
     C --> R[责任域路由]
-    R --> A{选择唯一 Owner}
-    A --> CA[Core Agent<br/>规则 / schema / ABI]
-    A --> TA[Trainer Agent<br/>PPO / collector / task]
-    A --> PA[Product Agent<br/>React / FastAPI / HTTP]
-    A --> TEA[Teacher Agent<br/>evidence / privacy / explanation]
-    CA --> O[选中的唯一 Owner<br/>隔离 worktree 中实施]
-    TA --> O
-    PA --> O
-    TEA --> O
-    O --> CR[ChangeReport<br/>changed paths / 自检 / 限制]
-    CR --> T[独立 Test Agent<br/>只看最终 snapshot]
-    T --> G{证据闸门}
-    G -->|PASS| I[隔离集成<br/>IntegrationManifest]
-    G -->|失败且有新 learning delta| RG[Retry Learning Gate<br/>有限恢复 / 重试]
-    RG --> O
-    G -->|同一失败且无变化| S[STOP_NO_LEARNING<br/>停止消耗模型]
-    G -->|权限 / contract / 环境不确定| H[HUMAN_REQUIRED]
-    I --> M[RunManifest<br/>TestReport / rollback / 终止原因]
-    M --> E[PathAnalysis<br/>分析执行弯路]
+    R --> A{四选一}
+    A --> O[一个被选中的领域 Owner<br/>在隔离工作树中实施]
+    O --> CR[变更报告 ChangeReport<br/>文件范围 / 自检 / 限制]
+    CR --> T[独立测试 Agent<br/>只看最终快照]
+    T --> D[诊断与失败分类<br/>代码 / 测试 / 环境 / Docker / 权限 / 协议]
+    D --> RP{恢复策略}
+
+    A -. 候选责任域 .-> CA[核心 Agent<br/>规则 / 数据结构 / 接口]
+    A -. 候选责任域 .-> TA[训练 Agent<br/>PPO / 数据采集 / 训练任务]
+    A -. 候选责任域 .-> PA[产品 Agent<br/>React / FastAPI / HTTP]
+    A -. 候选责任域 .-> TEA[教师 Agent<br/>证据 / 隐私 / 解释]
+
+    RP -->|PASS| Q{需要隔离集成?}
+    Q -->|否| M[运行清单 RunManifest<br/>测试报告 / 终止原因]
+    Q -->|是| I[隔离集成<br/>集成清单 / 回滚证据]
+    I --> M
+    RP -->|需要重试| LG[重试学习门 Retry Learning Gate<br/>检查失败签名与学习增量]
+    LG -->|允许返回 Owner| O
+    LG -->|允许重新测试| T
+    LG -->|同一失败且无新学习| S[停止无学习 STOP_NO_LEARNING<br/>停止消耗模型]
+    RP -->|恢复同一 Runner| RR[恢复同一个 Runner<br/>不经过学习门]
+    RR --> D
+    RP -->|权限 / 接口契约 / 环境 / 预算不确定| H[需要人工处理 HUMAN_REQUIRED]
+    M --> E[路径分析<br/>分析执行弯路与候选经验]
 ```
+
+恢复策略负责当前任务的流程控制；`Retry Learning Gate` 只负责判断重试是否带来新的学习增量，两个模块相互独立。
 
 这里的关键不是“多开几个 Agent”，而是让每个角色只接收完成工作所需的上下文：
 
