@@ -7,6 +7,7 @@ Loop 执行、停止和交付只看 [`START_HERE.md`](START_HERE.md)；当前能
 [`CURRENT_STATE.md`](CURRENT_STATE.md)。本页只做模板目录，不复制上述协议。
 
 项目导航：[AGENT_LOOP_NAVIGATION.md](../AGENT_LOOP_NAVIGATION.md)；三阶段路线图：[IDEAL_LOOP_3_STAGE_PLAN.md](IDEAL_LOOP_3_STAGE_PLAN.md)；模型范围：[MODEL_SCOPE.md](MODEL_SCOPE.md)；坑记录：[LESSONS_LEARNED.md](LESSONS_LEARNED.md)。领域任务卡和开场模板见 [`../agent-entry/README.md`](../agent-entry/README.md)。
+面试准备和概念复习按需读取：[INTERVIEW_QA.md](INTERVIEW_QA.md)。它不是新 Agent 的默认上下文，也不替代当前状态、协议或 Skill。
 
 历史 Phase/Pilot 报告只从 [`archive/README.md`](archive/README.md) 按需追溯，不进入默认上下文。
 `pilots/` 是为早期确定性回归保留的兼容夹具，详见其
