@@ -18,7 +18,7 @@ $core-environment      $training-config     $product-integration
                    $teacher-explanation
 ```
 
-不要新增 manager Agent。跨边界任务由最接近事实来源的 Agent 主导，通过 contract 与验证结果 handoff。
+不要新增独立的业务 Manager Agent。主 Codex 可以作为编排入口和控制面，负责理解目标、责任域路由、上下文装配和生命周期推进，但不替 Core、Trainer、Product 或 Teacher 定义领域事实。跨边界任务仍由最接近事实来源的 Agent 主导，通过 contract 与验证结果 handoff。
 
 ## 新对话固定入口
 

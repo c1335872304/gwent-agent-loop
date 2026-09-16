@@ -22,7 +22,7 @@ Gwent-AI 不只是一个昆特牌模型项目，也是一个可审计的 **Agent
 
 ## Agent Loop 架构
 
-Agent Loop 的核心职责是控制一次工程任务的生命周期，而不是增加一个“万能 Manager Agent”。每个任务都绑定不可变的 `TaskPacket`、必要时绑定 `ContextBrief`，并沿着明确的责任域路由到 Core、Trainer、Product 或 Teacher。
+Agent Loop 的核心职责是由主 Codex 编排一次工程任务的生命周期，而不是再增加一个拥有独立业务权限的 Manager Agent。主 Codex 负责目标理解、责任域路由、上下文装配和流程推进；每个任务都绑定不可变的 `TaskPacket`，必要时绑定 `ContextBrief`，再交给 Core、Trainer、Product 或 Teacher 负责领域事实。
 
 ```mermaid
 flowchart TB
@@ -62,7 +62,7 @@ flowchart TB
 
 ## 四个专业 Agent：职责与边界
 
-四个 Agent 是**按事实来源划分的专业 Owner**，不是按编程语言划分的四个聊天窗口。一次任务只选择一个主 Owner；跨领域变化通过 contract 和 handoff 串行交接，不新增一个 Manager Agent 来替代专业判断。
+四个 Agent 是**按事实来源划分的专业 Owner**，不是按编程语言划分的四个聊天窗口。一次任务只选择一个主 Owner；主 Codex 负责编排，跨领域变化通过 contract 和 handoff 串行交接，不再增加一个会重复路由、拥有独立业务权限的第五个模型角色。
 
 | Agent | Skill | 负责的事实与代码 | 明确不负责 | 交接条件 |
 |---|---|---|---|---|

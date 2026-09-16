@@ -53,9 +53,9 @@
 
 答：Core 负责规则、合法动作、Schema 和 ABI；Trainer 负责 PPO、Collector、Reward、训练任务和模型来源；Product 负责 React、FastAPI、HTTP 契约和用户界面；Teacher 负责结构化证据、解释和隐私。划分依据是事实来源和修改边界，不是编程语言。
 
-### 11. 为什么不增加一个 Manager Agent？
+### 11. 为什么不增加一个独立的 Manager Agent？
 
-答：Manager Agent 容易成为第二套路由和规则来源，造成上下文重复、职责模糊和越权修改。当前做法是由最接近事实来源的专业 Agent 主导，跨边界变化通过 contract 和交接完成。调度器只控制生命周期，不替业务 Owner 定义领域事实。
+答：主 Codex 确实承担编排职责：理解目标、选择责任域、生成任务上下文、调用 Owner 和 Test、检查报告并推进生命周期。从广义上说，它是编排器，具有部分管理功能；但它不是第五个业务 Owner，也不应该替 Core、Trainer、Product 或 Teacher 定义领域事实。这里“不增加 Manager Agent”指不再额外引入一个拥有独立业务权限、会重复路由并可能越权修改的模型角色。
 
 ### 12. Owner 和 Test Agent 为什么必须分离？
 
