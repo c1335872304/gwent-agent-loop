@@ -44,7 +44,7 @@ condition.
 ## Verified evidence
 
 - Architecture gate: 169 deterministic Agent Loop tests passed against the current local snapshot;
-- Documentation links: 414 local links passed against the current local snapshot;
+- Documentation links: 429 local links passed against the local documentation snapshot;
 - Historical Docker canonical pytest: 145 tests passed, with 2 existing warnings;
 - Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
   elapsed `364.257s`, 4 model turns; budget gate passed;
