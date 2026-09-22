@@ -144,6 +144,20 @@ Pilot 启动器。`run_stage3_live.py` 固定的是历史 Pilot 011 的 task、s
 python3 scripts/agent_loop/run_stage3_live.py --help
 ```
 
+### 4.1 已声明任务的调度器控制
+
+调度器只管理已经写入 runtime 配置的任务，不从主控自然语言生成 TaskPacket。当前
+主控工具可执行 `loop_inspect`、`loop_submit`、`loop_pause`、`loop_prepare_resume`、
+`loop_resume` 和 `loop_cancel`；先 `loop_inspect`，再按返回的 revision、runner_ref 和
+状态决定下一步。暂停后只有补充信息不改变范围、contract、验收、预算或权限时，才可
+生成 ResumeDirective 并恢复同一 Runner；否则新建 TaskPacket revision 或
+`HUMAN_REQUIRED`。
+
+控制 MCP 只属于主控用户级配置，Owner/Test 通过 `--ignore-user-config` 不加载它。
+服务、token 和 state root 都是本机私有运行状态，不提交；新任务必须使用新的声明式
+runtime/state root。详细协议、启动方式和 Pilot 019 证据见
+[`SCHEDULER_CONTROL_ENTRY_PLAN.md`](SCHEDULER_CONTROL_ENTRY_PLAN.md)。
+
 ## 5. 验证命令速查
 
 ```bash
@@ -180,22 +194,7 @@ cd apps/web/frontend && npm run build
 `ENVIRONMENT_FAILURE`、`DOCKER_FAILURE`、`PERMISSION_REQUIRED`、`PROTOCOL_FAILURE`、
 `BUDGET_EXHAUSTED` 和 `HUMAN_REQUIRED` 不得互相伪装。
 
-## 7. 本仓库的特殊文件边界
-
-外部 `/mnt/c/codes/gwent_v4/main` 中的以下四个历史 ZIP 是不可读取的用户改动：
-
-```text
-packages/gwent_architecture_20260910_173340.zip
-packages/gwent_architecture_20260910_181503.zip
-release_assets/gwent-v3-models-update20.zip
-release_assets/gwent-v3-update20-model.zip
-```
-
-不要读取、哈希、暂存、合并、删除或改变它们的内容；其他文件的合并也不能以
-覆盖它们为代价。当前外部 `main` 若只显示这四个路径为 modified，应保留并报告，
-不要用 reset、clean 或 stash 处理。
-
-## 8. 新对话可直接使用的启动模板
+## 7. 新对话可直接使用的启动模板
 
 新对话不需要依赖旧聊天。把下面信息写入任务上下文，或让 Agent 从仓库读取：
 
@@ -204,7 +203,7 @@ release_assets/gwent-v3-update20-model.zip
 docs/current/agent-loop/CONTEXT_INDEX.yaml、docs/current/agent-loop/START_HERE.md
 和 docs/current/agent-loop/CURRENT_STATE.md；
 然后只读本任务对应的领域任务卡、Skill、contract、实现、测试与 Lessons。
-不要扫描全仓库，不要读取模型或四个历史 ZIP。
+不要扫描全仓库，不要读取模型或历史归档。
 
 目标：<一句话目标>
 责任域：<core | trainer | product | teacher | loop>
@@ -219,7 +218,7 @@ docs/current/agent-loop/CONTEXT_INDEX.yaml、docs/current/agent-loop/START_HERE.
 RunManifest、失败分类、实际命令和是否需要人工集成。
 ```
 
-## 9. 文档维护
+## 8. 文档维护
 
 每次有实质性 Loop 变化时，先更新 `CURRENT_STATE.md`；入口、命令、路由或边界
 变化时更新本页和导航。可复现且已验证的新坑写入 `LESSONS_LEARNED.md`；未经验证

@@ -227,21 +227,19 @@ change is allowed in this experiment.
   references, consumer scope and the same final snapshot evidence;
 - run the model-free multi-role canary recorded in `archive/pilots/PILOT_010_REPORT.md`.
 
-### Remaining: bounded local operation and optional host adapters
+### Remaining: optional host adapters and deliberately closed automation
 
 - the revision-5 local Codex CLI Host-backed serial multi-role canary passed;
-  `PILOT_018_REPORT.md` is the current field evidence;
+  `PILOT_018_REPORT.md` remains the multi-role field evidence, and
+  `PILOT_019_REPORT.md` is the Scheduler-control entry field evidence;
 - optionally wire an external Desktop/MCP Codex Host factory to the same durable
   lookup/hydration path; the local CLI reference implementation and its
   separate-process regression are complete;
-- register the Scheduler control MCP only in the main control host configuration
-  and run one real low-risk Owner → independent Test canary through
-  `loop_submit -> loop_inspect -> loop_pause/prepare_resume/resume` before
-  declaring the control entry field-complete;
-- the external `/mnt/c/codes/gwent_v4` `main` contains the E0–E6 implementation and
-  context-governance audit through `289d53b`; the final architecture gate passed
-  against that state. Its four tracked ZIP deletion entries remain outside this
-  task's scope and were left untouched;
+- the Scheduler control MCP is registered only in the main-control user
+  configuration. Pilot 019 completed the real low-risk Owner → independent
+  Test canary through `loop_submit -> loop_inspect -> loop_pause ->
+  loop_prepare_resume -> loop_resume`; a future task must use a fresh declared
+  runtime/state root rather than reusing this completed canary;
 - preserve the fail-closed decision when any role or platform rebind is absent;
 - keep cross-domain parallelism, automatic repair, deployment, promotion, and
   model changes disabled until they receive separate bounded canaries.

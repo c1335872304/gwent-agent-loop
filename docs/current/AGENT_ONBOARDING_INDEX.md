@@ -23,6 +23,7 @@
 | 任何研发或 Agent Loop 任务 | [`../../AGENTS.md`](../../AGENTS.md) | 本页 → [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md) → 当前状态 |
 | 只想确认目前具备什么能力 | [`agent-loop/CURRENT_STATE.md`](agent-loop/CURRENT_STATE.md) | [`agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md`](agent-loop/IDEAL_LOOP_3_STAGE_PLAN.md) |
 | 启动或恢复一次受限串行 Loop | [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md) | [`agent-loop/CODEX_TRANSPORT.md`](agent-loop/CODEX_TRANSPORT.md) → TaskPacket/ContextBrief |
+| 暂停、查询或恢复已声明的 Loop | [`agent-loop/SCHEDULER_CONTROL_ENTRY_PLAN.md`](agent-loop/SCHEDULER_CONTROL_ENTRY_PLAN.md) | 当前 TaskPacket/state root → `loop_inspect` → 受限控制动作 |
 | 查项目运行时架构或稳定事实 | [`PROJECT_BASELINE.md`](PROJECT_BASELINE.md) | [`ARCHITECTURE.md`](ARCHITECTURE.md) → 对应 contract |
 | 寻找尚未在本页列出的当前文档 | [`../README.md`](../README.md) | 当前事实来源 / 日常操作 / 历史归档 |
 | 本地启动、Docker 或手工验收 | [`LOCAL_DOCKER.md`](LOCAL_DOCKER.md) | [`DEVELOPMENT.md`](DEVELOPMENT.md) → [`PROJECT_TEST_PLAN.md`](PROJECT_TEST_PLAN.md) |
@@ -172,9 +173,8 @@ ownership 不清、Host 无法 rebind 或任一预算耗尽时，停止为 `HUMA
 - 直接改脏 parent/main、解决冲突、删除用户改动或扩大 Docker/外部权限，都不是默认动作；
   先按 [`GIT_MANAGEMENT.md`](GIT_MANAGEMENT.md) 和 TaskPacket 停在人工闸门。
 - `models/v3/policy.pt` 在当前架构阶段冻结；非 Trainer 任务不读取、不哈希、不替换它。
-- 外部 `/mnt/c/codes/gwent_v4` 的四个历史 ZIP 是不可读取的用户改动；不得读取、哈希、
-  暂存、合并、删除或以它们为代价执行 reset/clean/stash。完整边界见
-  [`agent-loop/START_HERE.md`](agent-loop/START_HERE.md)。
+- 外部 Windows checkout 的状态必须以实时 Git 输出为准；不得用 reset、clean 或
+  stash 清除未归属改动。具体边界见 [`GIT_MANAGEMENT.md`](GIT_MANAGEMENT.md)。
 
 ## 7. 工件与状态索引
 

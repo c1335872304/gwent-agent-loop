@@ -1,6 +1,6 @@
 index_version: 1
-workspace_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
-generated_at: "2026-09-16"
+workspace_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
+generated_at: "2026-09-23"
 entry_cards:
   core:
     card: "docs/current/agent-entry/CORE.md"
@@ -73,8 +73,8 @@ entries:
     source_refs:
       - {path: "AGENTS.md", locator: "路由 and Agent sections", source_kind: "rule"}
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "角色与职责", source_kind: "architecture"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["agent routing", "domain owner", "manager agent", "handoff"]
@@ -91,8 +91,8 @@ entries:
       - {path: "docs/current/agent-loop/EXPERIENCE_PROTOCOL.md", locator: "E0–E5 的输入、输出、回归闸门和只读提案", source_kind: "protocol"}
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "记录格式 and confirmed lessons", source_kind: "lesson_policy"}
       - {path: "AGENTS.md", locator: "Agent Loop boundaries and no Manager Agent", source_kind: "rule"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["self-evolution", "detour", "path analysis", "avoidance rule", "experience layer", "shadow retrieval", "promotion"]
@@ -108,8 +108,8 @@ entries:
       - {path: "AGENTS.md", locator: "Core Agent / Product Agent", source_kind: "rule"}
       - {path: ".agents/skills/core-environment/references/ACTION_CONTRACT.md", locator: "action contract", source_kind: "contract"}
       - {path: ".agents/skills/product-integration/SKILL.md", locator: "legal action", source_kind: "skill"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["legal action", "option_index", "action grammar", "frontend action"]
@@ -124,8 +124,8 @@ entries:
     source_refs:
       - {path: "AGENTS.md", locator: "Teacher Coding Agent", source_kind: "rule"}
       - {path: ".agents/skills/teacher-explanation/references/PRIVACY_BOUNDARY.md", locator: "privacy boundary", source_kind: "contract"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["Teacher", "explanation", "hidden information", "privacy", "evidence"]
@@ -141,8 +141,8 @@ entries:
       - {path: "AGENTS.md", locator: "Trainer Agent", source_kind: "rule"}
       - {path: ".agents/skills/training-config/SKILL.md", locator: "warm-start/resume/model promotion", source_kind: "skill"}
       - {path: "artifacts/checkpoints/registry.yaml", locator: "registry", source_kind: "contract"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["checkpoint", "warm-start", "resume", "model promotion", "policy.pt"]
@@ -156,8 +156,8 @@ entries:
     claim: "A loop must have whole-task limits for role runs, subtasks, depth, tokens, turns and elapsed time; exhaustion stops new model work."
     source_refs:
       - {path: "docs/current/AGENT_LOOP_PLAN.md", locator: "预算、熔断与退出", source_kind: "architecture"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["token budget", "retry", "infinite loop", "subtask depth", "runner loss"]
@@ -173,8 +173,8 @@ entries:
       - {path: "scripts/agent_loop/report_validation.py", locator: "_RESULT_STATUS", source_kind: "validator"}
       - {path: "scripts/agent_loop/codex_bridge.py", locator: "TestReport exact status instruction", source_kind: "host_protocol"}
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "LL-015", source_kind: "lesson"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["TestReport status", "PASS enum", "protocol drift", "Docker evidence"]
@@ -190,8 +190,8 @@ entries:
       - {path: "scripts/agent_loop/retry_learning.py", locator: "evaluate_retry_learning and build_retry_experience", source_kind: "validator"}
       - {path: "scripts/agent_loop/execution.py", locator: "RunnerExecution.recover and _finalize_retry_learning", source_kind: "host_protocol"}
       - {path: "docs/current/agent-loop/LESSONS_LEARNED.md", locator: "LL-016", source_kind: "lesson"}
-    verified_at: "2026-09-16"
-    verified_snapshot: "external-main@289d53b; local-doc-history-cleanup@44815a1; context-index@d0fbe0c; current-state-evidence@c6b6607; architecture-gate 2026-09-16; E4-approved; E5-blocked-missing-independent-lesson"
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
     status: "confirmed"
     confidence: "high"
     trigger_terms: ["retry learning", "learning delta", "STOP_NO_LEARNING", "repeat failure", "retry gate"]
@@ -200,6 +200,23 @@ entries:
     supersedes: []
     superseded_by: []
     notes: "Same failure signature plus unchanged preconditions and delta is stopped; savings remain unavailable unless a counterfactual baseline is supplied."
+  - id: "scheduler-control-entry"
+    domain: "project"
+    claim: "A main-control-only Scheduler service manages declared tasks through inspect, submit, pause, prepare-resume, resume and cancel; it never creates a task from raw conversation text."
+    source_refs:
+      - {path: "docs/current/agent-loop/SCHEDULER_CONTROL_ENTRY_PLAN.md", locator: "控制协议 and 阶段二", source_kind: "protocol"}
+      - {path: "docs/current/agent-loop/PILOT_019_REPORT.md", locator: "结论 and 证据摘要", source_kind: "field_evidence"}
+      - {path: "scripts/agent_loop/control_protocol.py", locator: "SchedulerControl", source_kind: "implementation"}
+    verified_at: "2026-09-23"
+    verified_snapshot: "main@515d4ff; architecture-gate 2026-09-22; Scheduler-control-Pilot-019-PASS; E4-approved; E5-blocked-missing-independent-lesson"
+    status: "confirmed"
+    confidence: "high"
+    trigger_terms: ["scheduler control", "loop_inspect", "loop_pause", "ResumeDirective", "same runner", "MCP control"]
+    owner: "project"
+    lesson_refs: ["LL-017"]
+    supersedes: []
+    superseded_by: []
+    notes: "Control tools are user-level main-control capability only. A completed runtime cannot be reused for a new task."
 
 maintenance:
   stale_after_days: 30

@@ -204,10 +204,10 @@ Owner/Test 越权控制和补充信息分类。终端用户可在主控对话不
 `prepare_resume`、`resume`、`events` 命令、追加控制日志和恢复指令；
 `control_service.py` 提供单实例 Unix socket 服务与私有能力令牌；
 `agent_loop_control.py` 提供人工 CLI。`test_scheduler_control.py` 覆盖幂等重放、
-版本/Runner 漂移、服务重启后的恢复指令、私有令牌和 Scheduler 审计 actor。当前
-managed sandbox 仍禁止 Unix socket bind/connect；但同一 fake-backend socket smoke
-已在真实本机权限下通过，证明服务入口本身可运行。真实 Owner → Test 的控制 canary
-仍属于阶段二现场验收。
+版本/Runner 漂移、服务重启后的恢复指令、私有令牌和 Scheduler 审计 actor。受控
+sandbox 可能禁止 Unix socket bind/connect，因此现场 socket 证据必须从真实 WSL
+宿主采集；`GW-SCHED-CTRL-001` 已完成该采集及阶段二 Owner → Test 验收，详见
+[`PILOT_019_REPORT.md`](PILOT_019_REPORT.md)。
 
 ### 阶段二：主控对话接入与真实闭环
 

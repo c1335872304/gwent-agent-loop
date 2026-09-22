@@ -7,25 +7,21 @@
 
 - 先用 [`AGENT_ONBOARDING_INDEX.md`](AGENT_ONBOARDING_INDEX.md) 判断责任域、最小验证和 handoff；
 - 受限串行任务的 snapshot、scope、工件和停止条件见 [`START_HERE.md`](agent-loop/START_HERE.md)；
-- 外部 `main` 的特殊 ZIP 边界见 [`START_HERE.md`](agent-loop/START_HERE.md) 的“特殊文件边界”；
 - 当前 Git 状态必须以 `git status --short`、`git branch --show-current` 和 `git log -1 --oneline` 的实际输出为准。
 
 ## 0. 当前仓库上下文
 
-最后整理：2026-09-15。以下是稳定工作约束，不替代实时命令输出。
+最后整理：2026-09-23。以下是稳定工作约束，不替代实时命令输出。
 
 ```text
 维护分支：main
 Codex 任务：默认使用 codex/<topic> 隔离分支或 worktree
-外部集成 checkout：/mnt/c/codes/gwent_v4（main）
-远程仓库：当前未配置；不得假设存在 remote
+Windows 同步 checkout：/mnt/c/codes/gwent_v4（main）
+远程仓库：origin = git@github.com:c1335872304/gwent-agent-loop.git
 基线与后续提交：已经存在；不得重跑“首次提交”流程
 Git LFS：未配置；大二进制的长期远程策略仍需人工决定
 ```
 
-外部 `main` 中四个历史 ZIP 是不可读取的用户改动；它们不属于当前任务 scope，禁止
-读取、哈希、暂存、覆盖、删除或通过 reset/clean/stash 处理。具体路径由
-[`START_HERE.md`](agent-loop/START_HERE.md) 维护，避免在多个文档重复列举。
 `.gitignore` 默认排除缓存、`node_modules/`、`.agent-loop/`、训练运行输出和 checkpoint。
 `models/v3/policy.pt` 与发布资产是否适合未来远程存储，仍需在配置 remote 前单独决定。
 
@@ -279,7 +275,7 @@ git status --short --ignored
 
 ## 9. 远程仓库准备
 
-当前不配置远程。未来配置前必须确认：
+远程已配置为 GitHub `origin`。新增远程、变更可见性或发布大二进制前仍必须确认：
 
 1. 仓库可见性和访问权限；
 2. `policy.pt` 与 release zip 是否应该进入 Git、Release 附件或对象存储；
@@ -296,8 +292,8 @@ git status --short --ignored
 
 - [x] Git 基线和后续提交存在；
 - [x] `.gitignore`、目录契约和 Agent Loop 本机状态边界已定义；
-- [x] 外部 `main` 的四个不可读取 ZIP 已被记录为保留项；
-- [ ] remote / LFS / 发布二进制的长期存储策略尚未授权，不由 Agent 自动配置；
+- [x] GitHub `origin` 已配置，Windows checkout 与 `main` 同步；
+- [ ] LFS / 发布二进制的长期存储策略尚未授权，不由 Agent 自动配置；
 - [ ] 每次开始仍必须用实时 Git 命令确认 branch、HEAD、dirty paths 和用户改动。
 
 ### 每个 Agent 任务
