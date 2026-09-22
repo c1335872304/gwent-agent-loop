@@ -177,7 +177,7 @@ cd apps/web/frontend && npm run build
 - parent 有无法归属的改动、Git 冲突或合并范围不明确。
 
 失败分类优先于“继续试一次”：`CODE_DEFECT`、`CONTRACT_GAP`、
-`ENVIRONMENT_FAILURE`、`DOCKER_FAILURE`、`PERMISSION_REQUIRED`、`PROTOCOL_ERROR`、
+`ENVIRONMENT_FAILURE`、`DOCKER_FAILURE`、`PERMISSION_REQUIRED`、`PROTOCOL_FAILURE`、
 `BUDGET_EXHAUSTED` 和 `HUMAN_REQUIRED` 不得互相伪装。
 
 ## 7. 本仓库的特殊文件边界

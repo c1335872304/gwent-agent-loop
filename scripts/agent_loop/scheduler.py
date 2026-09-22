@@ -422,40 +422,40 @@ class Scheduler:
         self._persist()
         return tuple(self._events[before:])
 
-    def pause(self, task_id: str, *, reason: str) -> ScheduledTask:
+    def pause(self, task_id: str, *, reason: str, actor: str = "scheduler") -> ScheduledTask:
         task = self._task(task_id)
         if task.status != "running":
             raise SchedulerStateError(f"cannot pause task in state {task.status}")
         if not str(reason).strip():
             raise SchedulerError("pause reason must not be empty")
         self.backend.pause(task, reason=str(reason))
-        self._transition(task, "paused", actor="scheduler", reason=str(reason))
+        self._transition(task, "paused", actor=str(actor), reason=str(reason))
         self._persist()
         return deepcopy(task)
 
-    def resume(self, task_id: str) -> ScheduledTask:
+    def resume(self, task_id: str, *, actor: str = "scheduler") -> ScheduledTask:
         task = self._task(task_id)
         if task.status != "paused":
             raise SchedulerStateError(f"cannot resume task in state {task.status}")
         if self._elapsed_seconds() >= self.limits.max_elapsed_minutes * 60:
             self._budget_exhausted = True
-            self._terminate(task, "human_required", "elapsed budget exhausted before resume")
+            self._terminate(task, "human_required", "elapsed budget exhausted before resume", actor=str(actor))
             self._persist()
             return deepcopy(task)
         if self.occupied_count > self.limits.max_concurrency:
             raise SchedulerStateError("max_concurrency is full; resume remains queued by caller")
         if task.budget is None or self._task_budget_remaining(task) <= 0:
-            self._terminate(task, "human_required", "task budget exhausted before resume")
+            self._terminate(task, "human_required", "task budget exhausted before resume", actor=str(actor))
             self._persist()
             return deepcopy(task)
         try:
             self.backend.resume(task)
         except Exception as exc:
-            self._terminate(task, "human_required", f"resume failed; manual recovery required: {exc}")
+            self._terminate(task, "human_required", f"resume failed; manual recovery required: {exc}", actor=str(actor))
             self._persist()
             return deepcopy(task)
         task.resume_count += 1
-        self._transition(task, "running", actor="scheduler", reason="resumed")
+        self._transition(task, "running", actor=str(actor), reason="resumed")
         self._persist()
         return deepcopy(task)
 
@@ -465,6 +465,7 @@ class Scheduler:
         *,
         reason: str = "operator ended task",
         status: SchedulerTaskStatus = "cancelled",
+        actor: str = "scheduler",
     ) -> ScheduledTask:
         """End queued or active work; normal completion comes from ``pump``."""
         if status not in {"cancelled", "failed", "blocked", "human_required"}:
@@ -476,15 +477,21 @@ class Scheduler:
             try:
                 self.backend.cancel(task, reason=str(reason))
             except Exception as exc:
-                self._terminate(task, "human_required", f"cancel failed; manual recovery required: {exc}")
+                self._terminate(task, "human_required", f"cancel failed; manual recovery required: {exc}", actor=str(actor))
                 self._persist()
                 return deepcopy(task)
-        self._terminate(task, status, str(reason))
+        self._terminate(task, status, str(reason), actor=str(actor))
         self._persist()
         return deepcopy(task)
 
-    def cancel(self, task_id: str, *, reason: str = "operator cancelled task") -> ScheduledTask:
-        return self.end(task_id, reason=reason, status="cancelled")
+    def cancel(
+        self,
+        task_id: str,
+        *,
+        reason: str = "operator cancelled task",
+        actor: str = "scheduler",
+    ) -> ScheduledTask:
+        return self.end(task_id, reason=reason, status="cancelled", actor=actor)
 
     def stop(self, *, reason: str = "scheduler stopped") -> None:
         """Stop admitting work and end every queued/active task safely."""
@@ -923,6 +930,7 @@ class Scheduler:
         reason: str,
         *,
         cancel_backend: bool = True,
+        actor: str = "scheduler",
     ) -> None:
         if task.status in TERMINAL_TASK_STATUSES:
             return
@@ -933,7 +941,7 @@ class Scheduler:
                 status = "human_required"
                 reason = f"{reason}; backend cancellation failed: {exc}"
         self._release(task.budget)
-        self._transition(task, status, actor="scheduler", reason=reason)
+        self._transition(task, status, actor=actor, reason=reason)
         task.reason = reason
         if status == "human_required":
             self._human_required = True

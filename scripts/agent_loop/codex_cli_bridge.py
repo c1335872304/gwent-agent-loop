@@ -34,6 +34,8 @@ class CodexCliBridgeError(ValidationError):
 
 _SAFE_TOKEN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,119}")
 _SAFE_REF = re.compile(r"[A-Za-z0-9._/-]+")
+_REASONING_EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"}
+_LUNA_REASONING_EFFORTS = {"none", "low", "medium", "high", "xhigh", "max"}
 
 
 @dataclass
@@ -56,6 +58,7 @@ class _CliSession:
     process: subprocess.Popen[str] | None = None
     status: str = "running"
     thread_ready: threading.Event = field(default_factory=threading.Event)
+    resume_ready: threading.Event = field(default_factory=threading.Event)
     output_lines: list[str] = field(default_factory=list)
     reader: threading.Thread | None = None
     loss_reason: str | None = None
@@ -136,6 +139,9 @@ class CodexCliBridge:
         worktree_root: str | Path | None = None,
         artifact_root: str | Path | None = None,
         session_registry_root: str | Path | None = None,
+        resume_directive_root: str | Path | None = None,
+        model: str | None = None,
+        model_reasoning_effort: str | None = None,
         startup_timeout: float = 30.0,
         stop_timeout: float = 10.0,
     ) -> None:
@@ -148,10 +154,24 @@ class CodexCliBridge:
         self.codex_command = tuple(codex_command or ("codex",))
         if not self.codex_command or any(not str(item).strip() for item in self.codex_command):
             raise CodexCliBridgeError("Codex CLI command must not be empty")
+        self.model = self._optional_model(model)
+        self.model_reasoning_effort = self._optional_reasoning_effort(
+            model_reasoning_effort,
+            self.model,
+        )
         self.worktree_root = Path(worktree_root or (Path(tempfile.gettempdir()) / "gwent-agent-loop"))
         self.artifact_root = Path(artifact_root) if artifact_root else None
         self.session_registry = HostSessionRegistry(
             session_registry_root or (self.worktree_root / "host-registry")
+        )
+        # A control-plane ResumeDirective is deliberately outside a child
+        # worktree.  It may be copied into *that same* child worktree only
+        # when this explicit root is configured.  A generic arbitrary-path
+        # copy API would let a resumed task consume unreviewed host files.
+        self.resume_directive_root = (
+            Path(resume_directive_root).resolve()
+            if resume_directive_root is not None
+            else None
         )
         self.startup_timeout = float(startup_timeout)
         self.stop_timeout = float(stop_timeout)
@@ -270,12 +290,33 @@ class CodexCliBridge:
         session = self._session(handle)
         if not str(reason).strip():
             raise CodexCliBridgeError("interrupt reason must not be empty")
+        if session.process is not None and session.process.poll() is None and not session.resume_ready.is_set():
+            raise CodexCliBridgeError(
+                "Codex CLI has not reached a durable resume checkpoint; wait for turn.started"
+            )
         if session.process is not None and session.process.poll() is None:
             self._stop(session)
             session.status = "interrupted"
             self._sync_registry(session)
             return {"status": "interrupted", "reason": str(reason)}
         return self._finished(session)
+
+    def wait_for_resume_checkpoint(
+        self, handle: CodexThreadHandle, *, timeout_seconds: float
+    ) -> bool:
+        """Wait until Codex reports that its first turn has started.
+
+        A ``thread.started`` event supplies an identity, but this CLI only
+        makes that identity resumable after the first turn enters execution.
+        Interrupting before then loses the remote rollout and must not be
+        represented as a resumable pause.
+        """
+        if timeout_seconds <= 0:
+            raise CodexCliBridgeError("resume checkpoint timeout must be positive")
+        session = self._session(handle)
+        if session.resume_ready.wait(float(timeout_seconds)):
+            return True
+        return False
 
     def resume_task(
         self, handle: CodexThreadHandle, *, artifact_refs: tuple[str, ...]
@@ -287,8 +328,12 @@ class CodexCliBridge:
             raise CodexCliBridgeError("resume requires non-empty artifact_refs")
         session.thread_ready.clear()
         self._start(session, [
-            "exec", "resume", session.thread_id, "--json", "--sandbox", session.sandbox_mode,
+            # ``resume`` is a subcommand.  ``--sandbox`` and
+            # ``--output-last-message`` belong to ``codex exec`` and must
+            # therefore precede it; ``--json`` belongs to ``exec resume``.
+            "exec", "--sandbox", session.sandbox_mode,
             "--output-last-message", str(session.output_path),
+            "resume", "--json", session.thread_id,
             "Continue the bounded task. Read these persisted artifacts before acting: "
             + ", ".join(str(ref) for ref in artifact_refs),
         ])
@@ -299,6 +344,52 @@ class CodexCliBridge:
         session.resume_count += 1
         self._sync_registry(session)
         return self._metrics(session, status="running")
+
+    def materialize_resume_directive(
+        self, handle: CodexThreadHandle, source_ref: str | Path
+    ) -> str:
+        """Copy one validated control directive into its original worktree.
+
+        ``codex exec resume`` runs with the child worktree as its current
+        directory.  Passing an absolute control-plane path would either be
+        unreadable to that process or expand its filesystem authority.  This
+        method binds the copy to the exact Runner identity and returns only a
+        repository-relative reference suitable for ``resume_task``.
+        """
+        session = self._session(handle)
+        if self.resume_directive_root is None:
+            raise CodexCliBridgeError("resume directive materialization is not configured")
+        source = Path(source_ref).resolve()
+        try:
+            source.relative_to(self.resume_directive_root)
+        except ValueError as exc:
+            raise CodexCliBridgeError("resume directive is outside the configured control root") from exc
+        try:
+            directive = json.loads(source.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise CodexCliBridgeError("resume directive cannot be read as JSON") from exc
+        if not isinstance(directive, Mapping):
+            raise CodexCliBridgeError("resume directive must be a JSON object")
+        try:
+            revision_matches = int(directive.get("task_revision", 0)) == session.task_revision
+        except (TypeError, ValueError):
+            revision_matches = False
+        expected_ref = f"codex:{session.host_id}:{session.thread_id}"
+        if (
+            directive.get("schema") != "agent-loop.resume-directive.v1"
+            or directive.get("task_id") != session.task_id
+            or not revision_matches
+            or directive.get("runner_ref") != expected_ref
+        ):
+            raise CodexCliBridgeError("resume directive does not match the persisted Codex session")
+        relative = Path(".agent-loop") / "resume-directives" / session.task_id / source.name
+        target = session.worktree / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            json.dumps(directive, ensure_ascii=True, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        return relative.as_posix()
 
     def rebind_task(
         self, handle: CodexThreadHandle, *, payload: Mapping[str, Any]
@@ -438,9 +529,10 @@ class CodexCliBridge:
         stderr = session.stderr_path.open("w", encoding="utf-8")
         stdout = session.stdout_path.open("a", encoding="utf-8")
         session.stdout_offset = stdout.tell()
+        command = self._codex_exec_command(args)
         try:
             process = subprocess.Popen(
-                [*self.codex_command, *args],
+                command,
                 cwd=session.project_root if args[0] == "exec" and "resume" not in args else session.worktree,
                 stdin=subprocess.DEVNULL,
                 stdout=stdout,
@@ -456,6 +548,17 @@ class CodexCliBridge:
         session.pid = process.pid
         session.reader = threading.Thread(target=self._read_stdout, args=(session,), daemon=True)
         session.reader.start()
+
+    def _codex_exec_command(self, args: Sequence[str]) -> list[str]:
+        if not args or args[0] != "exec":
+            raise CodexCliBridgeError("Codex CLI bridge only supports exec launches")
+        command = [*self.codex_command, "exec", "--ignore-user-config"]
+        if self.model:
+            command.extend(["--model", self.model])
+        if self.model_reasoning_effort:
+            command.extend(["--config", f'model_reasoning_effort="{self.model_reasoning_effort}"'])
+        command.extend(str(item) for item in args[1:])
+        return command
 
     def _materialize_inputs(self, worktree: Path, payload: Mapping[str, Any]) -> None:
         refs = payload.get("refs", {})
@@ -530,6 +633,8 @@ class CodexCliBridge:
             if thread_id:
                 session.thread_id = self._token(thread_id, "thread_id")
                 session.thread_ready.set()
+            if event.get("type") == "turn.started":
+                session.resume_ready.set()
             self._record_usage(session, event)
             self._sync_registry(session)
 
@@ -557,6 +662,8 @@ class CodexCliBridge:
                 thread_id = event.get("thread_id") or event.get("threadId")
                 if thread_id:
                     session.thread_id = self._token(thread_id, "thread_id")
+                if event.get("type") == "turn.started":
+                    session.resume_ready.set()
                 self._record_usage(session, event)
         session.stdout_offset = session.stdout_path.stat().st_size
         if session.thread_id:
@@ -650,7 +757,14 @@ class CodexCliBridge:
     @staticmethod
     def _validate_scope(paths: list[str], scope: tuple[str, ...]) -> None:
         if any(path in {"declared test scope only", "task scope"} for path in scope):
-            raise CodexCliBridgeError("Codex CLI bridge requires concrete write scope paths")
+            # A generic scope is safe only for a genuinely read-only verifier.
+            # It must never silently authorize a changed file: tasks that may
+            # write tests have to declare concrete test roots in their packet.
+            if paths:
+                raise CodexCliBridgeError(
+                    "Codex CLI bridge requires concrete write scope paths when files changed"
+                )
+            return
         for path in paths:
             if not any(path == root or path.startswith(root.rstrip("/") + "/") for root in scope):
                 raise CodexCliBridgeError(f"Codex task changed path outside write scope: {path}")
@@ -693,7 +807,15 @@ class CodexCliBridge:
             if session.is_clone or (session.worktree / ".git").is_dir():
                 shutil.rmtree(session.worktree, ignore_errors=True)
             else:
-                self._git(session.project_root, "worktree", "remove", "--force", str(session.worktree))
+                try:
+                    self._git(session.project_root, "worktree", "remove", "--force", str(session.worktree))
+                except subprocess.CalledProcessError:
+                    # Git can remove the directory but still report a stale
+                    # nested-worktree metadata error.  Treat that as cleaned
+                    # only when the requested directory is actually gone.
+                    if session.worktree.exists():
+                        raise
+                    self._git(session.project_root, "worktree", "prune")
         shutil.rmtree(session.session_dir, ignore_errors=True)
 
     def _sync_registry(self, session: _CliSession) -> None:
@@ -922,6 +1044,32 @@ class CodexCliBridge:
         text = CodexCliBridge._text(value, label)
         if not _SAFE_TOKEN.fullmatch(text):
             raise CodexCliBridgeError(f"invalid {label}")
+        return text
+
+    @staticmethod
+    def _optional_model(value: Any) -> str | None:
+        if value is None:
+            return None
+        text = str(value).strip()
+        if not text:
+            return None
+        if text.startswith("-") or "\\" in text or not _SAFE_REF.fullmatch(text):
+            raise CodexCliBridgeError("invalid Codex model")
+        if any(part == ".." for part in Path(text).parts):
+            raise CodexCliBridgeError("invalid Codex model")
+        return text
+
+    @staticmethod
+    def _optional_reasoning_effort(value: Any, model: str | None) -> str | None:
+        if value is None:
+            return None
+        text = str(value).strip()
+        if not text:
+            return None
+        if text not in _REASONING_EFFORTS:
+            raise CodexCliBridgeError("invalid Codex model_reasoning_effort")
+        if model == "gpt-5.6-luna" and text not in _LUNA_REASONING_EFFORTS:
+            raise CodexCliBridgeError("gpt-5.6-luna does not support that reasoning effort")
         return text
 
     @staticmethod

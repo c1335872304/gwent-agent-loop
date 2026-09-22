@@ -236,6 +236,9 @@ def check_agent_loop() -> None:
         "scripts.agent_loop.test_integration",
         "scripts.agent_loop.test_scheduler",
         "scripts.agent_loop.test_scheduler_backend",
+        "scripts.agent_loop.test_scheduler_control",
+        "scripts.agent_loop.test_control_mcp_server",
+        "scripts.agent_loop.test_control_runtime",
         "scripts.agent_loop.test_stage3_canary",
     )
 

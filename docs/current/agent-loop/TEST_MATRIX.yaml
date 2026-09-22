@@ -83,6 +83,10 @@ domains:
         command: "npm run build"
         cwd: "apps/web/frontend"
         evidence: "frontend production build"
+      - id: "product-static-html-canary"
+        command: "python3 -c \"from pathlib import Path; text = Path('apps/web/frontend/index.html').read_text(encoding='utf-8'); raise SystemExit(0 if 'data-agent-loop-canary=' in text else 1)\""
+        cwd: "."
+        evidence: "low-risk static Product canary marker is present"
     docker:
       compose_files: ["deploy/docker/compose.cpu.yml"]
       allowed_actions: ["config", "up", "down", "ps", "health", "logs"]

@@ -380,6 +380,29 @@ regression_test: "scripts/agent_loop/test_retry_learning.py"
 trigger_terms: ["retry learning", "learning delta", "STOP_NO_LEARNING", "重复失败", "retry gate"]
 ```
 
+### LL-017：CLI 的可恢复检查点是 `turn.started`，不是 `thread.started`
+
+```yaml
+id: "LL-017"
+status: "confirmed"
+discovered_at: "2026-09-22"
+task_id: "GW-SCHED-CTRL-001"
+scope: "loop | protocol"
+symptom: "拿到 thread_id 后立即 pause，codex exec resume 返回 no rollout found。"
+impact: "控制面会把尚未持久化的会话误标为可恢复，导致无效 resume 和额外模型消耗。"
+root_cause: "thread.started 只表示会话身份已分配；本地 CLI 在 turn.started 后才有可恢复的 rollout。"
+evidence:
+  - ref: ".agent-loop/control-canary/GW-SCHED-CTRL-001-20260922T140735Z/control/control-events.ndjson"
+    snapshot: "026bc04854a4ad88937dcd7556dd5fe5d4619929"
+  - ref: "scripts/agent_loop/codex_cli_bridge.py"
+correct_practice: "pause 前必须等待 bridge 的 durable resume checkpoint；只有收到 turn.started 才允许 interrupt。"
+verification:
+  - "scripts.agent_loop.test_codex_cli_bridge: durable checkpoint test"
+  - "GW-SCHED-CTRL-001 same-runner resume and independent Test PASS"
+regression_test: "scripts/agent_loop/test_codex_cli_bridge.py"
+trigger_terms: ["thread.started", "turn.started", "pause", "resume", "no rollout found"]
+```
+
 1. 先确认它不是已有 Skill、contract 或导航条目的重复内容；
 2. 保存最小可验证症状，不复制整段聊天或敏感日志；
 3. 记录来源和 snapshot；

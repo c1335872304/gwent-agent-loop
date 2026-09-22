@@ -19,12 +19,27 @@ import time
 from pathlib import Path
 
 args = sys.argv[1:]
+if args and args[0] == "exec":
+    normalized = ["exec"]
+    index = 1
+    while index < len(args):
+        item = args[index]
+        if item in {"--ignore-user-config"}:
+            index += 1
+            continue
+        if item in {"--model", "-m", "--config", "-c"}:
+            index += 2
+            continue
+        normalized.extend(args[index:])
+        break
+    args = normalized
 if args and args[0] == "exec" and len(args) > 1 and args[1] == "resume":
     args = ["exec", *args[2:]]
 if "-C" in args:
     os.chdir(args[args.index("-C") + 1])
 output = Path(args[args.index("--output-last-message") + 1])
 print(json.dumps({"type": "thread.started", "thread_id": "fake-thread"}), flush=True)
+print(json.dumps({"type": "turn.started"}), flush=True)
 if args and args[-1] == "sleep":
     time.sleep(30)
 Path("allowed.txt").write_text("changed\n", encoding="utf-8")
@@ -57,6 +72,55 @@ print(json.dumps(result, sort_keys=True))
 
 
 class CodexCliBridgeTests(unittest.TestCase):
+    def test_exec_command_places_user_config_isolation_after_exec_with_model(self):
+        with TemporaryDirectory() as temp:
+            bridge = CodexCliBridge(
+                {"project": temp},
+                codex_command=("codex",),
+                model="gpt-5.6-luna",
+                model_reasoning_effort="xhigh",
+            )
+            command = bridge._codex_exec_command(["exec", "resume", "thread-1", "--json"])
+            self.assertEqual(
+                command[:8],
+                [
+                    "codex",
+                    "exec",
+                    "--ignore-user-config",
+                    "--model",
+                    "gpt-5.6-luna",
+                    "--config",
+                    'model_reasoning_effort="xhigh"',
+                    "resume",
+                ],
+            )
+
+    def test_resume_keeps_exec_options_before_the_resume_subcommand(self):
+        with TemporaryDirectory() as temp:
+            bridge = CodexCliBridge({"project": temp})
+            command = bridge._codex_exec_command([
+                "exec",
+                "--sandbox",
+                "workspace-write",
+                "--output-last-message",
+                "result.json",
+                "resume",
+                "--json",
+                "thread-1",
+            ])
+            self.assertLess(command.index("--sandbox"), command.index("resume"))
+            self.assertLess(command.index("--output-last-message"), command.index("resume"))
+            self.assertGreater(command.index("--json"), command.index("resume"))
+
+    def test_rejects_luna_reasoning_effort_not_supported_by_model(self):
+        with TemporaryDirectory() as temp:
+            with self.assertRaisesRegex(CodexCliBridgeError, "gpt-5.6-luna"):
+                CodexCliBridge(
+                    {"project": temp},
+                    model="gpt-5.6-luna",
+                    model_reasoning_effort="ultra",
+                )
+
     def test_host_docker_sandbox_requires_explicit_test_capability(self):
         base = {
             "task": {"role": "test-verification"},
@@ -194,6 +258,13 @@ class CodexCliBridgeTests(unittest.TestCase):
             self.assertEqual(result["status"], "completed")
             closed = bridge.close_task(handle, report_ref=result["report_ref"])
             self.assertEqual(closed["changed_paths"], ["allowed.txt"])
+
+    def test_generic_test_scope_can_close_only_when_no_files_changed(self):
+        CodexCliBridge._validate_scope([], ("declared test scope only",))
+        with self.assertRaisesRegex(CodexCliBridgeError, "concrete write scope"):
+            CodexCliBridge._validate_scope(
+                ["apps/web/frontend/index.html"], ("declared test scope only",)
+            )
             self.assertEqual(closed["input_tokens"], 11)
             self.assertEqual(closed["output_tokens"], 7)
             self.assertGreater(closed["elapsed_seconds"], 0)
@@ -234,6 +305,7 @@ class CodexCliBridgeTests(unittest.TestCase):
             }
             handle = parse_codex_thread_handle(bridge.create_task(payload))
             self.assertEqual(bridge.wait_task(handle)["status"], "running")
+            self.assertTrue(bridge.wait_for_resume_checkpoint(handle, timeout_seconds=1))
             self.assertEqual(bridge.interrupt_task(handle, reason="bounded stop")["status"], "interrupted")
             self.assertEqual(bridge.resume_task(handle, artifact_refs=("change-report.json",))["status"], "running")
             for _ in range(20):
@@ -246,6 +318,57 @@ class CodexCliBridgeTests(unittest.TestCase):
             self.assertEqual(closed["changed_paths"], ["allowed.txt"])
             self.assertEqual(closed["input_tokens"], 11)
             self.assertEqual(closed["output_tokens"], 7)
+
+    def test_resume_directive_is_bound_to_the_original_worktree_and_runner(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "allowed.txt").write_text("base\n", encoding="utf-8")
+            subprocess.run(["git", "init", "-q", str(root)], check=True)
+            subprocess.run(["git", "-C", str(root), "config", "user.name", "Test"], check=True)
+            subprocess.run(["git", "-C", str(root), "config", "user.email", "test@example.com"], check=True)
+            subprocess.run(["git", "-C", str(root), "add", "allowed.txt"], check=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-qm", "base"], check=True)
+            base = subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip()
+            directives = root / "control"
+            bridge = CodexCliBridge(
+                {"project": root},
+                codex_command=(sys.executable, "-c", FAKE_CODEX),
+                worktree_root=root / "worktrees",
+                artifact_root=root / "artifacts",
+                resume_directive_root=directives,
+                startup_timeout=2,
+                stop_timeout=1,
+            )
+            payload = {
+                "protocol_version": 1,
+                "project_id": "project",
+                "target": {"type": "project", "environment": {"type": "worktree", "startingState": {"branchName": base}}},
+                "task": {"task_id": "TASK-DIRECTIVE", "attempt_id": "attempt-1", "role": "product", "snapshot": base, "write_scope": ["allowed.txt"]},
+                "prompt": "sleep",
+            }
+            handle = parse_codex_thread_handle(bridge.create_task(payload))
+            self.assertTrue(bridge.wait_for_resume_checkpoint(handle, timeout_seconds=2))
+            self.assertEqual(bridge.interrupt_task(handle, reason="pause for directive")["status"], "interrupted")
+            source = directives / "resume-directives" / "TASK-DIRECTIVE" / "r1-directive.json"
+            source.parent.mkdir(parents=True)
+            source.write_text(json.dumps({
+                "schema": "agent-loop.resume-directive.v1",
+                "task_id": "TASK-DIRECTIVE",
+                "task_revision": 1,
+                "runner_ref": handle.runner_ref,
+                "facts": [{"claim": "clarification", "source_ref": "task", "effect": "continue"}],
+            }), encoding="utf-8")
+            relative = bridge.materialize_resume_directive(handle, source)
+            self.assertEqual(relative, ".agent-loop/resume-directives/TASK-DIRECTIVE/r1-directive.json")
+            session = bridge._session(handle)
+            copied = session.worktree / relative
+            self.assertTrue(copied.is_file())
+            self.assertEqual(json.loads(copied.read_text(encoding="utf-8"))["runner_ref"], handle.runner_ref)
+            outside = root / "outside.json"
+            outside.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+            with self.assertRaisesRegex(CodexCliBridgeError, "outside"):
+                bridge.materialize_resume_directive(handle, outside)
+            bridge.cleanup_task(handle)
 
     def test_duplicate_detached_snapshot_uses_isolated_force_fallback(self):
         with TemporaryDirectory() as temp:
