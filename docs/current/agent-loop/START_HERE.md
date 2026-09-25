@@ -148,7 +148,12 @@ python3 scripts/agent_loop/run_stage3_live.py --help
 
 调度器只管理已经写入 runtime 配置的任务，不从主控自然语言生成 TaskPacket。当前
 主控工具可执行 `loop_inspect`、`loop_submit`、`loop_pause`、`loop_prepare_resume`、
-`loop_resume` 和 `loop_cancel`；先 `loop_inspect`，再按返回的 revision、runner_ref 和
+`loop_resume`、`loop_cancel`；`loop_update` 为主控提供一次调用式的补充指令传递入口。
+用户在当前聊天补充适用于活动子任务的知识时，主控先判断它是否改变目标、写入范围、
+contract、验收、预算或权限；若都不改变且任务身份明确，可调用 `loop_update`，无需用户
+另说“暂停”。工具会 inspect，必要时暂停，保存最小 ResumeDirective，再恢复同一 Runner。
+任务身份不清、已完成、revision/runner_ref 漂移或任何边界变化时停止为 `HUMAN_REQUIRED`。
+单独控制操作仍先 `loop_inspect`，再按返回的 revision、runner_ref 和
 状态决定下一步。暂停后只有补充信息不改变范围、contract、验收、预算或权限时，才可
 生成 ResumeDirective 并恢复同一 Runner；否则新建 TaskPacket revision 或
 `HUMAN_REQUIRED`。

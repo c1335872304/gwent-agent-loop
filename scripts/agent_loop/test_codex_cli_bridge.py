@@ -306,7 +306,16 @@ class CodexCliBridgeTests(unittest.TestCase):
             handle = parse_codex_thread_handle(bridge.create_task(payload))
             self.assertEqual(bridge.wait_task(handle)["status"], "running")
             self.assertTrue(bridge.wait_for_resume_checkpoint(handle, timeout_seconds=1))
-            self.assertEqual(bridge.interrupt_task(handle, reason="bounded stop")["status"], "interrupted")
+            # Model a usage observation received before the pause. The pause
+            # response must carry cumulative counters rather than implicit 0s.
+            session = bridge._session(handle)
+            session.input_tokens = 19
+            session.output_tokens = 5
+            interrupted = bridge.interrupt_task(handle, reason="bounded stop")
+            self.assertEqual(interrupted["status"], "interrupted")
+            self.assertEqual(interrupted["input_tokens"], 19)
+            self.assertEqual(interrupted["output_tokens"], 5)
+            self.assertGreater(interrupted["elapsed_seconds"], 0)
             self.assertEqual(bridge.resume_task(handle, artifact_refs=("change-report.json",))["status"], "running")
             for _ in range(20):
                 result = bridge.wait_task(handle)

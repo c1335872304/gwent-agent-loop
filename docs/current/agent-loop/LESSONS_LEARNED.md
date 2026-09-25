@@ -403,6 +403,31 @@ regression_test: "scripts/agent_loop/test_codex_cli_bridge.py"
 trigger_terms: ["thread.started", "turn.started", "pause", "resume", "no rollout found"]
 ```
 
+### LL-018：暂停事件必须返回累计 Runner 指标
+
+```yaml
+id: "LL-018"
+status: "confirmed"
+discovered_at: "2026-09-26"
+task_id: "GW-LOOP-UPDATE-20260926-002 / GW-LOOP-UPDATE-20260926-003"
+scope: "loop | protocol"
+symptom: "MCP 在 Runner 运行一段时间后请求暂停，控制层收到 elapsed_seconds=0，单调性校验拒绝事件并把任务阻断。"
+impact: "无法执行聊天补充信息的自动 pause → ResumeDirective → same-Runner resume；CLI 子任务被中断，不能安全续跑。"
+root_cause: "CodexCliBridge.interrupt_task 只返回 status/reason；CodexHostTransport 将缺失的累计 token/耗时默认为 0，ExecutionRecord 因指标倒退拒绝暂停事件。"
+evidence:
+  - ref: ".agent-loop/control-canary/GW-LOOP-UPDATE-20260926-002/control/control-events.ndjson"
+    snapshot: "d5e9554c7041cdb54cc2f15c12dc5934994f2bb1"
+  - ref: ".agent-loop/control-canary/GW-LOOP-UPDATE-20260926-002/scheduler.json"
+    snapshot: "d5e9554c7041cdb54cc2f15c12dc5934994f2bb1"
+  - ref: "scripts/agent_loop/codex_cli_bridge.py"
+correct_practice: "Host 每次返回生命周期事件时都要携带累计 token 和耗时；暂停事件复用 CodexCliBridge._metrics，而不是只返回状态。指标单调性校验保持严格。"
+verification:
+  - "scripts.agent_loop.test_codex_cli_bridge.test_interrupt_and_resume_reuse_the_same_thread asserts elapsed and cumulative token values"
+  - "GW-LOOP-UPDATE-20260926-003 completed pause → ResumeDirective → same-Runner resume and independent Test PASS"
+regression_test: "scripts/agent_loop/test_codex_cli_bridge.py"
+trigger_terms: ["pause metrics", "elapsed_seconds moved backwards", "interrupt", "same-runner resume"]
+```
+
 1. 先确认它不是已有 Skill、contract 或导航条目的重复内容；
 2. 保存最小可验证症状，不复制整段聊天或敏感日志；
 3. 记录来源和 snapshot；

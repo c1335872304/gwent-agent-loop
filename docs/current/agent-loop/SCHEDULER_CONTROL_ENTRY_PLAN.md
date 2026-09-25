@@ -1,8 +1,9 @@
 # 调度器控制入口实施计划
 
-> **状态：阶段一、阶段二均已完成。真实 WSL 服务已启动，主控用户级 MCP 已注册，
-> `GW-SCHED-CTRL-001` 已完成 Owner → pause → inspect → ResumeDirective → same-Runner
-> resume → 独立 Test → RunManifest 闭环；阶段三仍为可选宿主升级。**
+> **状态：阶段一、阶段二基础闭环已完成。真实 WSL 服务和主控用户级 MCP 已验证；
+> `GW-SCHED-CTRL-001` 完成 Owner → pause → ResumeDirective → same-Runner resume →
+> 独立 Test → RunManifest。新增聊天补充信息入口 `loop_update` 已通过实时 MCP stdio
+> 同 Runner 递送 canary；自动主控调用和该扩展的标准 RunManifest 尚未验证。阶段三仍为可选宿主升级。**
 >
 > 本文只规划“用户 / 主控如何安全操控已持久化的串行 Agent Loop”。它不改变
 > 当前的领域路由、Skill、测试独立性、预算、恢复策略或自进化晋级规则。
@@ -235,8 +236,13 @@ submit Owner
 ```
 
 **现场实现：** 已新增零第三方依赖的
-`scripts/agent_loop/control_mcp_server.py`，只公开 `loop_inspect`、`loop_submit`、
-`loop_pause`、`loop_prepare_resume`、`loop_resume`、`loop_cancel` 六项动作。`loop_submit`
+`scripts/agent_loop/control_mcp_server.py`，公开 `loop_inspect`、`loop_submit`、
+`loop_update`、`loop_pause`、`loop_prepare_resume`、`loop_resume`、`loop_cancel` 七项工具。`loop_update`
+用于主控把当前用户消息中的结构化补充指令送给指定活动任务：它先查询持久化身份；
+任务运行时暂停原 Runner，再写入 ResumeDirective 并恢复同一 Runner；已暂停任务则从写入
+ResumeDirective 开始。该工具不解析自然语言、不判断任务范围是否安全，主控必须先作边界判断；
+它也不接受整段父对话，只接受 `claim/source_ref/effect` 事实条目。每一步均沿用原控制 API，
+按 task revision、runner_ref 和幂等键约束。`loop_submit`
 只提交 `runtime.json` 中已声明的 LaunchSpec，不能从自然语言上传或生成新
 TaskPacket；所有写动作固定标为 `main_control` 并携带新幂等键。它必须作为**主控宿主的用户级 MCP 配置**单独注册，
 不得写进项目 `.codex/config.toml`；否则子任务可能继承该配置。`CodexCliBridge` 已对
@@ -269,19 +275,27 @@ python3 scripts/agent_loop/agent_loop_control.py serve \
 [mcp_servers.agentLoopControl]
 command = "python3"
 args = ["/absolute/repo/scripts/agent_loop/control_mcp_server.py", "--socket", "/absolute/state/control.sock", "--token-file", "/absolute/state/token"]
-enabled_tools = ["loop_inspect", "loop_submit", "loop_pause", "loop_prepare_resume", "loop_resume", "loop_cancel"]
+enabled_tools = ["loop_inspect", "loop_submit", "loop_update", "loop_pause", "loop_prepare_resume", "loop_resume", "loop_cancel"]
 default_tools_approval_mode = "prompt"
 ```
 
 这与官方的本地 STDIO MCP 配置模型一致；Desktop、CLI 和 IDE 会共享同一宿主配置，
 所以隔离 Owner/Test 的 `--ignore-user-config` 是实际安全边界，而非文档约定。
 
-`GW-SCHED-CTRL-001` 已在真实 WSL 完成验收：控制服务通过私有 Unix socket 启动，
+`GW-SCHED-CTRL-001` 已在真实 WSL 完成基础验收：控制服务通过私有 Unix socket 启动，
 用户级 `agent-loop-control` MCP 注册指向同一服务；主控依次执行 submit、inspect、
 pause、prepare-resume、resume 和 inspect。Owner 在 `turn.started` 后被暂停，避免了
 CLI 尚未生成可恢复 rollout 时的错误；ResumeDirective 与同一 `runner_ref` 绑定，恢复
 后 Owner 只提交 `apps/web/frontend/index.html`，独立 Test 从 Owner final snapshot 开始并
-返回 `PASS`。完整 RunManifest、TestReport 和控制事件留在忽略的运行目录，摘要见
+返回 `PASS`。之后的 `GW-LOOP-UPDATE-20260926-003` 以新的运行目录验证 `loop_update`：
+主控通过真实 MCP stdio 提交补充值 `from-main`；工具自动 inspect、暂停活动 Owner、
+持久化 ResumeDirective 并恢复同一 `runner_ref`。Owner 的最终提交 `79c4879` 只改
+`apps/web/frontend/index.html`，且包含指定值；独立只读 Test Agent 从最终快照验证并返回
+`PASS`。暂停事件保留了累计耗时，Runner 完成一次 resume，记录 316,518 输入 token、
+3,377 输出 token和约 97 秒 Owner 执行时间。该扩展 canary 尚未生成标准集成 RunManifest，
+Test Agent 也未通过 Scheduler 另行调度；它验证了指令传递和应用，不证明新的主控模型
+会在任意对话中自动选择该工具。基础闭环的完整 RunManifest、TestReport 和控制事件留在
+忽略的运行目录，摘要见
 [`PILOT_019_REPORT.md`](PILOT_019_REPORT.md)。该 runtime 只承载其声明的 TaskPacket；
 下一个任务必须使用新的状态根和 runtime 配置重启服务，不能把自然语言直接塞进旧服务。
 

@@ -1,9 +1,10 @@
 """Run a live Scheduler-control Owner -> Test canary.
 
-The canary proves the main-control entry can submit, inspect, pause,
-prepare-resume, and resume one declared Product task through the local
-Scheduler control service.  It then launches an independent Test Agent from
-the Owner final snapshot and writes a RunManifest.
+The canary proves the main-control entry can submit and inspect one declared
+Product task, deliver a post-start user supplement through ``loop_update``,
+and resume the same Runner through the local Scheduler control service.  It
+then launches an independent Test Agent from the Owner final snapshot and
+writes a RunManifest.
 
 It intentionally writes only a static marker in ``apps/web/frontend/index.html``
 inside Codex-managed child worktrees.  The caller's parent worktree is not
@@ -13,6 +14,7 @@ modified by the Owner/Test tasks.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import subprocess
@@ -71,6 +73,8 @@ OWNER_ATTEMPT_ID = "owner-control-001"
 TEST_ATTEMPT_ID = "test-control-001"
 COMMAND_ID = "product-static-html-canary"
 CANARY_MARKER = 'data-agent-loop-canary="GW-SCHED-CTRL-001"'
+CANARY_ATTRIBUTE = "data-agent-loop-canary"
+CANARY_SUPPLEMENT_VALUE = "from-main"
 
 
 class McpControlClient:
@@ -113,6 +117,7 @@ class McpControlClient:
         expected = {
             "loop_inspect",
             "loop_submit",
+            "loop_update",
             "loop_pause",
             "loop_prepare_resume",
             "loop_resume",
@@ -247,8 +252,9 @@ def _packet(snapshot: str, *, task_root: str, verification_command: str) -> dict
         "revision": 1,
         "title": "Scheduler control canary: static Product marker",
         "requested_outcome": (
-            "In apps/web/frontend/index.html, add the static marker "
-            f"{CANARY_MARKER!r} to the existing root div and change no other file."
+            "In apps/web/frontend/index.html, add a static "
+            f"{CANARY_ATTRIBUTE!r} attribute to the existing root div and change no other file. "
+            "Its value will be supplied after the task starts; wait for that clarification."
         ),
         "non_goals": [
             "Do not change React source, backend code, Core contracts, Teacher behavior, package files, or tests.",
@@ -305,7 +311,7 @@ def _packet(snapshot: str, *, task_root: str, verification_command: str) -> dict
         },
         "acceptance": {
             "behavioral": [
-                f"`apps/web/frontend/index.html` root div contains {CANARY_MARKER}.",
+                f"`apps/web/frontend/index.html` root div contains `{CANARY_ATTRIBUTE}` with the value supplied after task start.",
                 "No other path changes in the Owner final snapshot.",
             ],
             "verification_commands": [verification_command],
@@ -348,11 +354,11 @@ def _context(snapshot: str) -> dict[str, Any]:
         },
         "problem_model": {
             "current_behavior": "Scheduler control entry lacks one live Owner/Test canary.",
-            "expected_behavior": "Main control can submit, pause, prepare-resume and resume an Owner, then run independent Test.",
+            "expected_behavior": "Main control can submit an Owner, deliver a post-start clarification through loop_update, and run independent Test.",
             "user_visible_impact": "Proves control entry without modifying parent worktree.",
             "hypotheses": [
                 {
-                    "statement": "A static Product marker is enough to exercise Product Owner and independent Test boundaries.",
+                    "statement": "A static Product attribute is enough to exercise post-start update delivery and independent Test boundaries.",
                     "status": "inferred",
                     "evidence_ref": "docs/current/agent-loop/SCHEDULER_CONTROL_ENTRY_PLAN.md",
                 }
@@ -411,6 +417,7 @@ def _manifest(
     verifier_record: Any,
     test_report_ref: str,
     test_report: Mapping[str, Any],
+    resume_directive_ref: str,
     state_events: list[dict[str, Any]],
     manifest_path: Path,
 ) -> dict[str, Any]:
@@ -457,12 +464,13 @@ def _manifest(
         "artifacts": [
             _artifact(owner_record.report_ref, kind="change_report", attempt_id=OWNER_ATTEMPT_ID, snapshot=owner_record.final_snapshot or base_snapshot),
             _artifact(test_report_ref, kind="test_report", attempt_id=TEST_ATTEMPT_ID, snapshot=final_snapshot),
+            _artifact(resume_directive_ref, kind="decision", attempt_id="main-control", snapshot=base_snapshot),
         ],
         "retry_learning": summarize_retry_learning(role_runs),
         "state_events": state_events,
         "gates": [
             {"gate_id": "control-submit", "kind": "control", "status": "passed", "evidence_refs": [], "decided_by": "main_control", "decided_at": _now()},
-            {"gate_id": "control-pause-resume", "kind": "recovery", "status": "passed", "evidence_refs": [], "decided_by": "main_control", "decided_at": _now()},
+            {"gate_id": "control-pause-resume", "kind": "recovery", "status": "passed", "evidence_refs": [resume_directive_ref], "decided_by": "main_control", "decided_at": _now()},
             {"gate_id": "test", "kind": "test", "status": "passed", "evidence_refs": [test_report_ref], "decided_by": "test-verification", "decided_at": _now()},
         ],
         "termination": {
@@ -633,6 +641,7 @@ def _finish_existing_canary(*, root: Path, state_root: Path, project_id: str) ->
         verifier_record=verifier_record,
         test_report_ref=verifier_report_ref,
         test_report=test_report,
+        resume_directive_ref=_latest_resume_artifact_ref(state_root),
         state_events=_state_events(1),
         manifest_path=manifest_path,
     )
@@ -780,40 +789,22 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         ):
             raise RuntimeError("Owner did not reach the Codex CLI resume checkpoint before timeout")
 
-        control_client.call(
-            "loop_pause",
+        update_result = control_client.call(
+            "loop_update",
             {
                 "task_id": TASK_ID,
-                "expected_revision": 1,
-                "expected_runner_ref": runner_ref,
-                "reason": "canary pause after submit",
-            },
-        )
-        prepared = control_client.call(
-            "loop_prepare_resume",
-            {
-                "task_id": TASK_ID,
-                "expected_revision": 1,
-                "expected_runner_ref": runner_ref,
-                "reason": "canary supplement does not change task scope",
+                "reason": "deliver the canary's post-start clarification",
                 "facts": [
                     {
-                        "claim": "Continue the same static Product marker task.",
-                        "source_ref": task_packet_ref,
-                        "effect": "No TaskPacket revision, write scope, contract, or acceptance change.",
+                        "claim": f'Set `{CANARY_ATTRIBUTE}` to "{CANARY_SUPPLEMENT_VALUE}".',
+                        "source_ref": "canary:user-supplement-after-owner-start",
+                        "effect": "Supplies the unspecified attribute value; task goal, write scope, contracts, and budgets remain unchanged.",
                     }
                 ],
             },
         )
-        control_client.call(
-            "loop_resume",
-            {
-                "task_id": TASK_ID,
-                "expected_revision": 1,
-                "expected_runner_ref": runner_ref,
-                "reason": "resume same Runner for canary",
-            },
-        )
+        if not update_result.get("same_runner_resumed") or update_result.get("runner_ref") != runner_ref:
+            raise RuntimeError(f"loop_update did not resume the same Runner: {update_result}")
 
         final_owner = {}
         while time.monotonic() <= deadline:
@@ -869,6 +860,44 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         max_elapsed_minutes=30,
         docker_enabled=False,
     )
+    # The verifier receives only the final snapshot plus the minimum clarified
+    # fact needed to check it.  The concrete value is deliberately absent from
+    # the Owner's original TaskPacket and ContextBrief.
+    verification_packet = copy.deepcopy(dict(test_spec.task_packet))
+    verification_acceptance = dict(verification_packet.get("acceptance", {}))
+    verification_acceptance["behavioral"] = [
+        f"`apps/web/frontend/index.html` root div contains {CANARY_MARKER}.",
+        "No other path changes in the Owner final snapshot.",
+    ]
+    verification_packet["acceptance"] = verification_acceptance
+    verification_context = copy.deepcopy(dict(test_spec.context_brief))
+    verification_facts = list(verification_context.get("fact_ledger", []))
+    verification_facts.append(
+        {
+            "fact": f'Set `{CANARY_ATTRIBUTE}` to "{CANARY_SUPPLEMENT_VALUE}".',
+            "status": "confirmed",
+            "source_ref": "canary:user-supplement-after-owner-start",
+            "snapshot": handoff.final_snapshot,
+        }
+    )
+    verification_context["fact_ledger"] = verification_facts
+    _write_json(inputs / "verification-task.json", verification_packet)
+    _write_json(inputs / "verification-context.json", verification_context)
+    test_spec = build_launch_spec(
+        task_packet=verification_packet,
+        context_brief=verification_context,
+        profile=copy.deepcopy(dict(test_spec.profile)),
+        task_packet_ref=test_spec.task_packet_ref,
+        context_brief_ref=test_spec.context_brief_ref,
+        profile_ref=test_spec.profile_ref,
+        attempt_id=TEST_ATTEMPT_ID,
+        write_scope=test_spec.request.write_scope,
+        max_turns=test_spec.request.max_turns,
+        max_input_tokens=test_spec.max_input_tokens,
+        max_output_tokens=test_spec.max_output_tokens,
+        max_elapsed_minutes=test_spec.max_elapsed_minutes,
+        subtask_depth=test_spec.subtask_depth,
+    )
     transport = CodexHostTransport(project_id=args.project_id, project_is_git=True, bridge=runtime.bridge)
     verifier = RunnerExecution(
         ExternalRunnerAdapter(test_spec, transport),
@@ -894,6 +923,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         verifier_record=verifier.record,
         test_report_ref=verifier_event.report_ref,
         test_report=test_report,
+        resume_directive_ref=str(update_result.get("resume_artifact_ref") or ""),
         state_events=_state_events(1),
         manifest_path=manifest_path,
     )
@@ -904,7 +934,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "owner_final_snapshot": owner_record.final_snapshot,
         "test_final_snapshot": verifier.record.final_snapshot,
         "runner_ref": runner_ref,
-        "resume_artifact_ref": prepared.get("resume_artifact_ref"),
+        "resume_artifact_ref": update_result.get("resume_artifact_ref"),
         "owner_report": owner_record.report_ref,
         "test_report": verifier_event.report_ref,
         "manifest": str(manifest_path),

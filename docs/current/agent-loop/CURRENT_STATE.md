@@ -1,7 +1,7 @@
 # Agent Loop Current State
 
 > **Canonical current-state document**
-> **Last verified:** 2026-09-22
+> **Last verified:** 2026-09-26
 > **Status:** Stage 3 本地 Codex CLI Host-backed 多角色串行 canary 已通过；Scheduler 控制入口已在真实 WSL 启动、注册为主控的用户级 MCP，并完成同一 Runner 的 Owner → pause → inspect → ResumeDirective → resume → 独立 Test 现场 canary；E4 固定回归已获人工批准，E5 因缺少至少两个独立结构化 Lesson 暂时阻塞，E6 仍关闭；本地隔离分支已加入 Retry Learning Gate；外部 `main` 同步状态以本次提交后的 Git 记录为准；未明确批准的父工作树变更仍保持人工 gate
 > **Three-stage roadmap:** [`IDEAL_LOOP_3_STAGE_PLAN.md`](IDEAL_LOOP_3_STAGE_PLAN.md)
 
@@ -43,20 +43,28 @@ condition.
 
 ## Verified evidence
 
-- Architecture gate: 184 deterministic Agent Loop tests passed against the current local snapshot;
-- Documentation links: 483 local links passed against the local documentation snapshot;
+- Architecture gate: 192 deterministic Agent Loop tests passed against the current local snapshot;
+- Documentation links: 485 local links passed against the local documentation snapshot;
 - Historical Docker canonical pytest: 145 tests passed, with 2 existing warnings;
 - Pilot 018 budget: input `973,240 / 1,000,000`, output `17,654 / 64,000`,
   elapsed `364.257s`, 4 model turns; budget gate passed;
-- Python syntax gate: 140 files passed against the current local snapshot;
+- Python syntax gate: 141 files passed against the current local snapshot;
 - Scheduler control entry: protocol/runtime/MCP tests passed, MCP stdio catalog exposes
-  `loop_inspect`, `loop_submit`, `loop_pause`, `loop_prepare_resume`,
+  `loop_inspect`, `loop_submit`, `loop_update`, `loop_pause`, `loop_prepare_resume`,
   `loop_resume` and `loop_cancel`, and an unsandboxed local Unix socket smoke
   returned `TASK-SOCKET` as `running` without starting a model. The managed
   Codex sandbox still denies Unix socket bind/connect, so socket evidence was
   collected from the real WSL host. The local service is live on a private Unix
   socket and `agent-loop-control` is registered in the user-level Codex MCP
-  configuration; Owner/Test still use `--ignore-user-config`;
+  configuration; Owner/Test still use `--ignore-user-config`. The `loop_update`
+  composite tool passes its targeted MCP regressions and the architecture
+  gate. Live canary `GW-LOOP-UPDATE-20260926-003` exercised MCP stdio
+  inspect → pause → persist directive → resume-same-runner: Owner applied the
+  withheld value `from-main`, closed at snapshot `79c4879`, and an independent
+  read-only Test Agent returned PASS. The exact base-to-final Git diff contains
+  only `apps/web/frontend/index.html`. This validates delivery and application,
+  but not automatic tool selection by a fresh main conversation; this canary
+  also did not emit the standard integrated RunManifest;
 - Scheduler control live canary `GW-SCHED-CTRL-001`: Product Owner was created
   from `026bc048`, explicitly paused only after the durable `turn.started`
   checkpoint, inspected by the control client, resumed through a persisted
@@ -138,7 +146,7 @@ condition.
 | Codex project-task request | builder implemented | `codex_bridge.py`, `CODEX_TRANSPORT.md` |
 | Host lifecycle mapping | implemented with injected bridge | `codex_host_transport.py` |
 | Real Codex create / wait / resume / close | implemented via Codex CLI bridge | `codex_cli_bridge.py` |
-| Scheduler control entry for main control | protocol, CLI, Runtime assembly, MCP adapter, real WSL service, user-level MCP registration and real Owner → Test control canary passed; App stop button remains intentionally unconnected | `control_protocol.py`, `control_service.py`, `agent_loop_control.py`, `control_runtime.py`, `control_mcp_server.py`, `PILOT_019_REPORT.md` |
+| Scheduler control entry for main control | explicit control flow has a real WSL Owner → Test canary; `loop_update` also passed a live MCP stdio same-Runner delivery canary, but fresh-main automatic invocation and standard integrated RunManifest remain unverified; App stop button remains unconnected | `control_protocol.py`, `control_service.py`, `agent_loop_control.py`, `control_runtime.py`, `control_mcp_server.py`, `PILOT_019_REPORT.md`, ignored `GW-LOOP-UPDATE-20260926-003` evidence |
 | Single-domain Owner -> Test orchestration | implemented with bounded waits and evidence gates | `bounded_loop.py` |
 | Main scheduler calling the real platform | real Product create, separate-process rebind, Teacher review, two independent Docker Test runs, isolated integration and rollback passed; direct parent mutation remains human-owned | `scheduler_backend.py`, `codex_cli_bridge.py`, `PILOT_018_REPORT.md` |
 | Worktree integration planning, conflict/scope detection and rollback rehearsal | implemented; disjoint isolated auto-integration and isolated rollback passed, direct parent mutation remains human-owned | `integration.py`, `INTEGRATION_MANIFEST_TEMPLATE.yaml`, `archive/pilots/PILOT_006_REPORT.md`, `archive/pilots/PILOT_007_REPORT.md` |

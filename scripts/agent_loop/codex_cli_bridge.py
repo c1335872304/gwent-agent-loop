@@ -298,7 +298,11 @@ class CodexCliBridge:
             self._stop(session)
             session.status = "interrupted"
             self._sync_registry(session)
-            return {"status": "interrupted", "reason": str(reason)}
+            return self._metrics(
+                session,
+                status="interrupted",
+                reason=str(reason),
+            )
         return self._finished(session)
 
     def wait_for_resume_checkpoint(
